@@ -126,7 +126,10 @@ it('keeps Domain modules out of each other\'s internals', function () {
         foreach ($uses as [, $otherModule, $layer]) {
             $allowed = in_array($layer, ['Actions', 'Queries', 'Data'], true);
 
-            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed) {
+            // Shared is the foundation every module builds on; it alone may use Audit.
+            $sharedUsesAudit = $module === 'Shared' && $otherModule === 'Audit';
+
+            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit) {
                 $offenders[] = "{$path} uses {$otherModule}\\{$layer}";
             }
         }

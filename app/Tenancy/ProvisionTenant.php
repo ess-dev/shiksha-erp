@@ -2,6 +2,9 @@
 
 namespace App\Tenancy;
 
+use App\Domain\Audit\AuditRecorder;
+use App\Domain\Audit\Data\AuditEntry;
+use App\Domain\Audit\Enums\AuditScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,6 +39,16 @@ class ProvisionTenant
             $landlord->statement('CREATE DATABASE '.$landlord->getQueryGrammar()->wrap($databaseName));
 
             $this->migrate($tenant);
+
+            app(AuditRecorder::class)->record(
+                new AuditEntry('platform.tenant_provisioned', 'tenant', $tenant->ulid, null, [
+                    'name' => $tenant->name,
+                    'subdomain' => $tenant->subdomain,
+                    'status' => $status,
+                ]),
+                AuditScope::Platform,
+                $tenant->id,
+            );
         } catch (Throwable $e) {
             $this->rollBack($tenant);
 
