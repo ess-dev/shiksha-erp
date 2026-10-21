@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureActiveMembership;
 use App\Http\Middleware\EnsureModuleInPlan;
 use App\Http\Middleware\EnsureSchoolIsAvailable;
 use App\Http\Middleware\HandleAppearance;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            EnsureActiveMembership::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
