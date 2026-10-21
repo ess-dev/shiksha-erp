@@ -2,6 +2,7 @@
 
 namespace App\Tenancy;
 
+use Illuminate\Support\Facades\DB;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 
 /**
@@ -15,7 +16,7 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  * @property string $database_name
  * @property string|null $database_username
  * @property string|null $database_password
- * @property string $status
+ * @property TenantStatus $status
  */
 class Tenant extends BaseTenant
 {
@@ -46,6 +47,7 @@ class Tenant extends BaseTenant
         return [
             'database_username' => 'encrypted',
             'database_password' => 'encrypted',
+            'status' => TenantStatus::class,
         ];
     }
 
@@ -57,5 +59,22 @@ class Tenant extends BaseTenant
     public function getRouteKeyName(): string
     {
         return 'ulid';
+    }
+
+    public function isAccessible(): bool
+    {
+        return $this->status->allowsAccess();
+    }
+
+    /**
+     * Whether the school's plan includes the module (plan gating).
+     */
+    public function hasModule(string $module): bool
+    {
+        return DB::connection(config('multitenancy.landlord_database_connection_name'))
+            ->table('tenant_modules')
+            ->where('tenant_id', $this->id)
+            ->where('module', $module)
+            ->exists();
     }
 }

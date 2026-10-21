@@ -14,12 +14,10 @@ use Throwable;
  */
 class ProvisionTenant
 {
-    public const SUBDOMAIN_PATTERN = '/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/';
-
     public function handle(string $name, string $subdomain, string $status = 'trial'): Tenant
     {
-        if (! preg_match(self::SUBDOMAIN_PATTERN, $subdomain)) {
-            throw new InvalidArgumentException("Invalid subdomain [{$subdomain}].");
+        if (! SubdomainRules::isValid($subdomain)) {
+            throw new InvalidArgumentException("Invalid or reserved subdomain [{$subdomain}].");
         }
 
         $ulid = strtolower((string) Str::ulid());

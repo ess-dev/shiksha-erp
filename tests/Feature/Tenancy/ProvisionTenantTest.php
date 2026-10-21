@@ -61,4 +61,30 @@ class ProvisionTenantTest extends TestCase
 
         app(ProvisionTenant::class)->handle('Bad', 'Bad_Name');
     }
+
+    public function test_reserved_subdomain_is_rejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        app(ProvisionTenant::class)->handle('Platform', 'admin');
+    }
+
+    public function test_data_in_one_school_is_invisible_from_another(): void
+    {
+        $a = app(ProvisionTenant::class)->handle('School A', 'school-a');
+        $b = app(ProvisionTenant::class)->handle('School B', 'school-b');
+
+        $a->execute(function () {
+            DB::connection('tenant')->statement('CREATE TABLE isolation_probe (name text)');
+            DB::connection('tenant')->table('isolation_probe')->insert(['name' => 'only in A']);
+        });
+
+        $b->execute(function () {
+            $this->assertFalse(DB::connection('tenant')->getSchemaBuilder()->hasTable('isolation_probe'));
+        });
+
+        $a->execute(function () {
+            $this->assertSame(1, DB::connection('tenant')->table('isolation_probe')->count());
+        });
+    }
 }

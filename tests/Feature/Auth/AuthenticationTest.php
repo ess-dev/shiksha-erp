@@ -6,10 +6,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
+use Tests\Concerns\HasCurrentSchool;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
+    use HasCurrentSchool;
     use RefreshDatabase;
 
     public function test_login_screen_can_be_rendered()
