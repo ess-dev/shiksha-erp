@@ -13,7 +13,8 @@ use InvalidArgumentException;
  * Platform data: the permission catalog and the versioned role templates.
  * Safe to re-run: permissions are updated in place; a template version that
  * already exists is left alone, so changing a template means adding a new
- * version (bump its "version" and describe the change in "changelog").
+ * version (a new entry under its "versions" with a changelog). Schools then
+ * see "update available" for roles copied from the older version.
  *
  * illustrative — verify: the permission list and template contents are
  * starting points until the product domain is settled.
@@ -21,73 +22,115 @@ use InvalidArgumentException;
 class AccessCatalogSeeder extends Seeder
 {
     /**
-     * key => [module, risk, owner-only, description]
+     * key => [module, risk, owner-only, description, since template version]
      *
-     * @var array<string, array{0: string, 1: string, 2: bool, 3: string}>
+     * @var array<string, array{0: string, 1: string, 2: bool, 3: string, 4: int}>
      */
     private const PERMISSIONS = [
-        'roles.manage' => ['core', 'critical', true, 'Create and edit roles and their permissions'],
-        'roles.assign' => ['core', 'sensitive', false, 'Give roles to staff within your own reach'],
-        'roles.view' => ['core', 'normal', false, 'See roles and who holds them'],
-        'staff.view' => ['core', 'normal', false, 'See staff records'],
-        'staff.manage' => ['core', 'sensitive', false, 'Add and edit staff records'],
-        'settings.manage' => ['core', 'sensitive', false, 'Change school settings'],
-        'audit.view' => ['core', 'sensitive', false, 'See the audit trail'],
-        'students.view' => ['students', 'normal', false, 'See students'],
-        'students.manage' => ['students', 'sensitive', false, 'Add and edit students'],
-        'students.view_sensitive' => ['students', 'sensitive', false, 'See guardian phones, documents and medical notes'],
-        'admissions.view' => ['admissions', 'normal', false, 'See admission applications'],
-        'admissions.manage' => ['admissions', 'sensitive', false, 'Process admissions'],
-        'attendance.view' => ['attendance', 'normal', false, 'See attendance'],
-        'attendance.mark' => ['attendance', 'normal', false, 'Mark attendance'],
-        'leave.approve' => ['leave', 'normal', false, 'Approve student leave'],
-        'fees.view' => ['fees', 'normal', false, 'See fee invoices and payments'],
-        'fees.collect' => ['fees', 'sensitive', false, 'Record fee payments'],
-        'fees.refund' => ['fees', 'critical', false, 'Refund fee payments'],
-        'fee_structures.manage' => ['fees', 'sensitive', false, 'Edit fee structures'],
-        'concessions.apply' => ['fees', 'sensitive', false, 'Apply fee concessions'],
-        'exams.view' => ['exams', 'normal', false, 'See exams and marks'],
-        'marks.enter' => ['exams', 'normal', false, 'Enter marks'],
-        'results.publish' => ['exams', 'sensitive', false, 'Publish results'],
-        'notices.view' => ['communication', 'normal', false, 'See notices'],
-        'notices.send' => ['communication', 'normal', false, 'Send notices'],
-        'homework.view' => ['homework', 'normal', false, 'See homework'],
-        'homework.assign' => ['homework', 'normal', false, 'Assign homework'],
+        'roles.manage' => ['core', 'critical', true, 'Create and edit roles and their permissions', 1],
+        'roles.assign' => ['core', 'sensitive', false, 'Give roles to staff within your own reach', 1],
+        'roles.view' => ['core', 'normal', false, 'See roles and who holds them', 1],
+        'staff.view' => ['core', 'normal', false, 'See staff records', 1],
+        'staff.manage' => ['core', 'sensitive', false, 'Add and edit staff records', 1],
+        'settings.manage' => ['core', 'sensitive', false, 'Change school settings', 1],
+        'audit.view' => ['core', 'sensitive', false, 'See the audit trail', 1],
+        'structure.view' => ['core', 'normal', false, 'See campuses, academic years, classes, sections and subjects', 2],
+        'structure.manage' => ['core', 'sensitive', false, 'Set up campuses, academic years, classes, sections and subjects', 2],
+        'students.view' => ['students', 'normal', false, 'See students', 1],
+        'students.manage' => ['students', 'sensitive', false, 'Add and edit students', 1],
+        'students.view_sensitive' => ['students', 'sensitive', false, 'See guardian phones, documents and medical notes', 1],
+        'admissions.view' => ['admissions', 'normal', false, 'See admission applications', 1],
+        'admissions.manage' => ['admissions', 'sensitive', false, 'Process admissions', 1],
+        'attendance.view' => ['attendance', 'normal', false, 'See attendance', 1],
+        'attendance.mark' => ['attendance', 'normal', false, 'Mark attendance', 1],
+        'leave.approve' => ['leave', 'normal', false, 'Approve student leave', 1],
+        'fees.view' => ['fees', 'normal', false, 'See fee invoices and payments', 1],
+        'fees.collect' => ['fees', 'sensitive', false, 'Record fee payments', 1],
+        'fees.refund' => ['fees', 'critical', false, 'Refund fee payments', 1],
+        'fee_structures.manage' => ['fees', 'sensitive', false, 'Edit fee structures', 1],
+        'concessions.apply' => ['fees', 'sensitive', false, 'Apply fee concessions', 1],
+        'exams.view' => ['exams', 'normal', false, 'See exams and marks', 1],
+        'marks.enter' => ['exams', 'normal', false, 'Enter marks', 1],
+        'results.publish' => ['exams', 'sensitive', false, 'Publish results', 1],
+        'notices.view' => ['communication', 'normal', false, 'See notices', 1],
+        'notices.send' => ['communication', 'normal', false, 'Send notices', 1],
+        'homework.view' => ['homework', 'normal', false, 'See homework', 1],
+        'homework.assign' => ['homework', 'normal', false, 'Assign homework', 1],
     ];
 
+    private const COORDINATOR = [
+        'roles.view', 'staff.view', 'students.view', 'attendance.view', 'leave.approve', 'exams.view',
+        'results.publish', 'notices.view', 'notices.send', 'homework.view',
+    ];
+
+    private const CLASS_TEACHER = [
+        'students.view', 'attendance.view', 'attendance.mark', 'leave.approve', 'exams.view', 'marks.enter',
+        'notices.view', 'notices.send', 'homework.view', 'homework.assign',
+    ];
+
+    private const SUBJECT_TEACHER = [
+        'students.view', 'attendance.mark', 'exams.view', 'marks.enter', 'notices.view', 'homework.view', 'homework.assign',
+    ];
+
+    private const ACCOUNTANT = [
+        'students.view', 'fees.view', 'fees.collect', 'fees.refund', 'fee_structures.manage', 'concessions.apply',
+    ];
+
+    private const ADMISSION_OFFICER = ['students.view', 'admissions.view', 'admissions.manage'];
+
+    private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
+
+    private const LIBRARIAN = ['students.view', 'notices.view'];
+
+    private const FRONT_OFFICE = ['students.view', 'admissions.view', 'attendance.view', 'notices.view'];
+
+    private const STRUCTURE_V2 = 'Adds viewing of the school structure (campuses, academic years, classes, sections, subjects)';
+
     /**
-     * key => [name, is owner template, version, changelog, permissions|'*'|'*-restricted']
-     * '*' is every permission; '*-restricted' is every permission that is
-     * neither owner-only nor critical.
+     * key => [name, is owner template, [version => [changelog, permissions]]]
+     * Permissions are a list, '*' (every permission that exists in that
+     * version) or '*-restricted' (the same, minus owner-only and critical).
      *
-     * @var array<string, array{0: string, 1: bool, 2: int, 3: string, 4: array<int, string>|string}>
+     * @var array<string, array{0: string, 1: bool, 2: array<int, array{0: string, 1: array<int, string>|string}>}>
      */
     private const TEMPLATES = [
-        'principal' => ['Principal / owner', true, 1, 'Initial version', '*'],
-        'vice_principal' => ['Vice principal', false, 1, 'Initial version', '*-restricted'],
-        'coordinator' => ['Coordinator', false, 1, 'Initial version', [
-            'roles.view', 'staff.view', 'students.view', 'attendance.view', 'leave.approve', 'exams.view',
-            'results.publish', 'notices.view', 'notices.send', 'homework.view',
+        'principal' => ['Principal / owner', true, [
+            1 => ['Initial version', '*'],
+            2 => ['Adds school structure permissions', '*'],
         ]],
-        'class_teacher' => ['Class teacher', false, 1, 'Initial version', [
-            'students.view', 'attendance.view', 'attendance.mark', 'leave.approve', 'exams.view', 'marks.enter',
-            'notices.view', 'notices.send', 'homework.view', 'homework.assign',
+        'vice_principal' => ['Vice principal', false, [
+            1 => ['Initial version', '*-restricted'],
+            2 => ['Adds school structure permissions', '*-restricted'],
         ]],
-        'subject_teacher' => ['Subject teacher', false, 1, 'Initial version', [
-            'students.view', 'attendance.mark', 'exams.view', 'marks.enter', 'notices.view', 'homework.view', 'homework.assign',
+        'coordinator' => ['Coordinator', false, [
+            1 => ['Initial version', self::COORDINATOR],
+            2 => [self::STRUCTURE_V2, [...self::COORDINATOR, 'structure.view']],
         ]],
-        'accountant' => ['Accountant', false, 1, 'Initial version', [
-            'students.view', 'fees.view', 'fees.collect', 'fees.refund', 'fee_structures.manage', 'concessions.apply',
+        'class_teacher' => ['Class teacher', false, [
+            1 => ['Initial version', self::CLASS_TEACHER],
+            2 => [self::STRUCTURE_V2, [...self::CLASS_TEACHER, 'structure.view']],
         ]],
-        'admission_officer' => ['Admission officer', false, 1, 'Initial version', [
-            'students.view', 'admissions.view', 'admissions.manage',
+        'subject_teacher' => ['Subject teacher', false, [
+            1 => ['Initial version', self::SUBJECT_TEACHER],
+            2 => [self::STRUCTURE_V2, [...self::SUBJECT_TEACHER, 'structure.view']],
         ]],
-        'transport_incharge' => ['Transport in-charge', false, 1, 'Initial version', [
-            'students.view', 'notices.view', 'notices.send',
+        'accountant' => ['Accountant', false, [
+            1 => ['Initial version', self::ACCOUNTANT],
+            2 => [self::STRUCTURE_V2, [...self::ACCOUNTANT, 'structure.view']],
         ]],
-        'librarian' => ['Librarian', false, 1, 'Initial version', ['students.view', 'notices.view']],
-        'front_office' => ['Front office', false, 1, 'Initial version', [
-            'students.view', 'admissions.view', 'attendance.view', 'notices.view',
+        'admission_officer' => ['Admission officer', false, [
+            1 => ['Initial version', self::ADMISSION_OFFICER],
+            2 => [self::STRUCTURE_V2, [...self::ADMISSION_OFFICER, 'structure.view']],
+        ]],
+        'transport_incharge' => ['Transport in-charge', false, [
+            1 => ['Initial version', self::TRANSPORT_INCHARGE],
+        ]],
+        'librarian' => ['Librarian', false, [
+            1 => ['Initial version', self::LIBRARIAN],
+        ]],
+        'front_office' => ['Front office', false, [
+            1 => ['Initial version', self::FRONT_OFFICE],
+            2 => [self::STRUCTURE_V2, [...self::FRONT_OFFICE, 'structure.view']],
         ]],
     ];
 
@@ -103,27 +146,29 @@ class AccessCatalogSeeder extends Seeder
                 ]);
             }
 
-            foreach (self::TEMPLATES as $key => [$name, $isOwner, $version, $changelog, $permissions]) {
-                $template = RoleTemplate::query()->firstOrCreate(['key' => $key], ['name' => $name, 'current_version' => $version]);
+            foreach (self::TEMPLATES as $key => [$name, $isOwner, $versions]) {
+                $template = RoleTemplate::query()->firstOrCreate(['key' => $key], ['name' => $name, 'current_version' => 1]);
 
-                if ($template->versions()->where('version', $version)->exists()) {
-                    continue;
+                foreach ($versions as $version => [$changelog, $permissions]) {
+                    if ($template->versions()->where('version', $version)->exists()) {
+                        continue;
+                    }
+
+                    $record = RoleTemplateVersion::query()->create([
+                        'role_template_id' => $template->id,
+                        'version' => $version,
+                        'changelog' => $changelog,
+                        'is_owner_template' => $isOwner,
+                    ]);
+
+                    foreach ($this->permissionsFor($permissions, $version) as $permissionKey) {
+                        DB::connection(config('multitenancy.landlord_database_connection_name'))
+                            ->table('role_template_version_permissions')
+                            ->insert(['role_template_version_id' => $record->id, 'permission_key' => $permissionKey]);
+                    }
                 }
 
-                $record = RoleTemplateVersion::query()->create([
-                    'role_template_id' => $template->id,
-                    'version' => $version,
-                    'changelog' => $changelog,
-                    'is_owner_template' => $isOwner,
-                ]);
-
-                foreach ($this->permissionsFor($permissions) as $permissionKey) {
-                    DB::connection(config('multitenancy.landlord_database_connection_name'))
-                        ->table('role_template_version_permissions')
-                        ->insert(['role_template_version_id' => $record->id, 'permission_key' => $permissionKey]);
-                }
-
-                $template->update(['name' => $name, 'current_version' => max($template->current_version, $version)]);
+                $template->update(['name' => $name, 'current_version' => max(array_keys($versions))]);
             }
         });
     }
@@ -132,21 +177,20 @@ class AccessCatalogSeeder extends Seeder
      * @param  array<int, string>|string  $permissions
      * @return list<string>
      */
-    private function permissionsFor(array|string $permissions): array
+    private function permissionsFor(array|string $permissions, int $version): array
     {
         if (is_array($permissions)) {
             return array_values($permissions);
         }
 
+        $existing = array_filter(self::PERMISSIONS, fn (array $entry) => $entry[4] <= $version);
+
         if ($permissions === '*') {
-            return array_keys(self::PERMISSIONS);
+            return array_keys($existing);
         }
 
         if ($permissions === '*-restricted') {
-            return array_keys(array_filter(
-                self::PERMISSIONS,
-                fn (array $entry) => ! $entry[2] && $entry[1] !== 'critical',
-            ));
+            return array_keys(array_filter($existing, fn (array $entry) => ! $entry[2] && $entry[1] !== 'critical'));
         }
 
         throw new InvalidArgumentException("Unknown permission set [{$permissions}].");

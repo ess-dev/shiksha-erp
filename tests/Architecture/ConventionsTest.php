@@ -123,8 +123,8 @@ it('keeps Domain modules out of each other\'s internals', function () {
 
             // Shared is the foundation every module builds on; it alone may use Audit.
             $sharedUsesAudit = $module === 'Shared' && $otherModule === 'Audit';
-            // Audit's enums (e.g. the scope an Action writes to) are its public vocabulary.
-            $auditVocabulary = $otherModule === 'Audit' && $layer === 'Enums';
+            // Audit's and Access's enums (action scope, permission scope types) are their public vocabulary.
+            $auditVocabulary = $layer === 'Enums' && in_array($otherModule, ['Audit', 'Access'], true);
 
             // The signed-in Identity is the principal every module's checks are about.
             $principal = $otherModule === 'Identity' && $layer === 'Models' && $class === 'Identity';

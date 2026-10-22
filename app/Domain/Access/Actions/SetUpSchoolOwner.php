@@ -39,6 +39,12 @@ class SetUpSchoolOwner extends Action
             $role = Role::query()->where('is_owner', true)->first()
                 ?? $this->builder->fromTemplate(self::OWNER_TEMPLATE)['role'];
 
+            // Platform step, so the owner role is brought up to the latest template
+            // without the self-grant check an ordinary update would apply.
+            if (($plan = $this->builder->pendingUpdate($role)) !== null) {
+                $this->builder->applyUpdate($role, $plan);
+            }
+
             RoleAssignment::query()->firstOrCreate(
                 ['role_id' => $role->id, 'staff_id' => $staff->id, 'scope_type' => 'school'],
                 ['ulid' => strtolower((string) Str::ulid()), 'scope' => Scope::school()->toStored()],

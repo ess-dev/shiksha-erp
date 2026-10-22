@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             AccessCatalogSeeder::class,
             DemoSchoolsSeeder::class,
             DemoStaffSeeder::class,
+            DemoStructureSeeder::class,
         ]);
     }
 }
