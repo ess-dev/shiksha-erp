@@ -34,6 +34,40 @@ export type PlatformPlan = {
     schools_count: number;
 };
 
+export type SchoolStatus = 'trial' | 'active' | 'suspended' | 'expired';
+
+export type PlatformSchool = {
+    ulid: string;
+    name: string;
+    city: string | null;
+    state: string | null;
+    board: string | null;
+    campuses: number;
+    plan_name: string | null;
+    status: SchoolStatus;
+    students: number;
+    mrr_paise: number;
+    trial_ends_on: string | null;
+    renews_on: string | null;
+};
+
+export type PlatformSchoolList = {
+    rows: PlatformSchool[];
+    page: number;
+    last_page: number;
+    matching: number;
+    total_schools: number;
+    total_students: number;
+    status_counts: Record<'all' | SchoolStatus, number>;
+    plans: { ulid: string; name: string }[];
+};
+
+export type PlatformSchoolFilters = {
+    status: SchoolStatus | null;
+    plan: string | null;
+    q: string;
+};
+
 export type PlatformModule = {
     key: string;
     label: string;

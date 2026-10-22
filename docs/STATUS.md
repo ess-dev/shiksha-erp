@@ -1,7 +1,7 @@
 # Shiksha ERP — status and what is pending
 
 Quick recall sheet. The detailed record (code map, decisions, verification) is in `docs/PROGRESS.md`; update both when work lands.
-Last updated: 2026-10-22. **Nothing from steps 9–11 below is committed yet.**
+Last updated: 2026-10-22.
 
 ## Working approach
 
@@ -14,7 +14,7 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 | Sign-in, two-step setup, challenge, recovery codes | Done    | Not in prototype (it has only a role picker). Platform host `admin.shiksha.localhost`.                                                                                                                                                                |
 | Dashboard `/overview`                              | Partial | Done: date, Schools card, Plans card, status doughnut, Super Admin chip. Missing: MRR, Students managed, Trials converting, MRR by plan, Needs attention, Newest schools, Onboard button. These need subscriptions + student counts + school details. |
 | Plans `/plans`                                     | Done    | Cards, module matrix, edit dialog, remove-modules confirm, toast. Card footer shows "MRR —" until subscriptions exist.                                                                                                                                |
-| Schools (list)                                     | Pending | Waiting for screenshots. Needs city, board, student count, plan, trial/renewal dates per school.                                                                                                                                                      |
+| Schools (list) `/schools`                          | Done    | Status tabs with counts, search (name/city/board/contact), plan filter, 25 per page, audited CSV export, MRR column. Name is not a link and "Onboard a school" is disabled until School detail and the wizard exist. Only the 2 demo schools exist locally. |
 | School detail                                      | Pending | Plan, modules, usage, billing, contact; suspend / reactivate / convert trial / change plan / support access.                                                                                                                                          |
 | Onboard a school (9-step wizard)                   | Pending | Stage A (steps 1–6) can use existing provisioning + structure Actions; stage B (students import, fees) waits for those modules.                                                                                                                       |
 | Revenue                                            | Pending | Invoices, GST (tax treatment is an open decision).                                                                                                                                                                                                    |

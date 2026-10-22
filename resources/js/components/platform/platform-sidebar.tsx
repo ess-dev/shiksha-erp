@@ -25,6 +25,7 @@ import {
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { dashboard } from '@/routes/platform';
 import { index as plans } from '@/routes/platform/plans';
+import { index as schools } from '@/routes/platform/schools';
 import type { NavItem } from '@/types';
 
 type PlatformNavItem = Omit<NavItem, 'href' | 'icon'> & {
@@ -36,7 +37,7 @@ type PlatformNavItem = Omit<NavItem, 'href' | 'icon'> & {
 /** Same entries, in the same order, as the prototype's Super Admin menu. */
 const items: PlatformNavItem[] = [
     { title: 'Dashboard', href: dashboard(), icon: LayoutDashboard },
-    { title: 'Schools', icon: Building2 },
+    { title: 'Schools', href: schools(), icon: Building2 },
     { title: 'Plans', href: plans(), icon: Layers },
     { title: 'Onboard a school', icon: PlusCircle },
     { title: 'Revenue', icon: IndianRupee },
