@@ -29,6 +29,7 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  * @property string|null $trial_ends_on
  * @property string|null $renews_on
  * @property string|null $suspended_reason
+ * @property string|null $contact_phone
  */
 class Tenant extends BaseTenant
 {
@@ -51,6 +52,7 @@ class Tenant extends BaseTenant
         'board',
         'contact_name',
         'contact_email',
+        'contact_phone',
         'campus_count',
         'student_count',
         'since_on',

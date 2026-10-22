@@ -25,7 +25,7 @@ import {
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { dashboard } from '@/routes/platform';
 import { index as plans } from '@/routes/platform/plans';
-import { index as schools } from '@/routes/platform/schools';
+import { index as schools, onboard } from '@/routes/platform/schools';
 import type { NavItem } from '@/types';
 
 type PlatformNavItem = Omit<NavItem, 'href' | 'icon'> & {
@@ -39,7 +39,7 @@ const items: PlatformNavItem[] = [
     { title: 'Dashboard', href: dashboard(), icon: LayoutDashboard },
     { title: 'Schools', href: schools(), icon: Building2 },
     { title: 'Plans', href: plans(), icon: Layers },
-    { title: 'Onboard a school', icon: PlusCircle },
+    { title: 'Onboard a school', href: onboard(), icon: PlusCircle },
     { title: 'Revenue', icon: IndianRupee },
     { title: 'Roles and permissions', icon: ShieldCheck },
     { title: 'Activity logs', icon: History },

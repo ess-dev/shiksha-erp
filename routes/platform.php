@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Platform\DashboardController;
+use App\Http\Controllers\Platform\OnboardingController;
 use App\Http\Controllers\Platform\PlanController;
 use App\Http\Controllers\Platform\SchoolController;
 use App\Http\Controllers\Platform\SchoolManagementController;
@@ -43,6 +44,9 @@ Route::middleware('platform.host')->name('platform.')->group(function () {
 
             Route::get('schools', [SchoolController::class, 'index'])->name('schools.index');
             Route::get('schools/export', [SchoolController::class, 'export'])->name('schools.export');
+            Route::get('schools/onboard', [OnboardingController::class, 'create'])->name('schools.onboard');
+            Route::post('schools/onboard', [OnboardingController::class, 'store'])->name('schools.onboard.store');
+            Route::get('schools/{school}/onboarded', [OnboardingController::class, 'done'])->name('schools.onboarded');
             Route::get('schools/{school}', [SchoolController::class, 'show'])->name('schools.show');
             Route::post('schools/{school}/suspend', [SchoolManagementController::class, 'suspend'])->name('schools.suspend');
             Route::post('schools/{school}/reactivate', [SchoolManagementController::class, 'reactivate'])->name('schools.reactivate');

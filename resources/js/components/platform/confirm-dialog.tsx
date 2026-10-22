@@ -37,12 +37,11 @@ export default function ConfirmDialog({
             <DialogContent className="gap-0 p-0 sm:max-w-md">
                 <DialogHeader className="border-b border-border px-6 py-4">
                     <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {description}
-                    </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 px-6 py-5 text-sm text-slate-600">
-                    <p>{description}</p>
+                    <DialogDescription className="text-sm text-slate-600">
+                        {description}
+                    </DialogDescription>
                     {children}
                 </div>
                 <DialogFooter className="border-t border-border px-6 py-4">

@@ -110,3 +110,37 @@ export type PlatformSchoolDetail = {
     activity: { summary: string; at: string }[];
     timezone: string;
 };
+
+export type OnboardingOptions = {
+    plans: {
+        ulid: string;
+        name: string;
+        price_per_student_year_paise: number;
+        min_students: number;
+        module_keys: string[];
+    }[];
+    modules: PlatformModule[];
+    boards: string[];
+    states: string[];
+    staff_roles: { key: string; label: string; requires_two_step: boolean }[];
+    trial_days: number;
+    base_domain: string;
+    today: string;
+};
+
+export type OnboardedSchool = {
+    ulid: string;
+    name: string;
+    address: string;
+    status: SchoolStatus;
+    plan_name: string;
+    trial_ends_on: string | null;
+    campuses: number;
+    sections: number;
+    invites: {
+        name: string;
+        email: string;
+        role: string;
+        link: string | null;
+    }[];
+};
