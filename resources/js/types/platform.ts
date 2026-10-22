@@ -72,3 +72,41 @@ export type PlatformModule = {
     key: string;
     label: string;
 };
+
+export type ModuleBadge = 'in_plan' | 'add_on' | 'turned_off';
+
+export type PlatformSchoolDetail = {
+    ulid: string;
+    name: string;
+    city: string | null;
+    state: string | null;
+    board: string | null;
+    campuses: number;
+    since_on: string | null;
+    status: SchoolStatus;
+    suspended_reason: string | null;
+    trial_ends_on: string | null;
+    renews_on: string | null;
+    plan_ulid: string | null;
+    plan_min_students: number | null;
+    students: number;
+    billable_students: number;
+    annual_paise: number | null;
+    mrr_paise: number;
+    contact_name: string | null;
+    contact_email: string | null;
+    modules: {
+        key: string;
+        label: string;
+        enabled: boolean;
+        badge: ModuleBadge | null;
+    }[];
+    plans: {
+        ulid: string;
+        name: string;
+        price_per_student_year_paise: number;
+    }[];
+    suspension_reasons: { key: string; label: string }[];
+    activity: { summary: string; at: string }[];
+    timezone: string;
+};

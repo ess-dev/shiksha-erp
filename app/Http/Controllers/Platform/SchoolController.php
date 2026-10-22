@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Platform;
 
 use App\Domain\Platform\Actions\ExportSchools;
+use App\Domain\Platform\Queries\SchoolDetailQuery;
 use App\Domain\Platform\Queries\SchoolsQuery;
 use App\Domain\Shared\CalendarDate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\ListSchoolsRequest;
+use App\Tenancy\Tenant;
 use Inertia\Inertia;
 use Inertia\Response;
 use SplFileObject;
@@ -23,6 +25,13 @@ class SchoolController extends Controller
                 'plan' => $request->planUlid(),
                 'q' => $request->search(),
             ],
+        ]);
+    }
+
+    public function show(Tenant $school, SchoolDetailQuery $detail): Response
+    {
+        return Inertia::render('platform/school-detail', [
+            'school' => $detail->get($school),
         ]);
     }
 

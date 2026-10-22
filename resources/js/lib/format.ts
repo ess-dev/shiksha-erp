@@ -66,3 +66,40 @@ export function formatCalendarDay(value: string): string {
 
     return `${weekday}, ${Number(match[3])} ${MONTHS[Number(match[2]) - 1]}`;
 }
+
+/**
+ * Shows a calendar date ("2025-12-01") as "Dec 2025".
+ */
+export function formatCalendarMonth(value: string): string {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    const month = match === null ? undefined : MONTHS[Number(match[2]) - 1];
+
+    return match === null || month === undefined
+        ? value
+        : `${month} ${match[1]}`;
+}
+
+/**
+ * Shows an instant (ISO string) as a clock time ("2:54 pm") in the given
+ * time zone, normally the school's.
+ */
+export function formatClock(value: string, timeZone: string): string {
+    return new Intl.DateTimeFormat('en-IN', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone,
+    }).format(new Date(value));
+}
+
+/**
+ * Up to two capital letters from a name ("Anand Bal Vidyalaya" -> "AB").
+ */
+export function initials(name: string): string {
+    return name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((word) => word[0]?.toUpperCase() ?? '')
+        .join('');
+}

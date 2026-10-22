@@ -1,5 +1,5 @@
-import { Head, router } from '@inertiajs/react';
-import { Download, PlusCircle, SearchX } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { ChevronRight, Download, PlusCircle, SearchX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import {
     exportMethod as exportSchools,
     index,
+    show,
 } from '@/routes/platform/schools';
 import type {
     PlatformSchool,
@@ -237,15 +238,21 @@ export default function PlatformSchools({ schools, filters }: Props) {
                                     >
                                         Renews / trial ends
                                     </th>
+                                    <th scope="col" className="px-4 py-3">
+                                        <span className="sr-only">Open</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {schools.rows.map((school) => (
                                     <tr key={school.ulid}>
                                         <td className="px-4 py-3.5">
-                                            <div className="font-semibold text-primary">
+                                            <Link
+                                                href={show(school.ulid)}
+                                                className="font-semibold text-primary hover:underline"
+                                            >
                                                 {school.name}
-                                            </div>
+                                            </Link>
                                             <div className="text-[13px] text-muted-foreground">
                                                 {[
                                                     [school.city, school.state]
@@ -287,6 +294,18 @@ export default function PlatformSchools({ schools, filters }: Props) {
                                         </td>
                                         <td className="hidden px-4 py-3.5 md:table-cell">
                                             {dateLabel(school)}
+                                        </td>
+                                        <td className="px-4 py-3.5 text-right">
+                                            <Link
+                                                href={show(school.ulid)}
+                                                aria-label={`Open ${school.name}`}
+                                                className="inline-grid size-8 place-items-center rounded-md text-slate-500 hover:bg-muted"
+                                            >
+                                                <ChevronRight
+                                                    className="size-4"
+                                                    aria-hidden="true"
+                                                />
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}
