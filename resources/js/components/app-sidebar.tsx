@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    Building2,
+    FolderGit2,
+    LayoutGrid,
+    ShieldCheck,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -15,7 +22,9 @@ import {
 } from '@/components/ui/sidebar';
 import { useCan } from '@/hooks/use-can';
 import { dashboard } from '@/routes';
+import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
+import { index as students } from '@/routes/students';
 import type { NavItem } from '@/types';
 
 const footerNavItems: NavItem[] = [
@@ -33,6 +42,8 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const canViewStructure = useCan('structure.view');
+    const canViewStudents = useCan('students.view');
+    const canViewRoles = useCan('roles.view');
 
     const mainNavItems: NavItem[] = [
         {
@@ -40,6 +51,24 @@ export function AppSidebar() {
             href: dashboard(),
             icon: LayoutGrid,
         },
+        ...(canViewStudents
+            ? [
+                  {
+                      title: 'Students',
+                      href: students(),
+                      icon: Users,
+                  },
+              ]
+            : []),
+        ...(canViewRoles
+            ? [
+                  {
+                      title: 'Roles and access',
+                      href: roles(),
+                      icon: ShieldCheck,
+                  },
+              ]
+            : []),
         ...(canViewStructure
             ? [
                   {

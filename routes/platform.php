@@ -50,6 +50,8 @@ Route::middleware('platform.host')->name('platform.')->group(function () {
             Route::get('schools/{school}', [SchoolController::class, 'show'])->name('schools.show');
             Route::post('schools/{school}/suspend', [SchoolManagementController::class, 'suspend'])->name('schools.suspend');
             Route::post('schools/{school}/reactivate', [SchoolManagementController::class, 'reactivate'])->name('schools.reactivate');
+            Route::delete('schools/{school}', [SchoolManagementController::class, 'destroy'])->name('schools.destroy');
+            Route::post('schools/{school}/retry-deletion', [SchoolManagementController::class, 'retryDeletion'])->name('schools.retry-deletion');
             Route::patch('schools/{school}/plan', [SchoolManagementController::class, 'changePlan'])->name('schools.plan');
             Route::patch('schools/{school}/modules', [SchoolManagementController::class, 'setModule'])->name('schools.modules');
 

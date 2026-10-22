@@ -1,6 +1,14 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronRight, Download, PlusCircle, SearchX } from 'lucide-react';
+import {
+    ChevronRight,
+    Download,
+    PlusCircle,
+    RotateCw,
+    SearchX,
+    Trash2,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import DeleteSchoolDialog from '@/components/platform/delete-school-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatCalendarDate, formatPaise } from '@/lib/format';
@@ -9,6 +17,7 @@ import {
     exportMethod as exportSchools,
     index,
     onboard,
+    retryDeletion,
     show,
 } from '@/routes/platform/schools';
 import type {
@@ -29,6 +38,7 @@ const tabs: { key: 'all' | SchoolStatus; label: string }[] = [
     { key: 'trial', label: 'Trial' },
     { key: 'suspended', label: 'Suspended' },
     { key: 'expired', label: 'Expired' },
+    { key: 'deleting', label: 'Deleting' },
 ];
 
 const statusStyles: Record<SchoolStatus, string> = {
@@ -36,6 +46,7 @@ const statusStyles: Record<SchoolStatus, string> = {
     trial: 'bg-indigo-100 text-indigo-800',
     suspended: 'bg-red-100 text-red-800',
     expired: 'bg-slate-100 text-slate-700',
+    deleting: 'bg-red-100 text-red-800',
 };
 
 function plural(count: number, one: string, many: string): string {
@@ -57,6 +68,7 @@ function dateLabel(school: PlatformSchool): string {
 export default function PlatformSchools({ schools, filters }: Props) {
     const [search, setSearch] = useState(filters.q);
     const firstRender = useRef(true);
+    const [deleting, setDeleting] = useState<PlatformSchool | null>(null);
 
     function visit(next: Partial<PlatformSchoolFilters> & { page?: number }) {
         const merged = { ...filters, ...next };
@@ -297,7 +309,44 @@ export default function PlatformSchools({ schools, filters }: Props) {
                                         <td className="hidden px-4 py-3.5 md:table-cell">
                                             {dateLabel(school)}
                                         </td>
-                                        <td className="px-4 py-3.5 text-right">
+                                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                                            {school.status === 'deleting' ? (
+                                                <button
+                                                    type="button"
+                                                    aria-label={`Retry deleting ${school.name}`}
+                                                    onClick={() =>
+                                                        router.post(
+                                                            retryDeletion.url(
+                                                                school.ulid,
+                                                            ),
+                                                            {},
+                                                            {
+                                                                preserveScroll: true,
+                                                            },
+                                                        )
+                                                    }
+                                                    className="inline-grid size-8 place-items-center rounded-md text-slate-500 hover:bg-red-50 hover:text-red-700"
+                                                >
+                                                    <RotateCw
+                                                        className="size-4"
+                                                        aria-hidden="true"
+                                                    />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    aria-label={`Delete ${school.name}`}
+                                                    onClick={() =>
+                                                        setDeleting(school)
+                                                    }
+                                                    className="inline-grid size-8 place-items-center rounded-md text-slate-500 hover:bg-red-50 hover:text-red-700"
+                                                >
+                                                    <Trash2
+                                                        className="size-4"
+                                                        aria-hidden="true"
+                                                    />
+                                                </button>
+                                            )}
                                             <Link
                                                 href={show(school.ulid)}
                                                 aria-label={`Open ${school.name}`}
@@ -350,6 +399,13 @@ export default function PlatformSchools({ schools, filters }: Props) {
                     </nav>
                 )}
             </section>
+
+            {deleting && (
+                <DeleteSchoolDialog
+                    school={deleting}
+                    onClose={() => setDeleting(null)}
+                />
+            )}
         </>
     );
 }

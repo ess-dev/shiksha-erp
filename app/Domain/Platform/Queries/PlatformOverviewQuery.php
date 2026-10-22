@@ -23,6 +23,10 @@ class PlatformOverviewQuery
         $byStatus = [];
 
         foreach (TenantStatus::cases() as $status) {
+            if ($status === TenantStatus::Deleting) {
+                continue;
+            }
+
             $byStatus[$status->value] = $counts[$status->value] ?? 0;
         }
 

@@ -38,6 +38,16 @@ return [
             'report' => false,
         ],
 
+        // The one logical disk for school files (decision D11). Local by default; a school can be
+        // switched to S3 by the Super Admin later. Code must never name 's3' or 'local' directly.
+        'tenant' => [
+            'driver' => 'local',
+            'root' => storage_path('app/tenant'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

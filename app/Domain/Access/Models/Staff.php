@@ -25,6 +25,11 @@ class Staff extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'identity_ulid', 'full_name', 'status'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return HasMany<RoleAssignment, $this>
      */

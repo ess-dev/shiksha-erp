@@ -17,6 +17,7 @@ import {
     index as schoolsIndex,
     plan as planRoute,
     reactivate,
+    retryDeletion,
     suspend,
 } from '@/routes/platform/schools';
 import type { ModuleBadge, PlatformSchoolDetail, SchoolStatus } from '@/types';
@@ -30,6 +31,7 @@ const statusStyles: Record<SchoolStatus, string> = {
     trial: 'bg-indigo-100 text-indigo-800',
     suspended: 'bg-red-100 text-red-800',
     expired: 'bg-slate-100 text-slate-700',
+    deleting: 'bg-red-100 text-red-800',
 };
 
 const badgeText: Record<ModuleBadge, string> = {
@@ -189,6 +191,31 @@ export default function PlatformSchoolDetail({ school }: Props) {
                     <Lock className="size-4 shrink-0" aria-hidden="true" />
                     Suspended: {school.suspended_reason}. Staff and parents see
                     a “Subscription suspended” screen; data is kept.
+                </div>
+            )}
+
+            {school.status === 'deleting' && (
+                <div
+                    role="status"
+                    className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-red-100 px-4 py-3 text-sm text-red-800"
+                >
+                    <span>
+                        This school is being deleted and nobody can open it. If
+                        it stays here, run the removal again.
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                            router.post(
+                                retryDeletion.url(school.ulid),
+                                {},
+                                { preserveScroll: true },
+                            )
+                        }
+                    >
+                        Retry delete
+                    </Button>
                 </div>
             )}
 

@@ -19,6 +19,7 @@ export default function ConfirmDialog({
     confirmLabel,
     destructive = false,
     processing = false,
+    confirmDisabled = false,
     onConfirm,
     onClose,
     children,
@@ -28,6 +29,7 @@ export default function ConfirmDialog({
     confirmLabel: string;
     destructive?: boolean;
     processing?: boolean;
+    confirmDisabled?: boolean;
     onConfirm: () => void;
     onClose: () => void;
     children?: React.ReactNode;
@@ -50,7 +52,7 @@ export default function ConfirmDialog({
                     </Button>
                     <Button
                         variant={destructive ? 'destructive' : 'default'}
-                        disabled={processing}
+                        disabled={processing || confirmDisabled}
                         onClick={onConfirm}
                     >
                         {processing && <Spinner />}

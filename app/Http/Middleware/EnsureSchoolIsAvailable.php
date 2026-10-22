@@ -28,6 +28,7 @@ class EnsureSchoolIsAvailable
         if (! $tenant->isAccessible()) {
             return match ($tenant->status) {
                 TenantStatus::Suspended, TenantStatus::Expired => $this->subscriptionPage($request, $tenant),
+                TenantStatus::Deleting => $this->page($request, 'not_found', 404),
                 default => $this->page($request, 'unavailable', 403),
             };
         }

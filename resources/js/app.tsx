@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import PlatformAuthLayout from '@/layouts/platform-auth-layout';
 import PlatformLayout from '@/layouts/platform-layout';
+import PrintLayout from '@/layouts/print-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -20,6 +21,8 @@ void createInertiaApp({
                 return PlatformLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
+            case name === 'students/transfer-certificate':
+                return PrintLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:

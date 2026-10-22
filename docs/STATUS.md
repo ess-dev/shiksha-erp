@@ -9,7 +9,29 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 
 ## Next up
 
-- **Students and guardians.** Dependency approved and installed 2026-10-22 (`spatie/laravel-data` 4.23, transformer 3.x, platform pin 8.3.6; commit `5fc2125`). Owner to send prototype screenshots one screen at a time, plus the required student fields and whether CSV import is in scope.
+- Owner to pick the next screen (suggested: the Principal's roles and assignments screen, or Admissions for "New admission"). Students slice 1 is built; see below.
+
+## To verify later (reminder list for the owner; ask about these in a later session)
+
+Built on 2026-10-22 and covered by automated tests, but not yet tried by the owner with real data:
+
+- **Student documents**: upload, verify and view (PDF/JPEG/PNG up to 5 MB) with real scans; where the files land (`storage/app/tenant/tenants/<school>/students/...`) and later moving the `tenant` disk to S3.
+- **Printable transfer certificate**: the layout and wording are a starting point (browser Print / Save as PDF; no signature or seal design); needs the school's format and legal review.
+- **CSV import and export** with the school's own spreadsheets (template columns, class names, house names, what warnings are useful).
+- **Sibling links** by staff (only when every guardian of both students has portal access) and the one-phone-one-guardian rule on real family data.
+- **Campus switcher** in the top bar on the other school pages (today it only narrows the Students list).
+- **Placeholders** that need their modules: Attendance, Fees and Marks tabs, class teacher, fee billing on import, cancelling installments on TC, transport.
+- **Relaxed fields** to tighten later: blood group "Unknown", house "Not assigned".
+
+## School screens: Principal
+
+| Screen                                    | Status         | Notes                                                                                                                                                                     |
+| ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| School structure `/school/structure`      | Done (earlier) | Years, campuses, classes, sections, subjects.                                                                                                                             |
+| Students list `/students`                 | Done           | Search, class and status filters, 25 per page, Import, Export CSV, campus switcher; Attendance and Fees show "Not available yet".                                         |
+| Student profile `/students/{student}`     | Done           | Overview, Guardians, Enrollment history, Documents built; Attendance, Fees, Marks "Not available yet". Change section, Change roll, Edit details, Issue TC, Link sibling. |
+| Houses and numbering `/students/settings` | Done           | Not in the prototype: houses (add, rename, active/inactive, reorder), admission and TC number prefixes.                                                                   |
+| New admission                             | Pending        | Button is disabled and marked Pending; comes with Admissions.                                                                                                             |
 
 ## Super Admin screens (prototype: 9)
 
@@ -42,10 +64,16 @@ Principal/School Admin (22 screens), Coordinator (22), Teacher (17), Accountant 
 
 Production platform host name, tax/GST treatment on plan prices (prices are currently tax-exclusive and illustrative), whether to add a chart library (the dashboard uses plain SVG; `recharts` was proposed, not approved), payment gateway, SMS/email/WhatsApp providers, MVP build order, retention periods, board grading rules.
 
+## Standing rule: school deletion must stay complete
+
+Super Admin can permanently delete a school (`DeleteSchool` action, typed confirmation `delete <school name>`): the school is set to `deleting` (all access blocked), then a queued job `PurgeSchoolData` runs the `PurgeSchool` action, which is retryable from the Super Admin UI if it fails. It drops the school database, removes its landlord rows (`memberships`, `tenant_modules`, `tenant_domains`, identities left with no membership), the `tenants/<ulid>` folder on the `tenant` disk, and keeps an append-only `platform.school_deleted` audit row (the `platform_audit_events.tenant_id` foreign key was dropped so history outlives the school).
+
+**Whenever you add anything new that is owned by a school and lives outside its own database** (a landlord table with `tenant_id`, files outside `tenants/<ulid>`, per-school cache/queue entries, external resources such as S3 buckets or per-school DB roles), add its removal to `app/Domain/Platform/Actions/PurgeSchool.php` and extend `tests/Feature/Platform/DeleteSchoolTest.php`. Data inside the school database needs nothing.
+
 ## Housekeeping / known gaps
 
 - No translation keys yet (English literals, like the starter kit pages).
-- No `docs/modules/<module>.md` files yet.
+- Only `docs/modules/students.md` exists; the other modules still need one each.
 - Pest browser tests not set up; full test suite takes about 4–5 minutes (285 tests passing at last run; one Audit test can fail once with a Postgres autovacuum permission error, passes when re-run). Never run two Pest processes at once.
 - If tests ever behave oddly, check `bootstrap/cache/config.php`: a stale cached config once made the tests run against the dev database and wipe it. `php artisan config:clear` fixes it; `php artisan db:seed` rebuilds demo data.
 - Orphaned old school databases from that incident remain in PostgreSQL (harmless, can be dropped by hand).
@@ -54,6 +82,10 @@ Production platform host name, tax/GST treatment on plan prices (prices are curr
 ## Local quick start
 
 - Demo Super Admin: `superadmin@shiksha.test` / `password` (local only). It has no authenticator until you enrol one at first sign-in: open `http://admin.shiksha.localhost:8000/sign-in`.
-- Demo schools: `greenfield.shiksha.localhost`, `riverside.shiksha.localhost` (`principal@greenfield.test` / `password`).
+- Demo schools: `greenfield.shiksha.localhost`, `riverside.shiksha.localhost` (`principal@greenfield.test` / `password`). The principal must set up two-step first; `coordinator@greenfield.test` / `password` (Classes 1 to 3, Main campus) does not, so it is the quick way to look at the Students screens.
 - Run: `php artisan serve --port=8000`, then `npm run build` (or `npm run dev`). New Super Admin: `php artisan platform:create-user "Name" email`.
 - Quality gates: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analyse --memory-limit=1G`, `vendor/bin/pest --compact`, `npm run types:check`, `npx vp check`, `npm run build`. After route changes: `php artisan wayfinder:generate --with-form`.
+
+## Session-wise students (2026-10-22)
+
+Built: session switcher + `students.view_past_sessions` permission, read-only past-session list, profile and export. To verify: past sessions with real enrolment history. Pending: parent view, rollover/promotion, per-session attendance/fees/marks.

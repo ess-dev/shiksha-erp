@@ -36,9 +36,18 @@ class AccessCatalogSeeder extends Seeder
         'audit.view' => ['core', 'sensitive', false, 'See the audit trail', 1],
         'structure.view' => ['core', 'normal', false, 'See campuses, academic years, classes, sections and subjects', 2],
         'structure.manage' => ['core', 'sensitive', false, 'Set up campuses, academic years, classes, sections and subjects', 2],
-        'students.view' => ['students', 'normal', false, 'See students', 1],
-        'students.manage' => ['students', 'sensitive', false, 'Add and edit students', 1],
-        'students.view_sensitive' => ['students', 'sensitive', false, 'See guardian phones, documents and medical notes', 1],
+        // Students are part of the core product, not a sellable module: a "students" module row would never
+        // exist in tenant_modules, so these permissions are always available (changed 2026-10-30).
+        'students.view' => ['core', 'normal', false, 'See students', 1],
+        'students.manage' => ['core', 'sensitive', false, 'Add and edit students, change sections and roll numbers', 1],
+        'students.view_sensitive' => ['core', 'sensitive', false, 'See guardian phones, documents and medical notes', 1],
+        'students.issue_tc' => ['core', 'critical', false, 'Issue transfer certificates', 3],
+        'students.import' => ['core', 'sensitive', false, 'Import students from a CSV file', 3],
+        'students.export' => ['core', 'sensitive', false, 'Export students with guardian phone numbers', 3],
+        'students.documents' => ['core', 'sensitive', false, 'Upload and verify student documents', 3],
+        'students.link_siblings' => ['core', 'sensitive', false, 'Link students as siblings', 3],
+        'students.view_past_sessions' => ['core', 'sensitive', false, 'View students of past academic sessions (read only)', 4],
+        'houses.manage' => ['core', 'normal', false, 'Add, rename and reorder school houses', 3],
         'admissions.view' => ['admissions', 'normal', false, 'See admission applications', 1],
         'admissions.manage' => ['admissions', 'sensitive', false, 'Process admissions', 1],
         'attendance.view' => ['attendance', 'normal', false, 'See attendance', 1],
@@ -78,6 +87,17 @@ class AccessCatalogSeeder extends Seeder
 
     private const ADMISSION_OFFICER = ['students.view', 'admissions.view', 'admissions.manage'];
 
+    private const STUDENTS_V3 = 'Adds student management: edit, import, export, documents, sibling links and houses';
+
+    private const SESSIONS_V4 = 'Adds viewing of past academic sessions in the Students screens';
+
+    private const COORDINATOR_V3_ADDS = [
+        'students.manage', 'students.view_sensitive', 'students.import', 'students.export', 'students.documents',
+        'students.link_siblings', 'houses.manage',
+    ];
+
+    private const ADMISSION_OFFICER_V3_ADDS = ['students.manage', 'students.view_sensitive', 'students.import', 'students.documents'];
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -97,14 +117,20 @@ class AccessCatalogSeeder extends Seeder
         'principal' => ['Principal / owner', true, [
             1 => ['Initial version', '*'],
             2 => ['Adds school structure permissions', '*'],
+            3 => [self::STUDENTS_V3, '*'],
+            4 => [self::SESSIONS_V4, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
             2 => ['Adds school structure permissions', '*-restricted'],
+            3 => [self::STUDENTS_V3, '*-restricted'],
+            4 => [self::SESSIONS_V4, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
             2 => [self::STRUCTURE_V2, [...self::COORDINATOR, 'structure.view']],
+            3 => [self::STUDENTS_V3, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS]],
+            4 => [self::SESSIONS_V4, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],
@@ -121,6 +147,7 @@ class AccessCatalogSeeder extends Seeder
         'admission_officer' => ['Admission officer', false, [
             1 => ['Initial version', self::ADMISSION_OFFICER],
             2 => [self::STRUCTURE_V2, [...self::ADMISSION_OFFICER, 'structure.view']],
+            3 => [self::STUDENTS_V3, [...self::ADMISSION_OFFICER, 'structure.view', ...self::ADMISSION_OFFICER_V3_ADDS]],
         ]],
         'transport_incharge' => ['Transport in-charge', false, [
             1 => ['Initial version', self::TRANSPORT_INCHARGE],

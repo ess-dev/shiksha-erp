@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Platform;
 
 use App\Domain\Platform\Actions\ChangeSchoolPlan;
+use App\Domain\Platform\Actions\DeleteSchool;
 use App\Domain\Platform\Actions\ReactivateSchool;
+use App\Domain\Platform\Actions\RetrySchoolDeletion;
 use App\Domain\Platform\Actions\SetSchoolModule;
 use App\Domain\Platform\Actions\SuspendSchool;
 use App\Domain\Platform\Exceptions\SchoolChangeException;
@@ -11,6 +13,7 @@ use App\Domain\Platform\Models\Plan;
 use App\Domain\Platform\Models\PlatformModule;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\ChangeSchoolPlanRequest;
+use App\Http\Requests\Platform\DeleteSchoolRequest;
 use App\Http\Requests\Platform\SetSchoolModuleRequest;
 use App\Http\Requests\Platform\SuspendSchoolRequest;
 use App\Tenancy\Tenant;
@@ -75,6 +78,34 @@ class SchoolManagementController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __(':module turned :state for :school', [
             'module' => $label, 'state' => $enabled ? 'on' : 'off', 'school' => $school->name,
         ])]);
+
+        return back();
+    }
+
+    public function destroy(DeleteSchoolRequest $request, Tenant $school, DeleteSchool $delete): RedirectResponse
+    {
+        $name = $school->name;
+
+        try {
+            $delete->handle($school, $request->string('confirmation')->toString());
+        } catch (SchoolChangeException $exception) {
+            return $this->refused($exception);
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __(':school is being deleted. It disappears from this list when the removal finishes.', ['school' => $name])]);
+
+        return to_route('platform.schools.index');
+    }
+
+    public function retryDeletion(Tenant $school, RetrySchoolDeletion $retry): RedirectResponse
+    {
+        try {
+            $retry->handle($school);
+        } catch (SchoolChangeException $exception) {
+            return $this->refused($exception);
+        }
+
+        Inertia::flash('toast', ['type' => 'warning', 'message' => __('Deleting :school again', ['school' => $school->name])]);
 
         return back();
     }
