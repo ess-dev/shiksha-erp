@@ -20,6 +20,9 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  */
 class Tenant extends BaseTenant
 {
+    /** Module every school has, whatever its plan. */
+    public const CORE_MODULE = 'core';
+
     protected $table = 'tenants';
 
     /** @var list<string> */
@@ -71,6 +74,10 @@ class Tenant extends BaseTenant
      */
     public function hasModule(string $module): bool
     {
+        if ($module === self::CORE_MODULE) {
+            return true;
+        }
+
         return DB::connection(config('multitenancy.landlord_database_connection_name'))
             ->table('tenant_modules')
             ->where('tenant_id', $this->id)

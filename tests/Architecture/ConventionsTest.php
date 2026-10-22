@@ -114,9 +114,11 @@ it('keeps Domain modules out of each other\'s internals', function () {
     foreach (sourceFiles('app/Domain') as $path => $contents) {
         $module = explode('/', $path)[0];
 
-        preg_match_all('/^use\s+App\\\\Domain\\\\(\w+)\\\\(\w+)/m', $contents, $uses, PREG_SET_ORDER);
+        preg_match_all('/^use\s+App\\\\Domain\\\\(\w+)\\\\(\w+)(?:\\\\(\w+))?/m', $contents, $uses, PREG_SET_ORDER);
 
-        foreach ($uses as [, $otherModule, $layer]) {
+        foreach ($uses as $use) {
+            [, $otherModule, $layer] = $use;
+            $class = $use[3] ?? '';
             $allowed = in_array($layer, ['Actions', 'Queries', 'Data'], true);
 
             // Shared is the foundation every module builds on; it alone may use Audit.
@@ -124,7 +126,10 @@ it('keeps Domain modules out of each other\'s internals', function () {
             // Audit's enums (e.g. the scope an Action writes to) are its public vocabulary.
             $auditVocabulary = $otherModule === 'Audit' && $layer === 'Enums';
 
-            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit && ! $auditVocabulary) {
+            // The signed-in Identity is the principal every module's checks are about.
+            $principal = $otherModule === 'Identity' && $layer === 'Models' && $class === 'Identity';
+
+            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit && ! $auditVocabulary && ! $principal) {
                 $offenders[] = "{$path} uses {$otherModule}\\{$layer}";
             }
         }

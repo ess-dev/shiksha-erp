@@ -7,8 +7,14 @@ export type User = {
     two_factor_enabled: boolean;
 };
 
+export type Abilities = {
+    permissions: string[];
+    is_owner: boolean;
+};
+
 export type Auth = {
     user: User;
+    abilities: Abilities;
 };
 
 export type TwoFactorSetupData = {
