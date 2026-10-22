@@ -127,7 +127,9 @@ it('keeps Domain modules out of each other\'s internals', function () {
             $auditVocabulary = $layer === 'Enums' && in_array($otherModule, ['Audit', 'Access'], true);
 
             // The signed-in Identity is the principal every module's checks are about.
-            $principal = $otherModule === 'Identity' && $layer === 'Models' && $class === 'Identity';
+            // The signed-in Super Admin is the principal on the platform side.
+            $principal = ($otherModule === 'Identity' && $layer === 'Models' && $class === 'Identity')
+                || ($otherModule === 'Platform' && $layer === 'Models' && $class === 'PlatformUser');
 
             if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit && ! $auditVocabulary && ! $principal) {
                 $offenders[] = "{$path} uses {$otherModule}\\{$layer}";

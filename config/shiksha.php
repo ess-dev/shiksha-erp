@@ -16,12 +16,38 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Time Zone
+    |--------------------------------------------------------------------------
+    |
+    | The zone calendar "today" is read in (see CalendarDate::today()). The app
+    | itself stays on UTC. A per-school setting will replace this later.
+    |
+    */
+
+    'timezone' => env('SHIKSHA_TIMEZONE', 'Asia/Kolkata'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Platform Host
+    |--------------------------------------------------------------------------
+    |
+    | The Super Admin area is served only on this host. Locally it is
+    | "admin.shiksha.localhost". The production name is still an open decision,
+    | so it is configuration. It must stay in the reserved subdomain list below
+    | so no school can take it.
+    |
+    */
+
+    'platform_host' => env('PLATFORM_HOST', 'admin.'.env('APP_BASE_DOMAIN', 'shiksha.localhost')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Subdomain Rules
     |--------------------------------------------------------------------------
     |
     | A school subdomain is lowercase letters, digits and hyphens, not starting
     | or ending with a hyphen. Reserved names are kept for the platform.
-    | illustrative — verify the reserved list before launch.
+    | illustrative - verify the reserved list before launch.
     |
     */
 

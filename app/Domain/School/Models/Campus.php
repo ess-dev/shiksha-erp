@@ -22,6 +22,11 @@ class Campus extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'name', 'code', 'status'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return HasMany<Section, $this>
      */

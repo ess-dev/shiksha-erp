@@ -24,6 +24,11 @@ class SchoolClass extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'name', 'level'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return BelongsToMany<Subject, $this>
      */

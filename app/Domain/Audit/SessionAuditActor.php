@@ -8,6 +8,7 @@ use App\Domain\Audit\Data\AuditActor;
 use App\Domain\Audit\Enums\AuditActorType;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\Identity\Queries\StaffMembershipUlidQuery;
+use App\Domain\Platform\Models\PlatformUser;
 use App\Tenancy\Tenant;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
@@ -25,6 +26,12 @@ class SessionAuditActor implements ResolvesAuditActor
 
     public function resolve(): AuditActor
     {
+        $platformUser = $this->auth->guard('platform')->user();
+
+        if ($platformUser instanceof PlatformUser) {
+            return new AuditActor(AuditActorType::Platform, $platformUser->ulid);
+        }
+
         $identity = $this->auth->guard()->user();
 
         if (! $identity instanceof Identity) {
