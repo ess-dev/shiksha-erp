@@ -106,7 +106,7 @@ trait HasCurrentSchool
         $shared->unprepared(<<<'SQL'
             TRUNCATE admission_documents, admission_application_events, admission_applications, student_documents, student_sibling_links, enrollments, guardian_student, students, guardians, houses,
                 school_settings, number_sequences, school_class_subject, sections, subjects, school_classes, academic_years, campuses,
-                role_assignments, role_permissions, roles, staff RESTART IDENTITY CASCADE;
+                role_assignments, role_permissions, roles, staff, attendance_marks, attendance_registers, school_holidays RESTART IDENTITY CASCADE;
             ALTER TABLE audit_events DISABLE TRIGGER USER;
             DELETE FROM audit_events;
             ALTER TABLE audit_events ENABLE TRIGGER USER;

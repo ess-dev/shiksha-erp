@@ -70,7 +70,7 @@ it('gives the owner every permission in the plan over the whole school', functio
     expect(Gate::forUser($owner)->allows('roles.manage'))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('fees.refund', [new ScopeTarget(campusUlid: 'any')]))->toBeTrue()
         ->and(app(Authorizer::class)->holdsOwnerRole($owner))->toBeTrue()
-        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(37);
+        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(38);
 });
 
 it('denies people without a staff record or without the permission', function () {
@@ -321,9 +321,9 @@ it('seeds ten templates, their versions and the catalog idempotently', function 
         ->where('is_owner_template', true)->where('version', $version)->value('id');
 
     expect($landlord->table('role_templates')->count())->toBe(10)
-        ->and($landlord->table('permissions')->count())->toBe(37)
-        ->and($landlord->table('role_template_versions')->count())->toBe(30)
-        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(5)
+        ->and($landlord->table('permissions')->count())->toBe(38)
+        ->and($landlord->table('role_template_versions')->count())->toBe(33)
+        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(6)
         ->and($landlord->table('role_templates')->where('key', 'librarian')->value('current_version'))->toBe(1)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(1))->count())->toBe(27)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(2))->count())->toBe(29)

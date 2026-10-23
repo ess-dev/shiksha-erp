@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\School;
 
+use App\Domain\Access\Queries\ActiveStaffQuery;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\School\Queries\CampusesQuery;
 use App\Domain\School\Queries\SchoolDefinitionsQuery;
@@ -23,6 +24,7 @@ class StructureController extends Controller
         CampusesQuery $campuses,
         SchoolDefinitionsQuery $definitions,
         SectionsQuery $sections,
+        ActiveStaffQuery $staff,
     ): Response {
         Gate::authorize('structure.view');
 
@@ -40,6 +42,8 @@ class StructureController extends Controller
             'campuses' => $campuses->get($identity),
             'classes' => $definitions->classes($identity),
             'subjects' => $definitions->subjects($identity),
+            // Only people who can change structure see (and need) the staff list.
+            'staffOptions' => Gate::allows('structure.manage') ? $staff->options() : [],
             'sections' => $sections->paginate(
                 $identity,
                 $filters['year'] ?? $definitions->currentAcademicYear($identity)?->ulid,

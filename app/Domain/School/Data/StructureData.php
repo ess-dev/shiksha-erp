@@ -48,8 +48,11 @@ final readonly class StructureData implements JsonSerializable
         string $classUlid,
         string $className,
         int $classLevel,
+        ?string $classTeacherUlid = null,
+        ?string $classTeacherName = null,
     ): self {
         return new self('section', $ulid, [
+            'class_teacher' => $classTeacherUlid === null ? null : ['ulid' => $classTeacherUlid, 'name' => (string) $classTeacherName],
             'name' => $name,
             'capacity' => $capacity,
             'status' => $status,

@@ -34,6 +34,7 @@ export type Section = {
     academic_year_ulid: string;
     campus: { ulid: string; name: string };
     class: { ulid: string; name: string; level: number };
+    class_teacher: { ulid: string; name: string } | null;
 };
 
 export type PaginatedSections = {

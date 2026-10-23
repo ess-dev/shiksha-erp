@@ -37,7 +37,8 @@ class SectionsQuery
         $query = Section::query()
             ->with(['campus', 'schoolClass', 'academicYear'])
             ->join('school_classes', 'school_classes.id', '=', 'sections.school_class_id')
-            ->select('sections.*')
+            ->leftJoin('staff as class_teacher', 'class_teacher.id', '=', 'sections.class_teacher_staff_id')
+            ->select('sections.*', 'class_teacher.ulid as class_teacher_ulid', 'class_teacher.full_name as class_teacher_name')
             ->orderBy('school_classes.level')
             ->orderBy('sections.name');
 
@@ -82,6 +83,8 @@ class SectionsQuery
             $section->schoolClass->ulid,
             $section->schoolClass->name,
             $section->schoolClass->level,
+            $section->getAttribute('class_teacher_ulid'),
+            $section->getAttribute('class_teacher_name'),
         ));
     }
 }

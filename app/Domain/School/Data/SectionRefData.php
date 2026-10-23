@@ -25,6 +25,9 @@ final readonly class SectionRefData
         public string $className,
         public int $classLevel,
         public string $status,
+        public ?int $classTeacherStaffKey = null,
+        public ?string $classTeacherUlid = null,
+        public ?string $classTeacherName = null,
     ) {}
 
     /** "Class 1-A", as the prototype writes it. */

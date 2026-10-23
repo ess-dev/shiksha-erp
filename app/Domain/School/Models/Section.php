@@ -18,6 +18,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
  * @property string $name
  * @property int|null $capacity
  * @property string $status
+ * @property int|null $class_teacher_staff_id
  */
 class Section extends Model
 {
