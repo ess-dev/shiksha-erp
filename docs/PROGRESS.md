@@ -2,11 +2,11 @@
 
 Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `c2b7e01` plus uncommitted work (steps 9–11).
+Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `9678e5d` (everything below is committed).
 
 ## Where things stand
 
-Branch `dev`, 9 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **281 tests pass** (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
+Branch `dev`, 14 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **285 tests pass** (last full run 281; one Audit test can fail once on a Postgres autovacuum permission error and passes when re-run) (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
 Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analyse --memory-limit=1G`, `vendor/bin/pest --compact`, `npm run types:check`, `npx vp check`, `npm run build`.
 
 ### Done (in order)
@@ -26,6 +26,7 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 | 11  | Super Admin Schools list `/schools`: landlord school-detail columns, `SchoolsQuery`, audited CSV export (`ExportSchools`), `MonthlyRevenue`                         | —         |
 | 12  | Super Admin School details `/schools/{school}`: suspend / reactivate, plan change, per-school modules, activity                                                     | —         |
 | 13  | Super Admin Onboard a school wizard `/schools/onboard`: `OnboardSchool` Action, optional classes quick start, staff set-password links                              | —         |
+| 14  | School-side Subscription suspended / expired screen (`errors/subscription`) | `9678e5d` |
 
 ### Code map
 
@@ -90,6 +91,7 @@ Product domain details, staging host (P11), mobile API style (P4.3), payment gat
 
 Each step: read the relevant rules, plan briefly, build with Actions/Queries/Policies, write tests (happy path, authorization matrix, tenant isolation, edge cases), run the gates, update this file, commit.
 
+0. **Where the owner left off (2026-10-22):** Super Admin screens done: sign-in/two-step, Dashboard (partial), Plans, Schools list, School details, Onboard a school (stage A). Owner's proposed next: the Principal's school-side roles and assignments screen (with the "template update available" prompt and My profile). Working approach: the owner sends prototype screenshots one screen at a time (prototype zip: `school-erp-prototype-v6.zip`, e.g. `superadmin/`, `admin/`, `coordinator/`, `accountant/`); read the prototype JS in `assets/js/pages/` for hidden behaviour, ask about anything that changed since (classes/sections and fee structure are customisable per school), then build, test, commit. MVP module order after Students is still an open decision.
 1. **First screens (Inertia + React)** — school structure is done (see above); still to do: roles/assignments, using the existing Queries and Actions. Needs: controllers in `app/Http/Controllers` (or `app/Http/Web/<Module>` per the layout rule), Form Requests, Policies/Gates, Wayfinder, shared `data-table`, `lib/format.ts`, abilities-driven UI, translation keys, mobile-first. Also add the "template update available" prompt.
 2. **Students and guardians** — students, guardians, enrolment per section/year, guardian–student link with portal-access flag, shared-family-phone warning, masked sensitive fields, `students.*` permissions already in the catalog. Needs `spatie/laravel-data` decision first.
 3. **Parent sign-in** — phone + OTP (hashed, single-use, rate-limited per phone/IP/school), SMS driver interface with log/fake driver, guardian membership + context switcher, `pending_guardian_links`.
