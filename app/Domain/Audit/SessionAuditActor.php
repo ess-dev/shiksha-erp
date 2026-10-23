@@ -2,24 +2,42 @@
 
 namespace App\Domain\Audit;
 
+use App\Domain\Access\Queries\RoleNamesForIdentityQuery;
 use App\Domain\Audit\Contracts\ResolvesAuditActor;
 use App\Domain\Audit\Data\AuditActor;
 use App\Domain\Audit\Enums\AuditActorType;
+use App\Domain\Identity\Models\Identity;
+use App\Domain\Identity\Queries\StaffMembershipUlidQuery;
+use App\Tenancy\Tenant;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
 /**
- * Placeholder until identities and memberships exist: a signed-in user is
- * recorded as a plain "user" without identity or role detail; no one signed
- * in (jobs, commands, seeders) is the system.
+ * Who is acting: the signed-in staff member (identity, membership and role
+ * names in the current school), or the system when no one is signed in.
  */
 class SessionAuditActor implements ResolvesAuditActor
 {
-    public function __construct(private readonly AuthFactory $auth) {}
+    public function __construct(
+        private readonly AuthFactory $auth,
+        private readonly StaffMembershipUlidQuery $memberships,
+        private readonly RoleNamesForIdentityQuery $roles,
+    ) {}
 
     public function resolve(): AuditActor
     {
-        return $this->auth->guard()->check()
-            ? new AuditActor(AuditActorType::User)
-            : AuditActor::system();
+        $identity = $this->auth->guard()->user();
+
+        if (! $identity instanceof Identity) {
+            return AuditActor::system();
+        }
+
+        $tenant = Tenant::current();
+        $membershipUlid = $tenant instanceof Tenant ? $this->memberships->get($identity, $tenant) : null;
+
+        if ($membershipUlid === null) {
+            return new AuditActor(AuditActorType::User, $identity->ulid);
+        }
+
+        return new AuditActor(AuditActorType::Staff, $identity->ulid, $membershipUlid, $this->roles->get($identity));
     }
 }
