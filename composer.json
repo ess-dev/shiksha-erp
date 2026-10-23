@@ -70,6 +70,18 @@
             "npm run types:check",
             "@test"
         ],
+        "verify": [
+            "Composer\\Config::disableProcessTimeout",
+            "node scripts/verify.mjs"
+        ],
+        "verify:fix": [
+            "Composer\\Config::disableProcessTimeout",
+            "node scripts/verify.mjs --fix"
+        ],
+        "verify:quick": [
+            "Composer\\Config::disableProcessTimeout",
+            "node scripts/verify.mjs --quick"
+        ],
         "types:check": [
             "phpstan analyse"
         ],

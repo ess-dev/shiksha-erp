@@ -23,7 +23,8 @@ trait HasCurrentSchool
 
     public Tenant $school;
 
-    private static bool $sharedSchoolMigrated = false;
+    /** @var array<string, bool> databases already created and migrated in this run */
+    private static array $preparedSchoolDatabases = [];
 
     protected function setUpHasCurrentSchool(): void
     {
@@ -72,36 +73,36 @@ trait HasCurrentSchool
      * once per test run. CREATE DATABASE cannot run inside a transaction, so it
      * uses its own short-lived connection.
      */
-    private static function prepareSharedSchoolDatabase(): void
+    private static function prepareSharedSchoolDatabase(string $database = self::SHARED_SCHOOL_DATABASE): void
     {
-        if (self::$sharedSchoolMigrated) {
+        if (self::$preparedSchoolDatabases[$database] ?? false) {
             return;
         }
 
         $admin = DB::build([...config('database.connections.landlord'), 'database' => 'postgres']);
 
-        $exists = $admin->table('pg_database')->where('datname', self::SHARED_SCHOOL_DATABASE)->exists();
+        $exists = $admin->table('pg_database')->where('datname', $database)->exists();
 
         if (! $exists) {
-            $admin->statement('CREATE DATABASE "'.self::SHARED_SCHOOL_DATABASE.'"');
+            $admin->statement('CREATE DATABASE "'.$database.'"');
         }
 
         $admin->disconnect();
 
-        $shared = new Tenant(['database_name' => self::SHARED_SCHOOL_DATABASE]);
+        $shared = new Tenant(['database_name' => $database]);
         $shared->id = -1; // an unsaved model with a null key would count as "already current"
         app(ProvisionTenant::class)->migrate($shared);
 
-        self::$sharedSchoolMigrated = true;
+        self::$preparedSchoolDatabases[$database] = true;
     }
 
     /**
      * Empties the shared database's data. Audit rows are append-only, so the
      * protecting triggers are switched off for the cleanup only.
      */
-    private static function resetSharedSchoolDatabase(): void
+    private static function resetSharedSchoolDatabase(string $database = self::SHARED_SCHOOL_DATABASE): void
     {
-        $shared = DB::build([...config('database.connections.landlord'), 'database' => self::SHARED_SCHOOL_DATABASE]);
+        $shared = DB::build([...config('database.connections.landlord'), 'database' => $database]);
 
         $shared->unprepared(<<<'SQL'
             TRUNCATE admission_documents, admission_application_events, admission_applications, student_documents, student_sibling_links, enrollments, guardian_student, students, guardians, houses,
