@@ -104,7 +104,8 @@ trait HasCurrentSchool
         $shared = DB::build([...config('database.connections.landlord'), 'database' => self::SHARED_SCHOOL_DATABASE]);
 
         $shared->unprepared(<<<'SQL'
-            TRUNCATE role_assignments, role_permissions, roles, staff RESTART IDENTITY CASCADE;
+            TRUNCATE school_class_subject, sections, subjects, school_classes, academic_years, campuses,
+                role_assignments, role_permissions, roles, staff RESTART IDENTITY CASCADE;
             ALTER TABLE audit_events DISABLE TRIGGER USER;
             DELETE FROM audit_events;
             ALTER TABLE audit_events ENABLE TRIGGER USER;

@@ -76,6 +76,32 @@ final readonly class Scope
         return $this->type === ScopeType::School ? null : $this->payload;
     }
 
+    /**
+     * @return list<string> Campuses a campus or wing scope names (empty for other types)
+     */
+    public function campusUlids(): array
+    {
+        return $this->list('campus_ulids');
+    }
+
+    /**
+     * @return list<string> Sections a sections scope names (empty for other types)
+     */
+    public function sectionUlids(): array
+    {
+        return $this->list('section_ulids');
+    }
+
+    /**
+     * @return array{0: int, 1: int}|null The class-level range of a wing scope
+     */
+    public function levelRange(): ?array
+    {
+        return $this->type === ScopeType::Wing
+            ? [(int) $this->payload['from_level'], (int) $this->payload['to_level']]
+            : null;
+    }
+
     public function covers(ScopeTarget $target): bool
     {
         return match ($this->type) {

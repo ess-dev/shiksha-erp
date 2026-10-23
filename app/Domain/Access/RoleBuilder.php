@@ -25,24 +25,7 @@ class RoleBuilder
         $template = RoleTemplate::query()->where('key', $templateKey)->firstOrFail();
         $version = $template->currentVersion();
 
-        $catalog = $this->authorizer->catalog();
-        $tenant = Tenant::current();
-        $modulesInPlan = [];
-        $permissions = [];
-
-        foreach ($version->permissionKeys() as $key) {
-            $module = $catalog[$key]['module'] ?? null;
-
-            if ($module === null || ! $tenant instanceof Tenant) {
-                continue;
-            }
-
-            $modulesInPlan[$module] ??= $tenant->hasModule($module);
-
-            if ($modulesInPlan[$module]) {
-                $permissions[] = $key;
-            }
-        }
+        $permissions = $this->availableOnly($version->permissionKeys());
 
         $role = Role::query()->create([
             'ulid' => strtolower((string) Str::ulid()),
@@ -55,6 +38,80 @@ class RoleBuilder
         $this->setPermissions($role, $permissions);
 
         return ['role' => $role, 'permissions' => $permissions];
+    }
+
+    /**
+     * What a newer version of the role's template would change: permissions it
+     * adds (only those available to this school) and removes. Null when the role
+     * has no template or is already on the latest version. The school's own
+     * edits are never part of the plan.
+     *
+     * @return array{added: list<string>, removed: list<string>, to_version: int}|null
+     */
+    public function pendingUpdate(Role $role): ?array
+    {
+        if ($role->source_template_key === null || $role->source_template_version === null) {
+            return null;
+        }
+
+        $template = RoleTemplate::query()->where('key', $role->source_template_key)->first();
+
+        if ($template === null || $template->current_version <= $role->source_template_version) {
+            return null;
+        }
+
+        $old = $template->versions()->where('version', $role->source_template_version)->first()?->permissionKeys() ?? [];
+        $new = $template->currentVersion()->permissionKeys();
+
+        return [
+            'added' => $this->availableOnly(array_values(array_diff($new, $old))),
+            'removed' => array_values(array_diff($old, $new)),
+            'to_version' => $template->current_version,
+        ];
+    }
+
+    /**
+     * Applies a plan from pendingUpdate() and moves the role to the new version.
+     *
+     * @param  array{added: list<string>, removed: list<string>, to_version: int}  $plan
+     * @return list<string> The role's permissions afterwards
+     */
+    public function applyUpdate(Role $role, array $plan): array
+    {
+        $permissions = array_values(array_diff(array_unique([...$role->permissionKeys(), ...$plan['added']]), $plan['removed']));
+
+        $this->setPermissions($role, $permissions);
+        $role->forceFill(['source_template_version' => $plan['to_version']])->save();
+
+        return $permissions;
+    }
+
+    /**
+     * @param  list<string>  $keys
+     * @return list<string> Keys that exist in the catalog and whose module is in this school's plan
+     */
+    private function availableOnly(array $keys): array
+    {
+        $catalog = $this->authorizer->catalog();
+        $tenant = Tenant::current();
+        $modulesInPlan = [];
+        $available = [];
+
+        foreach ($keys as $key) {
+            $module = $catalog[$key]['module'] ?? null;
+
+            if ($module === null || ! $tenant instanceof Tenant) {
+                continue;
+            }
+
+            $modulesInPlan[$module] ??= $tenant->hasModule($module);
+
+            if ($modulesInPlan[$module]) {
+                $available[] = $key;
+            }
+        }
+
+        return $available;
     }
 
     /**
