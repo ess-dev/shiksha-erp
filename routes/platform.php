@@ -3,6 +3,7 @@
 use App\Http\Controllers\Platform\DashboardController;
 use App\Http\Controllers\Platform\PlanController;
 use App\Http\Controllers\Platform\SchoolController;
+use App\Http\Controllers\Platform\SchoolManagementController;
 use App\Http\Controllers\Platform\SignInController;
 use App\Http\Controllers\Platform\TwoStepChallengeController;
 use App\Http\Controllers\Platform\TwoStepSetupController;
@@ -42,6 +43,11 @@ Route::middleware('platform.host')->name('platform.')->group(function () {
 
             Route::get('schools', [SchoolController::class, 'index'])->name('schools.index');
             Route::get('schools/export', [SchoolController::class, 'export'])->name('schools.export');
+            Route::get('schools/{school}', [SchoolController::class, 'show'])->name('schools.show');
+            Route::post('schools/{school}/suspend', [SchoolManagementController::class, 'suspend'])->name('schools.suspend');
+            Route::post('schools/{school}/reactivate', [SchoolManagementController::class, 'reactivate'])->name('schools.reactivate');
+            Route::patch('schools/{school}/plan', [SchoolManagementController::class, 'changePlan'])->name('schools.plan');
+            Route::patch('schools/{school}/modules', [SchoolManagementController::class, 'setModule'])->name('schools.modules');
 
             Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
             Route::patch('plans/{plan}', [PlanController::class, 'update'])->name('plans.update');

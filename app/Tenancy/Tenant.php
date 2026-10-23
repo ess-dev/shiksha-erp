@@ -28,6 +28,7 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  * @property string|null $since_on
  * @property string|null $trial_ends_on
  * @property string|null $renews_on
+ * @property string|null $suspended_reason
  */
 class Tenant extends BaseTenant
 {

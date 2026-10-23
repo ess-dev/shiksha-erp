@@ -21,8 +21,14 @@ final class MonthlyRevenue
             return 0;
         }
 
-        $annualPaise = max($students, $plan->min_students) * $plan->price_per_student_year_paise;
+        return intdiv(self::annualPaise($plan, $students) + 6, 12);
+    }
 
-        return intdiv($annualPaise + 6, 12);
+    /**
+     * Yearly value of a school on the plan, whatever its status.
+     */
+    public static function annualPaise(Plan $plan, int $students): int
+    {
+        return max($students, $plan->min_students) * $plan->price_per_student_year_paise;
     }
 }
