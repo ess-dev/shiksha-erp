@@ -52,6 +52,138 @@ export type PermissionRisk = 'normal' | 'sensitive' | 'critical';
 export type ScopeType = 'school' | 'campus' | 'wing' | 'sections';
 }
 }
+namespace Admissions {
+namespace Data {
+export type AdmissionAbilitiesData = {
+manage: boolean,
+enroll: boolean,
+documents: boolean,
+view_sensitive: boolean,
+settings: boolean,
+};
+export type AdmissionOptionsData = {
+genders: App.Domain.Students.Data.OptionData[],
+blood_groups: App.Domain.Students.Data.OptionData[],
+houses: App.Domain.Students.Data.OptionData[],
+sources: App.Domain.Students.Data.OptionData[],
+relations: App.Domain.Students.Data.OptionData[],
+campuses: App.Domain.Students.Data.OptionData[],
+classes: App.Domain.Admissions.Data.ClassOptionData[],
+offered: App.Domain.Admissions.Data.AdmissionPlaceData[],
+};
+export type AdmissionPlaceData = {
+campus_ulid: string,
+class_ulid: string,
+};
+export type ApplicationCardData = {
+ulid: string,
+name: string,
+class_name: string,
+campus_name: string,
+source: string,
+parent_name: string,
+stage: string,
+decision: string | null,
+is_closed: boolean,
+is_locked: boolean,
+days: number,
+missing_documents: number,
+student_ulid: string | null,
+};
+export type ApplicationDetailData = {
+ulid: string,
+name: string,
+stage: string,
+stage_label: string,
+next_stage: string | null,
+next_stage_label: string | null,
+decision: string | null,
+decision_label: string | null,
+is_closed: boolean,
+is_locked: boolean,
+class_name: string,
+campus_name: string,
+gender: string,
+gender_label: string,
+born_on: string | null,
+blood_group: string | null,
+address: string | null,
+house_ulid: string | null,
+parent_name: string,
+parent_relation: string,
+phone: string,
+email: string | null,
+source_label: string,
+enquired_on: string,
+notes: string | null,
+details_complete: boolean,
+missing_documents: number,
+student_ulid: string | null,
+documents: App.Domain.Admissions.Data.DocumentRowData[],
+history: App.Domain.Admissions.Data.HistoryRowData[],
+};
+export type BoardData = {
+summary: App.Domain.Admissions.Data.BoardSummaryData,
+stages: App.Domain.Admissions.Data.StageData[],
+cards: App.Domain.Admissions.Data.ApplicationCardData[],
+};
+export type BoardSummaryData = {
+open_applications: number,
+new_this_week: number,
+enrolled: number,
+conversion_percent: number,
+};
+export type ClassOptionData = {
+ulid: string,
+name: string,
+level: number,
+};
+export type DocumentRowData = {
+kind: string,
+label: string,
+is_required: boolean,
+is_received: boolean,
+file_name: string | null,
+uploaded_on: string | null,
+view_url: string | null,
+};
+export type DocumentRuleData = {
+kind: string,
+label: string,
+is_required: boolean,
+all_classes: boolean,
+class_ulids: string[],
+};
+export type DocumentSettingsData = {
+rules: App.Domain.Admissions.Data.DocumentRuleData[],
+classes: App.Domain.Admissions.Data.ClassOptionData[],
+is_default: boolean,
+};
+export type EnrolledApplicantData = {
+student_ulid: string,
+name: string,
+section_label: string,
+admission_number: string,
+roll_number: number,
+};
+export type HistoryRowData = {
+label: string,
+happened_on: string,
+note: string | null,
+};
+export type StageData = {
+stage: string,
+label: string,
+count: number,
+};
+}
+namespace Enums {
+export type AdmissionDecision = 'accepted' | 'waitlisted' | 'rejected';
+export type AdmissionDocumentKind = 'birth_certificate' | 'aadhaar' | 'transfer_certificate' | 'photo';
+export type AdmissionSource = 'walk_in' | 'website' | 'referral' | 'facebook_ad' | 'newspaper';
+export type AdmissionStage = 'enquiry' | 'application' | 'verified' | 'decision' | 'enrolled';
+}
+}
 namespace Audit {
 namespace Enums {
 export type AuditActorType = 'user' | 'staff' | 'guardian' | 'platform' | 'system';

@@ -50,6 +50,7 @@ class AccessCatalogSeeder extends Seeder
         'houses.manage' => ['core', 'normal', false, 'Add, rename and reorder school houses', 3],
         'admissions.view' => ['admissions', 'normal', false, 'See admission applications', 1],
         'admissions.manage' => ['admissions', 'sensitive', false, 'Process admissions', 1],
+        'admissions.enroll' => ['admissions', 'sensitive', false, 'Enroll accepted applicants as students', 5],
         'attendance.view' => ['attendance', 'normal', false, 'See attendance', 1],
         'attendance.mark' => ['attendance', 'normal', false, 'Mark attendance', 1],
         'leave.approve' => ['leave', 'normal', false, 'Approve student leave', 1],
@@ -98,6 +99,10 @@ class AccessCatalogSeeder extends Seeder
 
     private const ADMISSION_OFFICER_V3_ADDS = ['students.manage', 'students.view_sensitive', 'students.import', 'students.documents'];
 
+    private const ADMISSIONS_FULL = ['admissions.view', 'admissions.manage', 'admissions.enroll'];
+
+    private const ADMISSIONS_V5 = 'Adds enrolling accepted applicants, and the admissions pipeline for Coordinator and Front office';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -119,18 +124,21 @@ class AccessCatalogSeeder extends Seeder
             2 => ['Adds school structure permissions', '*'],
             3 => [self::STUDENTS_V3, '*'],
             4 => [self::SESSIONS_V4, '*'],
+            5 => [self::ADMISSIONS_V5, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
             2 => ['Adds school structure permissions', '*-restricted'],
             3 => [self::STUDENTS_V3, '*-restricted'],
             4 => [self::SESSIONS_V4, '*-restricted'],
+            5 => [self::ADMISSIONS_V5, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
             2 => [self::STRUCTURE_V2, [...self::COORDINATOR, 'structure.view']],
             3 => [self::STUDENTS_V3, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS]],
             4 => [self::SESSIONS_V4, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions']],
+            5 => [self::ADMISSIONS_V5, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL]],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],
@@ -148,6 +156,7 @@ class AccessCatalogSeeder extends Seeder
             1 => ['Initial version', self::ADMISSION_OFFICER],
             2 => [self::STRUCTURE_V2, [...self::ADMISSION_OFFICER, 'structure.view']],
             3 => [self::STUDENTS_V3, [...self::ADMISSION_OFFICER, 'structure.view', ...self::ADMISSION_OFFICER_V3_ADDS]],
+            5 => [self::ADMISSIONS_V5, [...self::ADMISSION_OFFICER, 'structure.view', ...self::ADMISSION_OFFICER_V3_ADDS, 'admissions.enroll']],
         ]],
         'transport_incharge' => ['Transport in-charge', false, [
             1 => ['Initial version', self::TRANSPORT_INCHARGE],
@@ -158,6 +167,7 @@ class AccessCatalogSeeder extends Seeder
         'front_office' => ['Front office', false, [
             1 => ['Initial version', self::FRONT_OFFICE],
             2 => [self::STRUCTURE_V2, [...self::FRONT_OFFICE, 'structure.view']],
+            5 => [self::ADMISSIONS_V5, [...self::FRONT_OFFICE, 'structure.view', 'admissions.manage']],
         ]],
     ];
 
