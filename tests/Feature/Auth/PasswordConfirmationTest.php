@@ -5,10 +5,12 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Concerns\HasCurrentSchool;
 use Tests\TestCase;
 
 class PasswordConfirmationTest extends TestCase
 {
+    use HasCurrentSchool;
     use RefreshDatabase;
 
     public function test_confirm_password_screen_can_be_rendered()

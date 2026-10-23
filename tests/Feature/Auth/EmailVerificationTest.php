@@ -8,10 +8,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Laravel\Fortify\Features;
+use Tests\Concerns\HasCurrentSchool;
 use Tests\TestCase;
 
 class EmailVerificationTest extends TestCase
 {
+    use HasCurrentSchool;
     use RefreshDatabase;
 
     protected function setUp(): void

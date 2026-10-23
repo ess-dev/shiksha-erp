@@ -7,10 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
+use Tests\Concerns\HasCurrentSchool;
 use Tests\TestCase;
 
 class SecurityTest extends TestCase
 {
+    use HasCurrentSchool;
     use RefreshDatabase;
 
     public function test_security_page_is_displayed()

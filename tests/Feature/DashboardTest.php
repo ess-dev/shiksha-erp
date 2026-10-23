@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCurrentSchool;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
+    use HasCurrentSchool;
     use RefreshDatabase;
 
     public function test_guests_are_redirected_to_the_login_page()
