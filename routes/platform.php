@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Platform\DashboardController;
 use App\Http\Controllers\Platform\PlanController;
+use App\Http\Controllers\Platform\SchoolController;
 use App\Http\Controllers\Platform\SignInController;
 use App\Http\Controllers\Platform\TwoStepChallengeController;
 use App\Http\Controllers\Platform\TwoStepSetupController;
@@ -38,6 +39,9 @@ Route::middleware('platform.host')->name('platform.')->group(function () {
 
         Route::middleware('platform.two_step')->group(function () {
             Route::get('overview', [DashboardController::class, 'index'])->name('dashboard');
+
+            Route::get('schools', [SchoolController::class, 'index'])->name('schools.index');
+            Route::get('schools/export', [SchoolController::class, 'export'])->name('schools.export');
 
             Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
             Route::patch('plans/{plan}', [PlanController::class, 'update'])->name('plans.update');

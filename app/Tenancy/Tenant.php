@@ -17,6 +17,17 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  * @property string|null $database_username
  * @property string|null $database_password
  * @property TenantStatus $status
+ * @property int|null $plan_id
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $board
+ * @property string|null $contact_name
+ * @property string|null $contact_email
+ * @property int $campus_count
+ * @property int $student_count
+ * @property string|null $since_on
+ * @property string|null $trial_ends_on
+ * @property string|null $renews_on
  */
 class Tenant extends BaseTenant
 {
@@ -34,6 +45,16 @@ class Tenant extends BaseTenant
         'database_username',
         'database_password',
         'status',
+        'city',
+        'state',
+        'board',
+        'contact_name',
+        'contact_email',
+        'campus_count',
+        'student_count',
+        'since_on',
+        'trial_ends_on',
+        'renews_on',
     ];
 
     /** @var list<string> */
