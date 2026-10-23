@@ -5,6 +5,7 @@ import {
     FolderGit2,
     LayoutGrid,
     ShieldCheck,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useCan } from '@/hooks/use-can';
 import { dashboard } from '@/routes';
+import { index as admissions } from '@/routes/admissions';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
 import { index as students } from '@/routes/students';
@@ -44,6 +46,7 @@ export function AppSidebar() {
     const canViewStructure = useCan('structure.view');
     const canViewStudents = useCan('students.view');
     const canViewRoles = useCan('roles.view');
+    const canViewAdmissions = useCan('admissions.view');
 
     const mainNavItems: NavItem[] = [
         {
@@ -57,6 +60,15 @@ export function AppSidebar() {
                       title: 'Students',
                       href: students(),
                       icon: Users,
+                  },
+              ]
+            : []),
+        ...(canViewAdmissions
+            ? [
+                  {
+                      title: 'Admissions',
+                      href: admissions(),
+                      icon: UserPlus,
                   },
               ]
             : []),

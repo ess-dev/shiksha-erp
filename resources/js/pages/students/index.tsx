@@ -6,11 +6,11 @@ import ImportDialog from '@/components/students/import-dialog';
 import ImportResultDialog from '@/components/students/import-result-dialog';
 import PastSessionBanner from '@/components/students/past-session-banner';
 import StudentsTable from '@/components/students/students-table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCan } from '@/hooks/use-can';
+import { index as admissions } from '@/routes/admissions';
 import {
     exportMethod,
     index,
@@ -41,6 +41,7 @@ export default function StudentsIndex({
     const page = usePage<{ campusSwitcher: CampusSwitcher | null }>();
     const canImport = useCan('students.import');
     const canExport = useCan('students.export');
+    const canAdmit = useCan('admissions.manage');
     const [importing, setImporting] = useState(false);
     const [dismissed, setDismissed] = useState<ImportResult | null>(null);
     const [search, setSearch] = useState(filters.q);
@@ -137,16 +138,13 @@ export default function StudentsIndex({
                                 </a>
                             </Button>
                         )}
-                        <Button
-                            size="sm"
-                            disabled
-                            title="New admission is pending: it arrives with the Admissions module"
-                        >
-                            <UserPlus /> New admission
-                            <Badge variant="secondary" className="ml-1">
-                                Pending
-                            </Badge>
-                        </Button>
+                        {canAdmit && !isPast && (
+                            <Button size="sm" asChild>
+                                <Link href={admissions()}>
+                                    <UserPlus /> New admission
+                                </Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

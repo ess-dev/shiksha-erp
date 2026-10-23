@@ -28,4 +28,9 @@ class HouseException extends DomainException
     {
         return new self('A prefix uses capital letters, digits and hyphens only, up to 12 characters.');
     }
+
+    public static function invalidDocumentRules(): self
+    {
+        return new self('Choose which classes each required document applies to.');
+    }
 }

@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\Access\RoleAssignmentController;
 use App\Http\Controllers\Access\RoleController;
+use App\Http\Controllers\Admissions\AdmissionController;
+use App\Http\Controllers\Admissions\AdmissionSettingsController;
+use App\Http\Controllers\Admissions\ApplicationController;
+use App\Http\Controllers\Admissions\ApplicationDocumentController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
@@ -77,4 +81,22 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('{student}/siblings/{sibling}', [SiblingController::class, 'destroy'])->name('siblings.destroy');
         Route::post('{student}/documents', [StudentDocumentController::class, 'store'])->name('documents.store');
     });
+});
+
+Route::middleware(['auth', 'module:admissions'])->prefix('admissions')->name('admissions.')->group(function () {
+    Route::get('/', [AdmissionController::class, 'index'])->name('index');
+    Route::post('/', [AdmissionController::class, 'store'])->name('store');
+
+    Route::get('settings', [AdmissionSettingsController::class, 'show'])->name('settings');
+    Route::put('settings/documents', [AdmissionSettingsController::class, 'update'])->name('settings.documents');
+
+    Route::post('{application}/move', [ApplicationController::class, 'move'])->name('move');
+    Route::put('{application}/details', [ApplicationController::class, 'details'])->name('details');
+    Route::put('{application}/notes', [ApplicationController::class, 'notes'])->name('notes');
+    Route::post('{application}/decision', [ApplicationController::class, 'decide'])->name('decision');
+    Route::post('{application}/enrol', [ApplicationController::class, 'enrol'])->name('enrol');
+
+    Route::put('{application}/documents/{kind}', [ApplicationDocumentController::class, 'received'])->name('documents.received');
+    Route::post('{application}/documents/{kind}', [ApplicationDocumentController::class, 'store'])->name('documents.store');
+    Route::get('{application}/documents/{kind}', [ApplicationDocumentController::class, 'show'])->middleware('signed')->name('documents.show');
 });

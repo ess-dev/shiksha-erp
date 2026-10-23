@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Access\Exceptions\GuardrailViolation;
+use App\Domain\Admissions\Exceptions\AdmissionException;
 use App\Domain\School\Exceptions\HouseException;
 use App\Domain\School\Exceptions\StructureException;
 use App\Domain\Students\Exceptions\StudentException;
@@ -62,6 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // (shown as not found), anything else a message on the form it came from.
         $exceptions->render(fn (StudentException $e, Request $request) => DomainRuleResponse::for($e, $request, 'student'));
         $exceptions->render(fn (HouseException $e, Request $request) => DomainRuleResponse::for($e, $request, 'house'));
+        $exceptions->render(fn (AdmissionException $e, Request $request) => DomainRuleResponse::for($e, $request, 'application'));
 
         // Access guardrails (nobody grants what they do not hold, critical confirmation, last owner).
         $exceptions->render(fn (GuardrailViolation $e, Request $request) => DomainRuleResponse::for($e, $request, 'roles'));

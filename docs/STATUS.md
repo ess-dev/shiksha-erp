@@ -9,7 +9,7 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 
 ## Next up
 
-- Owner to pick the next screen (suggested: the Principal's roles and assignments screen, or Admissions for "New admission"). Students slice 1 is built; see below.
+- Owner to pick the next screen. Students slice 1, the roles screen and Admissions are built; see below.
 
 ## To verify later (reminder list for the owner; ask about these in a later session)
 
@@ -23,6 +23,8 @@ Built on 2026-10-22 and covered by automated tests, but not yet tried by the own
 - **Placeholders** that need their modules: Attendance, Fees and Marks tabs, class teacher, fee billing on import, cancelling installments on TC, transport.
 - **Relaxed fields** to tighten later: blood group "Unknown", house "Not assigned".
 
+Admissions, built 2026-10-23: try Add enquiry, moving cards (arrows and drag), the "Documents still missing" prompt, uploading and viewing scans, Accept and Enroll (the scans should appear on the student's Documents tab), the required-documents page, and the board as a Coordinator and as a Front office user. Role templates are at version 5: each school must apply the update (Roles and access) before non-owner roles see the new permissions.
+
 ## School screens: Principal
 
 | Screen                                    | Status         | Notes                                                                                                                                                                     |
@@ -31,7 +33,9 @@ Built on 2026-10-22 and covered by automated tests, but not yet tried by the own
 | Students list `/students`                 | Done           | Search, class and status filters, 25 per page, Import, Export CSV, campus switcher; Attendance and Fees show "Not available yet".                                         |
 | Student profile `/students/{student}`     | Done           | Overview, Guardians, Enrollment history, Documents built; Attendance, Fees, Marks "Not available yet". Change section, Change roll, Edit details, Issue TC, Link sibling. |
 | Houses and numbering `/students/settings` | Done           | Not in the prototype: houses (add, rename, active/inactive, reorder), admission and TC number prefixes.                                                                   |
-| New admission                             | Pending        | Button is disabled and marked Pending; comes with Admissions.                                                                                                             |
+| New admission                             | Done           | Button links to the Admissions board (needs `admissions.manage`).                                                                                                         |
+| Admissions board `/admissions`            | Done           | Enquiry to Enrolled, drag and arrows, Add enquiry, details, documents, decision, Enroll. Fees not created yet. Not yet clicked through in a browser beyond viewing.       |
+| Required documents `/admissions/settings` | Done           | Not in the prototype: per-class required documents. Designed from the guide.                                                                                              |
 
 ## Super Admin screens (prototype: 9)
 
