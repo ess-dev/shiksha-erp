@@ -5,6 +5,7 @@ import {
     CalendarCheck,
     FolderGit2,
     LayoutGrid,
+    School,
     ShieldCheck,
     UserPlus,
     Users,
@@ -26,6 +27,7 @@ import { useCan } from '@/hooks/use-can';
 import { dashboard } from '@/routes';
 import { index as admissions } from '@/routes/admissions';
 import { index as attendance } from '@/routes/attendance';
+import { index as classes } from '@/routes/school/classes';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
 import { index as students } from '@/routes/students';
@@ -64,6 +66,15 @@ export function AppSidebar() {
                       title: 'Students',
                       href: students(),
                       icon: Users,
+                  },
+              ]
+            : []),
+        ...(canViewStructure
+            ? [
+                  {
+                      title: 'Classes',
+                      href: classes(),
+                      icon: School,
                   },
               ]
             : []),

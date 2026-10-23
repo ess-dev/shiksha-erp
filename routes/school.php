@@ -12,6 +12,7 @@ use App\Http\Controllers\Attendance\HolidayController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
+use App\Http\Controllers\School\ClassesController;
 use App\Http\Controllers\School\ClassTeacherController;
 use App\Http\Controllers\School\SchoolClassController;
 use App\Http\Controllers\School\SectionController;
@@ -28,6 +29,8 @@ use App\Http\Controllers\Students\StudentSectionController;
 use App\Http\Controllers\Students\StudentSettingsController;
 use App\Http\Controllers\Students\TransferCertificateController;
 use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth'])->get('classes', [ClassesController::class, 'index'])->name('school.classes.index');
 
 Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.')->group(function () {
     Route::get('/', [StructureController::class, 'index'])->name('index');

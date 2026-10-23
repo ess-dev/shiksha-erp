@@ -29,6 +29,11 @@ class StructureException extends DomainException
         return new self('Sections can only be added to an active campus.');
     }
 
+    public static function teacherAlreadyLeads(): self
+    {
+        return new self('That teacher already leads another class this year.');
+    }
+
     public static function duplicate(string $what): self
     {
         return new self("{$what} already exists.");

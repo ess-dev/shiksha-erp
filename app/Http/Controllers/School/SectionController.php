@@ -16,16 +16,25 @@ class SectionController extends Controller
         $identity = $request->user();
         abort_unless($identity instanceof Identity, 403);
 
-        $createSection->handle(
+        $campus = $request->campus();
+        $schoolClass = $request->schoolClass();
+
+        $section = $createSection->handle(
             $identity,
             $request->academicYear(),
-            $request->campus(),
-            $request->schoolClass(),
+            $campus,
+            $schoolClass,
             $request->string('name')->toString(),
             $request->filled('capacity') ? $request->integer('capacity') : null,
+            $request->filled('room') ? $request->string('room')->toString() : null,
+            $request->filled('class_teacher') ? $request->string('class_teacher')->toString() : null,
         );
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Section added.')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => __(':class-:section added on :campus.', [
+            'class' => $schoolClass->name,
+            'section' => $section->name,
+            'campus' => $campus->name,
+        ])]);
 
         return back();
     }

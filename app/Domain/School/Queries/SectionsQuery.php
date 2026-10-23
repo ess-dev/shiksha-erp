@@ -8,6 +8,8 @@ use App\Domain\Identity\Models\Identity;
 use App\Domain\School\Data\StructureData;
 use App\Domain\School\Models\Section;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 
 class SectionsQuery
@@ -28,10 +30,49 @@ class SectionsQuery
         ?string $classUlid = null,
         int $perPage = 30,
     ): LengthAwarePaginator {
+        $query = $this->scopedQuery($identity, $academicYearUlid, $campusUlid, $classUlid);
+
+        if ($query === null) {
+            return new Paginator([], 0, $perPage);
+        }
+
+        return $query->paginate($perPage)->through(fn (Section $section) => StructureData::section(
+            $section->ulid,
+            $section->name,
+            $section->capacity,
+            $section->status,
+            $section->academicYear->ulid,
+            $section->campus->ulid,
+            $section->campus->name,
+            $section->schoolClass->ulid,
+            $section->schoolClass->name,
+            $section->schoolClass->level,
+            $section->getAttribute('class_teacher_ulid'),
+            $section->getAttribute('class_teacher_name'),
+        ));
+    }
+
+    /**
+     * Every section the identity may see (same scoping as the paginated list),
+     * with campus, class and class teacher loaded; for screens that show all
+     * of them at once. Empty without `structure.view`.
+     *
+     * @return Collection<int, Section>
+     */
+    public function scopedSections(Identity $identity, ?string $academicYearUlid = null, ?string $campusUlid = null): Collection
+    {
+        return $this->scopedQuery($identity, $academicYearUlid, $campusUlid, null)?->get() ?? new Collection;
+    }
+
+    /**
+     * @return Builder<Section>|null Null when the identity may not see any section
+     */
+    private function scopedQuery(Identity $identity, ?string $academicYearUlid, ?string $campusUlid, ?string $classUlid): ?Builder
+    {
         $scopes = $this->scopes->get($identity, 'structure.view');
 
         if ($scopes->isEmpty()) {
-            return new Paginator([], 0, $perPage);
+            return null;
         }
 
         $query = Section::query()
@@ -72,19 +113,6 @@ class SectionsQuery
             $query->where('school_classes.ulid', $classUlid);
         }
 
-        return $query->paginate($perPage)->through(fn (Section $section) => StructureData::section(
-            $section->ulid,
-            $section->name,
-            $section->capacity,
-            $section->status,
-            $section->academicYear->ulid,
-            $section->campus->ulid,
-            $section->campus->name,
-            $section->schoolClass->ulid,
-            $section->schoolClass->name,
-            $section->schoolClass->level,
-            $section->getAttribute('class_teacher_ulid'),
-            $section->getAttribute('class_teacher_name'),
-        ));
+        return $query;
     }
 }

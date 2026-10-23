@@ -51,3 +51,7 @@ export type StructureFilters = {
     campus: string | null;
     class: string | null;
 };
+
+export type ClassesOverview = App.Domain.School.Data.ClassesOverviewData;
+export type ClassSection = App.Domain.School.Data.ClassSectionData;
+export type ClassCampus = App.Domain.School.Data.ClassCampusData;

@@ -29,6 +29,8 @@ class StoreSectionRequest extends FormRequest
             'class' => ['required', 'string', Rule::exists(SchoolClass::class, 'ulid')],
             'name' => ['required', 'string', 'max:20'],
             'capacity' => ['nullable', 'integer', 'min:1', 'max:500'],
+            'room' => ['nullable', 'string', 'max:30'],
+            'class_teacher' => ['nullable', 'string', 'max:26'],
         ];
     }
 

@@ -284,9 +284,43 @@ export type CampusSwitcherData = {
 campuses: App.Domain.School.Data.CampusOptionData[],
 selected: string | null,
 };
+export type ClassCampusData = {
+ulid: string,
+name: string,
+addable_classes: App.Domain.School.Data.ClassLevelOptionData[],
+};
 export type ClassLevelOptionData = {
 level: number,
 name: string,
+};
+export type ClassSectionData = {
+ulid: string,
+name: string,
+class_ulid: string,
+class_name: string,
+class_level: number,
+campus_ulid: string,
+room: string | null,
+capacity: number | null,
+students: number,
+girls: number,
+class_teacher_name: string | null,
+register_saved_at: string | null,
+register_absent: number,
+can_manage: boolean,
+next_section_name: string | null,
+};
+export type ClassesOverviewData = {
+academic_year_ulid: string | null,
+academic_year_name: string | null,
+campus_name: string | null,
+timezone: string,
+has_attendance: boolean,
+can_manage: boolean,
+campuses: App.Domain.School.Data.ClassCampusData[],
+sections: App.Domain.School.Data.ClassSectionData[],
+free_teachers: App.Domain.Access.Data.StaffOptionData[],
+class_ulids: Record<string, string>,
 };
 export type HolidayData = {
 ulid: string,

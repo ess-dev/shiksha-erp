@@ -17,6 +17,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
  * @property int $school_class_id
  * @property string $name
  * @property int|null $capacity
+ * @property string|null $room
  * @property string $status
  * @property int|null $class_teacher_staff_id
  */
@@ -27,7 +28,7 @@ class Section extends Model
     protected $table = 'sections';
 
     /** @var list<string> */
-    protected $fillable = ['ulid', 'academic_year_id', 'campus_id', 'school_class_id', 'name', 'capacity', 'status'];
+    protected $fillable = ['ulid', 'academic_year_id', 'campus_id', 'school_class_id', 'name', 'capacity', 'room', 'status'];
 
     public function getRouteKeyName(): string
     {
