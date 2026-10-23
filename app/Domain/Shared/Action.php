@@ -47,9 +47,12 @@ abstract class Action
         });
     }
 
-    protected function audit(AuditEntry $entry): void
+    /**
+     * @param  int|null  $tenantId  Platform-scope events: the school concerned, when it is not the current one
+     */
+    protected function audit(AuditEntry $entry, ?int $tenantId = null): void
     {
-        app(AuditRecorder::class)->record($entry, $this->auditScope);
+        app(AuditRecorder::class)->record($entry, $this->auditScope, $tenantId);
 
         $this->auditEvents++;
     }

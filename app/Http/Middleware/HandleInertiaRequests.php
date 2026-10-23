@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Identity\Data\AuthenticatedIdentityData;
+use App\Domain\Identity\Models\Identity;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,7 +41,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() instanceof Identity
+                    ? AuthenticatedIdentityData::fromIdentity($request->user())
+                    : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

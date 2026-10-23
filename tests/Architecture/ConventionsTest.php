@@ -65,17 +65,10 @@ arch('models are Eloquent models')
 it('keeps Eloquent writes out of controllers', function () {
     $writes = '/->(save|saveOrFail|update|updateOrCreate|delete|forceDelete|restore|insert|increment|decrement|fill|forceFill)\(|::(create|forceCreate|updateOrCreate|firstOrCreate|insert|upsert|destroy)\(/';
 
-    // Legacy starter-kit controllers that still write directly. Move each into
-    // an Action with the identity work, then remove it from this list.
-    $legacy = [
-        'Http/Controllers/Settings/ProfileController.php',
-        'Http/Controllers/Settings/SecurityController.php',
-    ];
-
     $offenders = [];
 
     foreach (controllerFiles() as $path => $contents) {
-        if (preg_match($writes, $contents) === 1 && ! in_array($path, $legacy, true)) {
+        if (preg_match($writes, $contents) === 1) {
             $offenders[] = $path;
         }
     }
@@ -128,8 +121,10 @@ it('keeps Domain modules out of each other\'s internals', function () {
 
             // Shared is the foundation every module builds on; it alone may use Audit.
             $sharedUsesAudit = $module === 'Shared' && $otherModule === 'Audit';
+            // Audit's enums (e.g. the scope an Action writes to) are its public vocabulary.
+            $auditVocabulary = $otherModule === 'Audit' && $layer === 'Enums';
 
-            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit) {
+            if ($otherModule !== $module && $otherModule !== 'Shared' && ! $allowed && ! $sharedUsesAudit && ! $auditVocabulary) {
                 $offenders[] = "{$path} uses {$otherModule}\\{$layer}";
             }
         }

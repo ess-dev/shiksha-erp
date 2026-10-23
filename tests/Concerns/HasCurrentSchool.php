@@ -2,6 +2,8 @@
 
 namespace Tests\Concerns;
 
+use App\Domain\Identity\Models\Identity;
+use App\Domain\Identity\Models\Membership;
 use App\Tenancy\Tenant;
 use Illuminate\Support\Str;
 
@@ -24,5 +26,29 @@ trait HasCurrentSchool
         ]);
 
         $this->school->makeCurrent();
+    }
+
+    /**
+     * A staff identity (password "password") with an active membership of the current school.
+     */
+    protected function staff(bool $twoFactor = false): Identity
+    {
+        $factory = Identity::factory();
+
+        $identity = ($twoFactor ? $factory->withTwoFactor() : $factory)->create();
+
+        $this->grantStaffMembership($identity);
+
+        return $identity;
+    }
+
+    protected function grantStaffMembership(Identity $identity, ?Tenant $school = null): Membership
+    {
+        return Membership::query()->create([
+            'ulid' => strtolower((string) Str::ulid()),
+            'identity_id' => $identity->id,
+            'tenant_id' => ($school ?? $this->school)->id,
+            'kind' => Membership::KIND_STAFF,
+        ]);
     }
 }
