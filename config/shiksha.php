@@ -83,6 +83,42 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Parent sign-in (phone + OTP)
+    |--------------------------------------------------------------------------
+    |
+    | illustrative - verify every number below with the owner. The "log"
+    | driver writes the code to the application log so the flow can be tried
+    | before an SMS provider is chosen (owner decision, 2026-10-23); it refuses
+    | to run in production, so a real provider must be added before launch.
+    |
+    */
+
+    'otp' => [
+        'driver' => env('SHIKSHA_OTP_DRIVER', 'log'),
+        'length' => 6,
+        'ttl_minutes' => 5,
+        'resend_seconds' => 30,
+        'max_attempts' => 5,
+        'per_phone_per_hour' => 5,
+        'per_ip_per_hour' => 20,
+        'per_school_per_hour' => 300,
+        'remember_days' => 30,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance
+    |--------------------------------------------------------------------------
+    |
+    | The percentage parents are told the school expects. illustrative - verify;
+    | it becomes a school setting when the owner asks.
+    |
+    */
+
+    'attendance_minimum_percent' => 75,
+
+    /*
+    |--------------------------------------------------------------------------
     | Billing contact
     |--------------------------------------------------------------------------
     |

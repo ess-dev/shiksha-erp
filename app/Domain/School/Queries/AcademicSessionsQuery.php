@@ -24,13 +24,13 @@ class AcademicSessionsQuery
     /**
      * Key and details of one session by ulid, or of the current one when null.
      *
-     * @return array{key: int, ulid: string, name: string, is_current: bool}|null
+     * @return array{key: int, ulid: string, name: string, is_current: bool, starts_on: string, ends_on: string}|null
      */
     public function find(?string $ulid = null): ?array
     {
         $query = AcademicYear::query();
         $year = $ulid === null ? $query->where('is_current', true)->first() : $query->where('ulid', $ulid)->first();
 
-        return $year === null ? null : ['key' => $year->id, 'ulid' => $year->ulid, 'name' => $year->name, 'is_current' => $year->is_current];
+        return $year === null ? null : ['key' => $year->id, 'ulid' => $year->ulid, 'name' => $year->name, 'is_current' => $year->is_current, 'starts_on' => $year->starts_on, 'ends_on' => $year->ends_on];
     }
 }

@@ -21,6 +21,27 @@ class SectionDirectoryQuery
     }
 
     /**
+     * Sections by internal key, for modules that store a section key (such as an enrolment).
+     *
+     * @param  list<int>  $keys
+     * @return array<int, SectionRefData>
+     */
+    public function byKeys(array $keys): array
+    {
+        if ($keys === []) {
+            return [];
+        }
+
+        $refs = [];
+
+        foreach ($this->base()->whereIn('sections.id', array_values(array_unique($keys)))->get() as $row) {
+            $refs[$row->id] = $this->ref($row);
+        }
+
+        return $refs;
+    }
+
+    /**
      * Active sections of the current academic year, optionally of one class level.
      *
      * @return list<SectionRefData>

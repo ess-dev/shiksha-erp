@@ -227,9 +227,25 @@ label: string,
 campus_name: string,
 relation: string,
 };
+export type StudentDayData = {
+date: string,
+state: App.Domain.Attendance.Enums.DayState,
+note: string | null,
+marked_by: string | null,
+marked_at: string | null,
+reason: string | null,
+};
+export type StudentTallyData = {
+present: number,
+late: number,
+absent: number,
+school_days: number,
+percent_tenths: number | null,
+};
 }
 namespace Enums {
 export type AttendanceStatus = 'present' | 'absent' | 'late';
+export type DayState = 'present' | 'absent' | 'late' | 'holiday' | 'off' | 'upcoming' | 'unmarked';
 export type RegisterState = 'closed' | 'view_only' | 'locked' | 'saved' | 'pending' | 'missed';
 }
 }
@@ -237,6 +253,15 @@ namespace Audit {
 namespace Enums {
 export type AuditActorType = 'user' | 'staff' | 'guardian' | 'platform' | 'system';
 export type AuditScope = 'tenant' | 'platform';
+}
+}
+namespace Identity {
+namespace Data {
+export type SchoolContextData = {
+is_parent_view: boolean,
+can_open_parent_view: boolean,
+can_open_staff_view: boolean,
+};
 }
 }
 namespace Platform {
@@ -368,6 +393,51 @@ admission_number: string,
 export type OptionData = {
 value: string,
 label: string,
+};
+export type ParentAttendanceData = {
+today: string,
+month: string,
+previous_month: string | null,
+next_month: string | null,
+days: App.Domain.Attendance.Data.StudentDayData[],
+month_tally: App.Domain.Attendance.Data.StudentTallyData,
+year_tally: App.Domain.Attendance.Data.StudentTallyData,
+session_name: string,
+is_current_session: boolean,
+minimum_percent: number,
+correction_window_days: number,
+absences: App.Domain.Attendance.Data.StudentDayData[],
+};
+export type ParentChildData = {
+ulid: string,
+name: string,
+first_name: string,
+relation: string,
+section_label: string,
+campus_name: string,
+roll_number: number | null,
+class_teacher_name: string | null,
+};
+export type ParentHomeData = {
+today: string,
+today_state: App.Domain.Attendance.Data.StudentDayData,
+week: App.Domain.Attendance.Data.StudentDayData[],
+month: App.Domain.Attendance.Data.StudentTallyData,
+month_label: string,
+year: App.Domain.Attendance.Data.StudentTallyData,
+session_name: string,
+is_current_session: boolean,
+};
+export type ParentShellData = {
+school_name: string,
+guardian_name: string,
+guardian_first_name: string,
+children: App.Domain.Students.Data.ParentChildData[],
+selected_child: string | null,
+sessions: App.Domain.School.Data.SessionSwitcherData | null,
+has_staff_context: boolean,
+attendance_enabled: boolean,
+timezone: string,
 };
 export type SectionOptionData = {
 ulid: string,

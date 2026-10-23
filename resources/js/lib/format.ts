@@ -103,3 +103,47 @@ export function initials(name: string): string {
         .map((word) => word[0]?.toUpperCase() ?? '')
         .join('');
 }
+
+/**
+ * Shows a calendar date ("2026-10-15") as its short weekday ("Thu"), read from
+ * the parts so it cannot shift with the time zone.
+ */
+export function formatWeekdayShort(value: string): string {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+
+    return match === null
+        ? value
+        : (WEEKDAYS[
+              new Date(
+                  Date.UTC(+match[1], +match[2] - 1, +match[3]),
+              ).getUTCDay()
+          ] ?? value);
+}
+
+const LONG_MONTHS = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
+
+/**
+ * Shows a month key ("2026-10") as "October 2026".
+ */
+export function formatMonthLong(value: string): string {
+    const match = /^(\d{4})-(\d{2})/.exec(value);
+    const month =
+        match === null ? undefined : LONG_MONTHS[Number(match[2]) - 1];
+
+    return match === null || month === undefined
+        ? value
+        : `${month} ${match[1]}`;
+}

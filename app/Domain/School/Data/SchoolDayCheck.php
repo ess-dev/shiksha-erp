@@ -11,5 +11,6 @@ final readonly class SchoolDayCheck
     public function __construct(
         public bool $isSchoolDay,
         public ?string $reason = null,
+        public bool $isHoliday = false,
     ) {}
 }
