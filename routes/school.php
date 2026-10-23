@@ -1,11 +1,24 @@
 <?php
 
+use App\Http\Controllers\Access\RoleAssignmentController;
+use App\Http\Controllers\Access\RoleController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
+use App\Http\Controllers\School\CampusSelectionController;
 use App\Http\Controllers\School\SchoolClassController;
 use App\Http\Controllers\School\SectionController;
+use App\Http\Controllers\School\SessionSelectionController;
 use App\Http\Controllers\School\StructureController;
 use App\Http\Controllers\School\SubjectController;
+use App\Http\Controllers\Students\HouseController;
+use App\Http\Controllers\Students\SiblingController;
+use App\Http\Controllers\Students\StudentController;
+use App\Http\Controllers\Students\StudentDocumentController;
+use App\Http\Controllers\Students\StudentExportController;
+use App\Http\Controllers\Students\StudentImportController;
+use App\Http\Controllers\Students\StudentSectionController;
+use App\Http\Controllers\Students\StudentSettingsController;
+use App\Http\Controllers\Students\TransferCertificateController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.')->group(function () {
@@ -20,4 +33,48 @@ Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.
     Route::post('classes', [SchoolClassController::class, 'store'])->name('classes.store');
     Route::post('subjects', [SubjectController::class, 'store'])->name('subjects.store');
     Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
+});
+
+Route::middleware(['auth'])->prefix('school/roles')->name('school.roles.')->group(function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::post('/', [RoleController::class, 'store'])->name('store');
+    Route::put('{role}/permissions', [RoleController::class, 'update'])->name('permissions');
+    Route::post('{role}/template-update', [RoleController::class, 'applyUpdate'])->name('template-update');
+
+    Route::post('{role}/staff/{staff}', [RoleAssignmentController::class, 'store'])->name('assign');
+    Route::delete('assignments/{assignment}', [RoleAssignmentController::class, 'destroy'])->name('assignments.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::put('school/campus', [CampusSelectionController::class, 'update'])->name('school.campus.select');
+    Route::put('school/session', [SessionSelectionController::class, 'update'])->name('school.session.select');
+
+    Route::prefix('students')->name('students.')->group(function () {
+        Route::get('/', [StudentController::class, 'index'])->name('index');
+        Route::get('export', StudentExportController::class)->name('export');
+
+        Route::get('import/template', [StudentImportController::class, 'template'])->name('import.template');
+        Route::post('import/preview', [StudentImportController::class, 'preview'])->name('import.preview');
+        Route::post('import', [StudentImportController::class, 'store'])->name('import.store');
+
+        Route::get('settings', [StudentSettingsController::class, 'show'])->name('settings');
+        Route::put('settings/numbering', [StudentSettingsController::class, 'updateNumbering'])->name('settings.numbering');
+        Route::post('settings/houses', [HouseController::class, 'store'])->name('houses.store');
+        Route::put('settings/houses/order', [HouseController::class, 'reorder'])->name('houses.reorder');
+        Route::patch('settings/houses/{house}', [HouseController::class, 'update'])->name('houses.update');
+
+        Route::post('documents/{document}/verify', [StudentDocumentController::class, 'verify'])->name('documents.verify');
+        Route::get('documents/{document}', [StudentDocumentController::class, 'show'])->middleware('signed')->name('documents.show');
+
+        Route::get('{student}', [StudentController::class, 'show'])->name('show');
+        Route::patch('{student}', [StudentController::class, 'update'])->name('update');
+        Route::post('{student}/section', [StudentSectionController::class, 'store'])->name('section');
+        Route::patch('{student}/roll-number', [StudentSectionController::class, 'updateRoll'])->name('roll-number');
+        Route::post('{student}/transfer-certificate', [TransferCertificateController::class, 'store'])->name('tc.store');
+        Route::get('{student}/transfer-certificate', [TransferCertificateController::class, 'show'])->name('tc.show');
+        Route::get('{student}/sibling-candidates', [SiblingController::class, 'candidates'])->name('siblings.candidates');
+        Route::post('{student}/siblings', [SiblingController::class, 'store'])->name('siblings.store');
+        Route::delete('{student}/siblings/{sibling}', [SiblingController::class, 'destroy'])->name('siblings.destroy');
+        Route::post('{student}/documents', [StudentDocumentController::class, 'store'])->name('documents.store');
+    });
 });

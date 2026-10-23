@@ -1,6 +1,10 @@
 <?php
 
+use App\Domain\Access\Exceptions\GuardrailViolation;
+use App\Domain\School\Exceptions\HouseException;
 use App\Domain\School\Exceptions\StructureException;
+use App\Domain\Students\Exceptions\StudentException;
+use App\Http\DomainRuleResponse;
 use App\Http\Middleware\EnsureActiveMembership;
 use App\Http\Middleware\EnsureModuleInPlan;
 use App\Http\Middleware\EnsurePlatformHost;
@@ -53,6 +57,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? response()->json(['message' => $e->getMessage(), 'errors' => ['structure' => [$e->getMessage()]]], 422)
                 : back()->withErrors(['structure' => $e->getMessage()]);
         });
+
+        // Student and house rules: 403 is a refusal, 404 a record outside the person's reach
+        // (shown as not found), anything else a message on the form it came from.
+        $exceptions->render(fn (StudentException $e, Request $request) => DomainRuleResponse::for($e, $request, 'student'));
+        $exceptions->render(fn (HouseException $e, Request $request) => DomainRuleResponse::for($e, $request, 'house'));
+
+        // Access guardrails (nobody grants what they do not hold, critical confirmation, last owner).
+        $exceptions->render(fn (GuardrailViolation $e, Request $request) => DomainRuleResponse::for($e, $request, 'roles'));
 
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

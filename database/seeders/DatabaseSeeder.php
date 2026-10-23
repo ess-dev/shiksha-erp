@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             DemoSchoolsSeeder::class,
             DemoStaffSeeder::class,
             DemoStructureSeeder::class,
+            DemoStudentsSeeder::class,
+            DemoCoordinatorSeeder::class,
         ]);
     }
 }

@@ -13,7 +13,7 @@ export type PlatformOverview = {
     plan_names: string[];
     schools_total: number;
     schools_by_status: Record<
-        'trial' | 'active' | 'suspended' | 'expired',
+        'trial' | 'active' | 'suspended' | 'expired' | 'deleting',
         number
     >;
 };
@@ -34,7 +34,12 @@ export type PlatformPlan = {
     schools_count: number;
 };
 
-export type SchoolStatus = 'trial' | 'active' | 'suspended' | 'expired';
+export type SchoolStatus =
+    | 'trial'
+    | 'active'
+    | 'suspended'
+    | 'expired'
+    | 'deleting';
 
 export type PlatformSchool = {
     ulid: string;

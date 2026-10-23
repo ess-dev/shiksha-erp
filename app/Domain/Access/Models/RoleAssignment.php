@@ -36,6 +36,11 @@ class RoleAssignment extends Model
         return ['scope_type' => ScopeType::class, 'scope' => 'array'];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return BelongsTo<Role, $this>
      */

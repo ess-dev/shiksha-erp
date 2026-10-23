@@ -19,6 +19,16 @@ class SchoolChangeException extends DomainException
         return new self('This school is not suspended.');
     }
 
+    public static function deleteNotConfirmed(): self
+    {
+        return new self('The confirmation text does not match, so nothing was deleted.');
+    }
+
+    public static function notDeleting(): self
+    {
+        return new self('This school is not being deleted.');
+    }
+
     public static function unknownModule(string $key): self
     {
         return new self("[{$key}] is not a sellable module.");

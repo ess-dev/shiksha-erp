@@ -33,6 +33,11 @@ class Role extends Model
         return ['is_owner' => 'boolean'];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return HasMany<RolePermission, $this>
      */

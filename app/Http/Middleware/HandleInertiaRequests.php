@@ -9,6 +9,12 @@ use App\Domain\Identity\Data\AuthenticatedIdentityData;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\Platform\Data\PlatformUserData;
 use App\Domain\Platform\Models\PlatformUser;
+use App\Domain\School\Data\CampusOptionData;
+use App\Domain\School\Data\CampusSwitcherData;
+use App\Domain\School\Data\SessionSwitcherData;
+use App\Domain\School\Queries\AccessibleCampusesQuery;
+use App\Domain\Students\StudentSession;
+use App\Tenancy\Tenant;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -59,6 +65,8 @@ class HandleInertiaRequests extends Middleware
                     && app(TwoStepRequirement::class)->isRequiredFor($request->user())
                     && ! app(TwoStepRequirement::class)->isSatisfiedBy($request->user()),
             ],
+            'campusSwitcher' => fn () => $this->campusSwitcher($request),
+            'sessionSwitcher' => fn () => $this->sessionSwitcher($request),
             'platform' => [
                 'user' => $request->user('platform') instanceof PlatformUser
                     ? PlatformUserData::fromUser($request->user('platform'))
@@ -66,5 +74,46 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * The top-bar session switcher: only for people holding
+     * `students.view_past_sessions` in a school with more than one session.
+     */
+    private function sessionSwitcher(Request $request): ?SessionSwitcherData
+    {
+        $user = $request->user();
+
+        if (! $user instanceof Identity || ! Tenant::current() instanceof Tenant) {
+            return null;
+        }
+
+        $chosen = $request->session()->get('school.session');
+
+        return app(StudentSession::class)->switcher($user, is_string($chosen) ? $chosen : null);
+    }
+
+    /**
+     * The top-bar campus switcher: only for people who can reach more than one
+     * campus. A remembered choice that is no longer reachable is ignored.
+     */
+    private function campusSwitcher(Request $request): ?CampusSwitcherData
+    {
+        $user = $request->user();
+
+        if (! $user instanceof Identity || ! Tenant::current() instanceof Tenant) {
+            return null;
+        }
+
+        $campuses = app(AccessibleCampusesQuery::class)->get($user);
+
+        if (count($campuses) < 2) {
+            return null;
+        }
+
+        $chosen = $request->session()->get('school.campus');
+        $reachable = array_map(fn (CampusOptionData $campus) => $campus->ulid, $campuses);
+
+        return new CampusSwitcherData($campuses, is_string($chosen) && in_array($chosen, $reachable, true) ? $chosen : null);
     }
 }
