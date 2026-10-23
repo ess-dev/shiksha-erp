@@ -1,25 +1,28 @@
 # Shiksha ERP — progress and next steps
 
+Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `c2b7e01`.
+Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `c2b7e01` plus uncommitted work (steps 9–11).
 
 ## Where things stand
 
-Branch `dev`, 9 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **171 tests pass** (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
+Branch `dev`, 9 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **222 tests pass** (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
 Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analyse --memory-limit=1G`, `vendor/bin/pest --compact`, `npm run types:check`, `npx vp check`, `npm run build`.
 
 ### Done (in order)
 
-| # | What | Commit |
-|---|---|---|
-| 1 | Starter kit baseline + `.ai` rules; Lefthook hooks | `7845c49` |
-| 2 | Landlord/tenant split, host-based school resolution, `tenants:provision`, demo schools | `929aad9` |
-| 3 | `school` and `module:<key>` middleware, tenant status, subdomain rules | `fda5955` |
-| 4 | Pest 4 + architecture tests (`tests/Architecture/ConventionsTest.php`) | `0fa7380` |
-| 5 | Append-only audit trail (tenant `audit_events`, landlord `platform_audit_events`), base `Action` | `cdda19b` |
-| 6 | Identities, memberships, staff sign-in (phone/email + password), membership re-check per request | `c7c6e1c` |
-| 7 | Permission catalog, versioned role templates, roles, scoped assignments, Gate integration, two-step enforcement | `cc87492` |
-| 8 | School structure: campuses, academic years, classes, sections, subjects; role-template update flow | `c2b7e01` |
+| #   | What                                                                                                                                                                            | Commit    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 1   | Starter kit baseline + `.ai` rules; Lefthook hooks                                                                                                                              | `7845c49` |
+| 2   | Landlord/tenant split, host-based school resolution, `tenants:provision`, demo schools                                                                                          | `929aad9` |
+| 3   | `school` and `module:<key>` middleware, tenant status, subdomain rules                                                                                                          | `fda5955` |
+| 4   | Pest 4 + architecture tests (`tests/Architecture/ConventionsTest.php`)                                                                                                          | `0fa7380` |
+| 5   | Append-only audit trail (tenant `audit_events`, landlord `platform_audit_events`), base `Action`                                                                                | `cdda19b` |
+| 6   | Identities, memberships, staff sign-in (phone/email + password), membership re-check per request                                                                                | `c7c6e1c` |
+| 7   | Permission catalog, versioned role templates, roles, scoped assignments, Gate integration, two-step enforcement                                                                 | `cc87492` |
+| 8   | School structure: campuses, academic years, classes, sections, subjects; role-template update flow                                                                              | `c2b7e01` |
+| 9   | School structure screen (`/school/structure`): lists + add forms, make-current year, campus status; sidebar link and `useCan` hook (uncommitted at time of writing)             | —         |
+| 10  | Super Admin foundation: `platform_users`, platform host, always-on two-step sign-in, platform shell matching the prototype, indigo/Inter theme (uncommitted at time of writing) | —         |
 
 ### Code map
 
@@ -29,6 +32,11 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 - `app/Domain/Identity/` — `Identity`, `Membership`, `StaffAuthenticator`, Actions (`CreateIdentity`, `GrantMembership`, `RevokeMembership`, `ChangeIdentityPassword`, `UpdateIdentityContact`).
 - `app/Domain/Access/` — `Authorizer` (answers permission keys through the Gate), `GrantGuard`, `Scope`/`ScopeSet`/`ScopeTarget`, `RoleBuilder`, `TwoStepRequirement`, Actions (`CreateRole`, `UpdateRolePermissions`, `AssignRole`, `RemoveRoleAssignment`, `CreateStaffRecord`, `SetUpSchoolOwner`, `ApplyRoleTemplateUpdate`), Queries (`PermissionScopesQuery`, `RoleTemplateUpdatesQuery`, `RoleNamesForIdentityQuery`).
 - `app/Domain/School/` — models, `StructureGuard`, Actions (`CreateCampus`, `UpdateCampus`, `CreateAcademicYear`, `SetCurrentAcademicYear`, `CreateSchoolClass`, `CreateSection`, `CreateSubject`, `SetClassSubjects`), Queries (`CampusesQuery`, `SectionsQuery`, `SchoolDefinitionsQuery`), `StructureData`.
+- `app/Domain/Platform/` — `PlatformUser` (landlord, guard `platform`), `PlatformAuthenticator`, `PlatformTwoStepSession`, Actions (`SignInPlatformUser`, `SignOutPlatformUser`, `StartTwoStepSetup`, `ConfirmTwoStepSetup`, `VerifyTwoStepChallenge`, `CreatePlatformUser`; all write `platform_audit_events`), Queries (`PlatformOverviewQuery`, `TwoStepSetupQuery`), Data. Controllers in `app/Http/Controllers/Platform/`, routes in `routes/platform.php`, pages in `resources/js/pages/platform/` (`platform/auth/*` use `platform-auth-layout`, the rest `platform-layout`).
+- Plans: landlord tables `platform_modules` (14 sellable modules, snake_case keys), `plans` (price per student per year in **paise**, `min_students`, optional `badge`), `plan_modules`, and `tenants.plan_id` (nullable). `PlanCatalogSeeder` creates missing modules/plans only (never overwrites edited plans; prices illustrative — verify). `UpdatePlan` Action syncs `tenant_modules` for schools whose `plan_id` is that plan (only for the plan-module keys). Screen: `resources/js/pages/platform/plans.tsx`, `components/platform/edit-plan-dialog.tsx`. Not built: subscriptions (trial/renewal/billing), assigning a plan to a school, MRR (card shows "MRR —"), add-on pricing, mapping of plan module keys to the permission catalog's modules (`students`, `leave` are not plan modules).
+- Platform dashboard (`/overview`): matches the prototype for what has data: header with today's date (`CalendarDate::today()`, zone from `config('shiksha.timezone')`, default Asia/Kolkata, illustrative), Schools card with status breakdown, Plans card, SVG doughnut "Subscriptions by status" (no chart library installed), "Super Admin" chip in the top bar. Still missing until subscriptions and student counts exist: MRR, Students managed, Trials converting, MRR by plan, Needs attention, Newest schools, Onboard a school button.
+- Platform host: `config('shiksha.platform_host')` (env `PLATFORM_HOST`, default `admin.<APP_BASE_DOMAIN>` = `admin.shiksha.localhost`). Platform routes are **not** route-domain-bound (Wayfinder would bake the host, and no port, into URLs); the `platform.host` middleware 404s other hosts, so platform paths must not clash with school/Fortify paths (hence `/overview`, `/sign-in`, `/two-step/*`). Middleware `platform.auth` then `platform.two_step`; `HomeController` serves `/` on every host. `SessionAuditActor` returns a `platform` actor when the `platform` guard is signed in.
+- Create a Super Admin: `php artisan platform:create-user "Name" email` (prompts for password). Local demo: `superadmin@shiksha.test` / `password` (seeded by `DemoPlatformUserSeeder`, local/testing only); it has no two-step secret until you enrol your own authenticator at first sign-in.
 - Middleware (`bootstrap/app.php`): `EnsureActiveMembership`, `EnsureTwoStepWhenRequired` run on every web request; aliases `school`, `module`. All school routes in `routes/web.php` and Fortify routes sit behind `school`.
 - Migrations: `database/migrations/landlord/` (tenants, tenant_modules, platform audit, identities/memberships, permission catalog and templates) and `database/migrations/tenant/` (audit_events, staff/roles/assignments, school structure). `php artisan migrate` runs landlord only; tenants are migrated by `ProvisionTenant::migrate()` (the demo seeder re-runs it for existing schools).
 - Seeders: `AccessCatalogSeeder` (platform data), `DemoSchoolsSeeder`, `DemoStaffSeeder`, `DemoStructureSeeder`; `php artisan db:seed` runs all of them and is safe to repeat.
@@ -56,10 +64,12 @@ Product domain details, staging host (P11), mobile API style (P4.3), payment gat
 
 ## Known gaps and debts
 
-- No role-management or school-structure **screens** yet; all of the above is backend + tests. The shared `auth.abilities` prop exists but no page uses it.
+- School-structure screen exists (`resources/js/pages/school/structure.tsx`, controllers in `app/Http/Controllers/School/`, routes in `routes/school.php`). Not yet looked at in a browser; covered by Pest feature tests and `tsc`/lint/build only. Not built there: assigning subjects to classes (`SetClassSubjects`), a shared `data-table` (TanStack is not installed; plain tables used), translation keys (strings are English literals like the kit pages).
+- No role-management **screens** or "template update available" prompt yet; `auth.abilities` is used only by the structure page and sidebar.
 - Class-teacher / subject-teacher auto-assignment (needs allocation + timetable) not built; `role_assignments.source = 'auto'` is reserved.
 - Owner transfer through the platform, support access, and platform audit viewer not built.
-- `platform_users` (Super Admin) and platform host: not built. Parent OTP sign-in, `pending_guardian_links`, Sanctum tokens: not built. SMS goes behind a driver interface with a log/fake driver when built.
+- Super Admin: only sign-in, two-step and an overview of schools by status exist. The sidebar lists all prototype entries (Schools, Plans, Onboard a school, Revenue, Roles and permissions, Activity logs, My profile) as disabled "Soon". No password reset or password change for Super Admin yet; no re-confirm/reset of a lost two-step device (another Super Admin or the console must clear the secret); no UI to add or disable Super Admins. Theme tokens (indigo palette, Inter font) were changed globally in `resources/css/app.css` and `vite.config.ts`, so the school area is restyled too; dark-mode tokens are untouched. Wayfinder must be generated with form variants for the CLI (`php artisan wayfinder:generate --with-form`); the Vite plugin already does. Not checked: the Apache vhost for `admin.shiksha.localhost` (checked only with `php artisan serve --port=8000`).
+- Parent OTP sign-in, `pending_guardian_links`, Sanctum tokens: not built. SMS goes behind a driver interface with a log/fake driver when built.
 - Two-step is enforced for owners and holders of critical permissions only; there is no UI beyond the kit's security settings page.
 - Translations: error pages get text from `lang/en/school.php`; the Laravel-to-React translation sharing (decision D4) is not built. Most kit pages still have hardcoded English strings.
 - Per-school database roles with encrypted credentials (decision D3) — columns exist, local setup uses the shared `shiksha` role.
@@ -74,11 +84,11 @@ Product domain details, staging host (P11), mobile API style (P4.3), payment gat
 
 Each step: read the relevant rules, plan briefly, build with Actions/Queries/Policies, write tests (happy path, authorization matrix, tenant isolation, edge cases), run the gates, update this file, commit.
 
-1. **First screens (Inertia + React)** — school structure (campuses, years, classes, sections, subjects) and roles/assignments, using the existing Queries and Actions. Needs: controllers in `app/Http/Controllers` (or `app/Http/Web/<Module>` per the layout rule), Form Requests, Policies/Gates, Wayfinder, shared `data-table`, `lib/format.ts`, abilities-driven UI, translation keys, mobile-first. Also add the "template update available" prompt.
+1. **First screens (Inertia + React)** — school structure is done (see above); still to do: roles/assignments, using the existing Queries and Actions. Needs: controllers in `app/Http/Controllers` (or `app/Http/Web/<Module>` per the layout rule), Form Requests, Policies/Gates, Wayfinder, shared `data-table`, `lib/format.ts`, abilities-driven UI, translation keys, mobile-first. Also add the "template update available" prompt.
 2. **Students and guardians** — students, guardians, enrolment per section/year, guardian–student link with portal-access flag, shared-family-phone warning, masked sensitive fields, `students.*` permissions already in the catalog. Needs `spatie/laravel-data` decision first.
 3. **Parent sign-in** — phone + OTP (hashed, single-use, rate-limited per phone/IP/school), SMS driver interface with log/fake driver, guardian membership + context switcher, `pending_guardian_links`.
 4. **Admissions** → **Attendance** → **Fees (Money value object, paise, idempotent payments)** → **Exams** → **Communication** → **Homework** — order is an open decision; confirm with the owner.
-5. **Platform (Super Admin)** — `platform_users`, platform host, two-step always, tenant management screens, owner transfer, support access, platform audit viewer.
+5. **Platform (Super Admin)** — done: `platform_users`, platform host, two-step always, shell, Plans screen. Next, in order: subscriptions; Schools list/detail (suspend, reactivate, change plan, modules); "Onboard a school" wizard (stage A: organization, plan/trial, campus, academic year, classes/sections, owner invite via the existing provisioning and structure Actions; stage B: student import, fees, modules after those modules exist); then dashboard KPIs, Revenue, Roles and permissions screen, Activity logs; owner transfer, support access, platform audit viewer.
 6. **Housekeeping** — class-teacher/subject-teacher auto roles, per-school DB roles (D3), D4 translations, D11 storage disk, faster tests, module docs, Pest browser tests, CI pipeline on Linux, remote + protected branches.
 
 ## How to start a new session

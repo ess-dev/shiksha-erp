@@ -11,7 +11,7 @@ class StructureException extends DomainException
 {
     public static function notAllowed(): self
     {
-        return new self('You are not allowed to change the school structure here.');
+        return new self('You are not allowed to change the school structure here.', 403);
     }
 
     public static function yearEndsBeforeItStarts(): self

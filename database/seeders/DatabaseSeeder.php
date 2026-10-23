@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AccessCatalogSeeder::class,
+            PlanCatalogSeeder::class,
+            DemoPlatformUserSeeder::class,
             DemoSchoolsSeeder::class,
             DemoStaffSeeder::class,
             DemoStructureSeeder::class,

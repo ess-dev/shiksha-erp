@@ -3,6 +3,7 @@
 namespace App\Domain\Shared;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use InvalidArgumentException;
 
 /**
@@ -11,6 +12,15 @@ use InvalidArgumentException;
  */
 final class CalendarDate
 {
+    /**
+     * Today's date in the school time zone (default Asia/Kolkata), never via UTC.
+     * The one place business rules should ask for "today".
+     */
+    public static function today(): string
+    {
+        return (new DateTimeImmutable('now', new DateTimeZone((string) config('shiksha.timezone'))))->format('Y-m-d');
+    }
+
     /**
      * @throws InvalidArgumentException when the text is not a real date
      */

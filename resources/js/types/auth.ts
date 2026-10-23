@@ -15,6 +15,7 @@ export type Abilities = {
 export type Auth = {
     user: User;
     abilities: Abilities;
+    two_step_required: boolean;
 };
 
 export type TwoFactorSetupData = {

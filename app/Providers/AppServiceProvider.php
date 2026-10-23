@@ -8,10 +8,14 @@ use App\Domain\Audit\Contracts\ResolvesAuditActor;
 use App\Domain\Audit\SessionAuditActor;
 use App\Domain\Identity\Models\Identity;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureAccessGate();
+        $this->configurePlatformRateLimiting();
 
         // `php artisan migrate` runs landlord migrations only; tenant migrations
         // run per school via `tenants:artisan`.
@@ -55,6 +60,21 @@ class AppServiceProvider extends ServiceProvider
 
             return app(Authorizer::class)->allows($user, $ability, $target instanceof ScopeTarget ? $target : null);
         });
+    }
+
+    /**
+     * Super Admin sign-in is limited per email and IP; two-step attempts per
+     * signed-in user (and IP), so a stolen password cannot be used to guess codes.
+     */
+    protected function configurePlatformRateLimiting(): void
+    {
+        RateLimiter::for('platform-sign-in', fn (Request $request) => Limit::perMinute(5)->by(
+            Str::lower((string) $request->input('email')).'|'.$request->ip(),
+        ));
+
+        RateLimiter::for('platform-two-step', fn (Request $request) => Limit::perMinute(5)->by(
+            ($request->user('platform')?->getAuthIdentifier() ?? 'guest').'|'.$request->ip(),
+        ));
     }
 
     /**

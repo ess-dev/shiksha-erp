@@ -24,6 +24,11 @@ class AcademicYear extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'name', 'starts_on', 'ends_on', 'is_current'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return array<string, string>
      */

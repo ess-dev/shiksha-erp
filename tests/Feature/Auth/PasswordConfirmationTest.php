@@ -31,4 +31,17 @@ class PasswordConfirmationTest extends TestCase
 
         $response->assertRedirect(route('login'));
     }
+
+    public function test_password_can_be_confirmed_with_the_correct_password_only()
+    {
+        $user = $this->staff();
+
+        $this->actingAs($user)
+            ->post(route('password.confirm.store'), ['password' => 'wrong-password'])
+            ->assertSessionHasErrors('password');
+
+        $this->actingAs($user)
+            ->post(route('password.confirm.store'), ['password' => 'password'])
+            ->assertSessionHasNoErrors();
+    }
 }

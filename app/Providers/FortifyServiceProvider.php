@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Actions\Fortify\ResetUserPassword;
 use App\Domain\Identity\Authentication\StaffAuthenticator;
+use App\Domain\Identity\Models\Identity;
 use App\Http\Responses\GenericPasswordResetLinkResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -50,6 +52,14 @@ class FortifyServiceProvider extends ServiceProvider
                 (string) $request->input('password'),
             );
         });
+
+        // Identities sign in with phone or email, so there is no single
+        // "login" column for Fortify's default password check to query.
+        Fortify::confirmPasswordsUsing(
+            fn (Identity $identity, ?string $password) => $password !== null
+                && is_string($identity->password)
+                && Hash::check($password, $identity->password),
+        );
     }
 
     /**

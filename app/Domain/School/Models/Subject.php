@@ -21,6 +21,11 @@ class Subject extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'name', 'code', 'status'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

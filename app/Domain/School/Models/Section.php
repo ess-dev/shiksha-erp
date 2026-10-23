@@ -28,6 +28,11 @@ class Section extends Model
     /** @var list<string> */
     protected $fillable = ['ulid', 'academic_year_id', 'campus_id', 'school_class_id', 'name', 'capacity', 'status'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
     /**
      * @return BelongsTo<AcademicYear, $this>
      */
