@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\School\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/platform.php';
@@ -9,7 +10,7 @@ Route::get('/', HomeController::class)->name('home');
 
 Route::middleware('school')->group(function () {
     Route::middleware(['auth'])->group(function () {
-        Route::inertia('dashboard', 'dashboard')->name('dashboard');
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
     });
 
     require __DIR__.'/parent.php';

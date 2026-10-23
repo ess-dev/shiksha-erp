@@ -118,6 +118,17 @@ return [
     'attendance_minimum_percent' => 75,
 
     /*
+    | "Frequent absences" on the staff dashboard: a student absent at least
+    | `absences` times in the last `school_days` school days before today.
+    | illustrative - verify; it becomes a school setting when the owner asks.
+    */
+
+    'attendance_frequent_absence' => [
+        'absences' => 3,
+        'school_days' => 10,
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Billing contact
     |--------------------------------------------------------------------------

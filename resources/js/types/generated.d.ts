@@ -65,6 +65,12 @@ documents: boolean,
 view_sensitive: boolean,
 settings: boolean,
 };
+export type AdmissionFunnelData = {
+open_applications: number,
+new_this_week: number,
+conversion_percent: number,
+stages: App.Domain.Admissions.Data.StageData[],
+};
 export type AdmissionOptionsData = {
 genders: App.Domain.Students.Data.OptionData[],
 blood_groups: App.Domain.Students.Data.OptionData[],
@@ -190,6 +196,40 @@ export type AdmissionStage = 'enquiry' | 'application' | 'verified' | 'decision'
 }
 namespace Attendance {
 namespace Data {
+export type AbsentStudentData = {
+student_ulid: string,
+name: string,
+roll_number: number | null,
+admission_number: string,
+section_label: string,
+campus_name: string,
+guardian_name: string | null,
+guardian_relation: string | null,
+guardian_phone: string | null,
+days_in_a_row: number,
+marked_by: string | null,
+marked_at: string,
+};
+export type AttendanceDashboardData = {
+today: string,
+closed_reason: string | null,
+percent_tenths: number | null,
+absent: number,
+sections_marked: number,
+sections_total: number,
+trend: App.Domain.Attendance.Data.AttendanceTrendPointData[],
+unmarked_sections: string[],
+frequent_absent_count: number,
+frequent_absentees: string[],
+frequent_absence_threshold: number,
+frequent_absence_days: number,
+absentees: App.Domain.Attendance.Data.AbsentStudentData[],
+absentees_total: number,
+};
+export type AttendanceTrendPointData = {
+date: string,
+percent_tenths: number | null,
+};
 export type RegisterData = {
 sections: App.Domain.Attendance.Data.SectionChoiceData[],
 section: string | null,
@@ -333,6 +373,17 @@ name: string,
 status: string,
 student_count: number,
 };
+export type SchoolDashboardData = {
+staff_name: string | null,
+part_of_day: string,
+today: string,
+campus_name: string | null,
+academic_year_name: string | null,
+timezone: string,
+attendance: App.Domain.Attendance.Data.AttendanceDashboardData | null,
+admissions: App.Domain.Admissions.Data.AdmissionFunnelData | null,
+holidays: App.Domain.School.Data.UpcomingHolidayData[],
+};
 export type SchoolSettingsData = {
 admission_prefix: string,
 tc_prefix: string,
@@ -400,6 +451,12 @@ subjects: App.Domain.School.Data.SubjectRowData[],
 sections: App.Domain.School.Data.SubjectSectionOptionData[],
 selected_section: App.Domain.School.Data.SectionTeachersData | null,
 staff: App.Domain.Access.Data.StaffOptionData[],
+};
+export type UpcomingHolidayData = {
+name: string,
+starts_on: string,
+ends_on: string | null,
+days_away: number,
 };
 }
 namespace Enums {

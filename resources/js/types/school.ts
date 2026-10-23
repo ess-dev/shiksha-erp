@@ -61,3 +61,12 @@ export type SectionTeachers = App.Domain.School.Data.SectionTeachersData;
 export type ClassesOverview = App.Domain.School.Data.ClassesOverviewData;
 export type ClassSection = App.Domain.School.Data.ClassSectionData;
 export type ClassCampus = App.Domain.School.Data.ClassCampusData;
+
+export type SchoolDashboard = App.Domain.School.Data.SchoolDashboardData;
+export type UpcomingHoliday = App.Domain.School.Data.UpcomingHolidayData;
+export type AttendanceDashboard =
+    App.Domain.Attendance.Data.AttendanceDashboardData;
+export type AttendanceTrendPoint =
+    App.Domain.Attendance.Data.AttendanceTrendPointData;
+export type AbsentStudent = App.Domain.Attendance.Data.AbsentStudentData;
+export type AdmissionFunnel = App.Domain.Admissions.Data.AdmissionFunnelData;
