@@ -2,11 +2,11 @@
 
 Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `9678e5d` (everything below is committed).
+Update this file in the same commit as the work it describes. Last updated: 2026-10-22, after commit `5fc2125` (everything below is committed).
 
 ## Where things stand
 
-Branch `dev`, 14 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **285 tests pass** (last full run 281; one Audit test can fail once on a Postgres autovacuum permission error and passes when re-run) (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
+Branch `dev`, 15 commits, no remote yet. `php artisan test`/`vendor/bin/pest`: **285 tests pass** (last full run 281; one Audit test can fail once on a Postgres autovacuum permission error and passes when re-run) (about 4.5 minutes). PHPStan (level from `phpstan.neon`) clean.
 Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analyse --memory-limit=1G`, `vendor/bin/pest --compact`, `npm run types:check`, `npx vp check`, `npm run build`.
 
 ### Done (in order)
@@ -93,7 +93,7 @@ Each step: read the relevant rules, plan briefly, build with Actions/Queries/Pol
 
 0. **Where the owner left off (2026-10-22):** Super Admin screens done: sign-in/two-step, Dashboard (partial), Plans, Schools list, School details, Onboard a school (stage A). Owner's proposed next: the Principal's school-side roles and assignments screen (with the "template update available" prompt and My profile). Working approach: the owner sends prototype screenshots one screen at a time (prototype zip: `school-erp-prototype-v6.zip`, e.g. `superadmin/`, `admin/`, `coordinator/`, `accountant/`); read the prototype JS in `assets/js/pages/` for hidden behaviour, ask about anything that changed since (classes/sections and fee structure are customisable per school), then build, test, commit. MVP module order after Students is still an open decision.
 1. **First screens (Inertia + React)** — school structure is done (see above); still to do: roles/assignments, using the existing Queries and Actions. Needs: controllers in `app/Http/Controllers` (or `app/Http/Web/<Module>` per the layout rule), Form Requests, Policies/Gates, Wayfinder, shared `data-table`, `lib/format.ts`, abilities-driven UI, translation keys, mobile-first. Also add the "template update available" prompt.
-2. **Students and guardians** — students, guardians, enrolment per section/year, guardian–student link with portal-access flag, shared-family-phone warning, masked sensitive fields, `students.*` permissions already in the catalog. Needs `spatie/laravel-data` decision first.
+2. **Students and guardians** — students, guardians, enrolment per section/year, guardian–student link with portal-access flag, shared-family-phone warning, masked sensitive fields, `students.*` permissions already in the catalog. `spatie/laravel-data` + TypeScript transformer are now installed (commit `5fc2125`), so this is unblocked: build Data objects with `#[TypeScript]` and run `composer types:generate`. Waiting on the owner's prototype screenshots (student list, profile, add/edit, guardians), the required student fields, and whether bulk CSV import is in scope now. Assumed model: one guardian to many students, one phone to many guardians (warn, don't block), portal-access flag.
 3. **Parent sign-in** — phone + OTP (hashed, single-use, rate-limited per phone/IP/school), SMS driver interface with log/fake driver, guardian membership + context switcher, `pending_guardian_links`.
 4. **Admissions** → **Attendance** → **Fees (Money value object, paise, idempotent payments)** → **Exams** → **Communication** → **Homework** — order is an open decision; confirm with the owner.
 5. **Platform (Super Admin)** — done: `platform_users`, platform host, two-step always, shell, Plans screen. Next, in order: subscriptions; Schools list/detail (suspend, reactivate, change plan, modules); "Onboard a school" wizard (stage A: organization, plan/trial, campus, academic year, classes/sections, owner invite via the existing provisioning and structure Actions; stage B: student import, fees, modules after those modules exist); then dashboard KPIs, Revenue, Roles and permissions screen, Activity logs; owner transfer, support access, platform audit viewer.

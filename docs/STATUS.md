@@ -7,6 +7,10 @@ Last updated: 2026-10-22.
 
 Screens are built one at a time from prototype screenshots the owner supplies (reference: `school-erp-prototype-v6.zip`, folder `superadmin/` etc.). After each screen the owner reviews, then says which screen is next. Do not start the next screen unprompted.
 
+## Next up
+
+- **Students and guardians.** Dependency approved and installed 2026-10-22 (`spatie/laravel-data` 4.23, transformer 3.x, platform pin 8.3.6; commit `5fc2125`). Owner to send prototype screenshots one screen at a time, plus the required student fields and whether CSV import is in scope.
+
 ## Super Admin screens (prototype: 9)
 
 | Screen                                             | Status         | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                         |
