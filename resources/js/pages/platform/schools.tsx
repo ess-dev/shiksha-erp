@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import {
     exportMethod as exportSchools,
     index,
+    onboard,
     show,
 } from '@/routes/platform/schools';
 import type {
@@ -120,10 +121,11 @@ export default function PlatformSchools({ schools, filters }: Props) {
                             Export CSV
                         </a>
                     </Button>
-                    {/* Disabled like its sidebar entry until the wizard is built. */}
-                    <Button disabled aria-disabled="true">
-                        <PlusCircle aria-hidden="true" />
-                        Onboard a school
+                    <Button asChild>
+                        <Link href={onboard()}>
+                            <PlusCircle aria-hidden="true" />
+                            Onboard a school
+                        </Link>
                     </Button>
                 </div>
             </div>

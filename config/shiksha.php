@@ -61,4 +61,24 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Onboarding
+    |--------------------------------------------------------------------------
+    |
+    | Defaults the Super Admin onboarding wizard offers. illustrative - verify
+    | the trial length, the board list and the state list with the owner.
+    |
+    */
+
+    'trial_days' => (int) env('SHIKSHA_TRIAL_DAYS', 30),
+
+    'boards' => ['CBSE', 'ICSE', 'State board', 'IB', 'Cambridge (IGCSE)', 'Pre-primary'],
+
+    'states' => [
+        'Punjab', 'Haryana', 'Chandigarh', 'Himachal Pradesh', 'Delhi', 'Uttar Pradesh',
+        'Rajasthan', 'Maharashtra', 'Karnataka', 'Kerala', 'Tamil Nadu', 'Gujarat',
+        'West Bengal', 'Telangana', 'Other',
+    ],
+
 ];

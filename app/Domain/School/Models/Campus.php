@@ -12,6 +12,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
  * @property string $name
  * @property string $code
  * @property string $status
+ * @property string|null $address
  */
 class Campus extends Model
 {
@@ -20,7 +21,7 @@ class Campus extends Model
     protected $table = 'campuses';
 
     /** @var list<string> */
-    protected $fillable = ['ulid', 'name', 'code', 'status'];
+    protected $fillable = ['ulid', 'name', 'code', 'status', 'address'];
 
     public function getRouteKeyName(): string
     {
