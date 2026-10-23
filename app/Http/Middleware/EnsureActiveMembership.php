@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Domain\Identity\Authentication\StaffAuthenticator;
+use App\Domain\Identity\Authentication\SchoolContext;
 use App\Domain\Identity\Models\Identity;
 use App\Tenancy\Tenant;
 use Closure;
@@ -12,12 +12,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Re-checks on every request that a signed-in person still has an active
- * membership of this school (and an active identity). Revoking a membership
- * therefore signs the person out of that school on their next request.
+ * membership of this school (and an active identity), and works out whether
+ * they are acting as staff or as a parent. Revoking a membership therefore
+ * signs the person out of that school on their next request. In the parent
+ * context only the parent screens, sign-out and the context switch are open.
  */
 class EnsureActiveMembership
 {
-    public function __construct(private readonly StaffAuthenticator $staff) {}
+    /** Routes a parent may reach besides the parent screens. */
+    private const PARENT_CONTEXT_ROUTES = ['parent.*', 'logout', 'school.context.*'];
+
+    public function __construct(private readonly SchoolContext $contexts) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -28,14 +33,26 @@ class EnsureActiveMembership
             return $next($request);
         }
 
-        if ($identity->isActive() && $this->staff->hasActiveStaffMembership($identity, $tenant)) {
-            return $next($request);
+        $available = $this->contexts->available($identity, $tenant);
+        $context = $this->contexts->choose($request, $available);
+
+        if ($context === null) {
+            $wasParent = $request->session()->get(SchoolContext::SESSION_KEY) === SchoolContext::GUARDIAN;
+
+            Auth::guard()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route($wasParent ? 'parent.sign-in' : 'login');
         }
 
-        Auth::guard()->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->session()->put(SchoolContext::SESSION_KEY, $context);
+        $request->attributes->set(SchoolContext::REQUEST_ATTRIBUTE, $context);
 
-        return redirect()->route('login');
+        if ($context === SchoolContext::GUARDIAN && ! $request->routeIs(...self::PARENT_CONTEXT_ROUTES)) {
+            return redirect()->route('parent.home');
+        }
+
+        return $next($request);
     }
 }

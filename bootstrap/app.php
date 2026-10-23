@@ -9,6 +9,7 @@ use App\Domain\School\Exceptions\StructureException;
 use App\Domain\Students\Exceptions\StudentException;
 use App\Http\DomainRuleResponse;
 use App\Http\Middleware\EnsureActiveMembership;
+use App\Http\Middleware\EnsureGuardianContext;
 use App\Http\Middleware\EnsureModuleInPlan;
 use App\Http\Middleware\EnsurePlatformHost;
 use App\Http\Middleware\EnsurePlatformTwoStep;
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'school' => EnsureSchoolIsAvailable::class,
             'module' => EnsureModuleInPlan::class,
+            'parent.auth' => EnsureGuardianContext::class,
             'platform.host' => EnsurePlatformHost::class,
             'platform.auth' => EnsurePlatformUser::class,
             'platform.two_step' => EnsurePlatformTwoStep::class,

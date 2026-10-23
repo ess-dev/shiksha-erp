@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Domain\Access\TwoStepRequirement;
+use App\Domain\Identity\Authentication\SchoolContext;
 use App\Domain\Identity\Models\Identity;
 use App\Tenancy\Tenant;
 use Closure;
@@ -34,6 +35,7 @@ class EnsureTwoStepWhenRequired
 
         if (! $identity instanceof Identity
             || ! Tenant::current() instanceof Tenant
+            || SchoolContext::current($request) === SchoolContext::GUARDIAN
             || $request->is(...self::ALLOWED)
             || ! $this->requirement->isRequiredFor($identity)
             || $this->requirement->isSatisfiedBy($identity)) {

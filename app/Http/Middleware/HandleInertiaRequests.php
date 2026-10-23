@@ -5,7 +5,9 @@ namespace App\Http\Middleware;
 use App\Domain\Access\Authorizer;
 use App\Domain\Access\Data\AbilitiesData;
 use App\Domain\Access\TwoStepRequirement;
+use App\Domain\Identity\Authentication\SchoolContext;
 use App\Domain\Identity\Data\AuthenticatedIdentityData;
+use App\Domain\Identity\Data\SchoolContextData;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\Platform\Data\PlatformUserData;
 use App\Domain\Platform\Models\PlatformUser;
@@ -65,6 +67,7 @@ class HandleInertiaRequests extends Middleware
                     && app(TwoStepRequirement::class)->isRequiredFor($request->user())
                     && ! app(TwoStepRequirement::class)->isSatisfiedBy($request->user()),
             ],
+            'schoolContext' => fn () => $this->schoolContext($request),
             'campusSwitcher' => fn () => $this->campusSwitcher($request),
             'sessionSwitcher' => fn () => $this->sessionSwitcher($request),
             'platform' => [
@@ -74,6 +77,30 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * Staff or parent view, and whether the other one is open to this person.
+     * Null for anyone who is only one of them.
+     */
+    private function schoolContext(Request $request): ?SchoolContextData
+    {
+        $user = $request->user();
+        $tenant = Tenant::current();
+
+        if (! $user instanceof Identity || ! $tenant instanceof Tenant) {
+            return null;
+        }
+
+        $available = app(SchoolContext::class)->available($user, $tenant);
+
+        if (count($available) < 2) {
+            return null;
+        }
+
+        $isParent = SchoolContext::current($request) === SchoolContext::GUARDIAN;
+
+        return new SchoolContextData($isParent, ! $isParent, $isParent);
     }
 
     /**

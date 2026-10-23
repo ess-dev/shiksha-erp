@@ -1,5 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CampusSwitcherControl } from '@/components/campus-switcher';
+import { ContextSwitcherControl } from '@/components/context-switcher';
 import { SessionSwitcherControl } from '@/components/session-switcher';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
@@ -20,6 +21,7 @@ export function AppSidebarHeader({
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
             <div className="ml-auto flex items-center gap-3">
+                <ContextSwitcherControl />
                 <SessionSwitcherControl />
                 <CampusSwitcherControl />
             </div>

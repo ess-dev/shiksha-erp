@@ -12,6 +12,7 @@ Route::middleware('school')->group(function () {
         Route::inertia('dashboard', 'dashboard')->name('dashboard');
     });
 
+    require __DIR__.'/parent.php';
     require __DIR__.'/school.php';
     require __DIR__.'/settings.php';
 });
