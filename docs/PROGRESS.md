@@ -60,7 +60,7 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 
 - Identities hold sign-in data only (no names). Names live in the tenant `staff` table, linked by `identity_ulid`.
 - Membership/identity changes are audited in the **platform** audit table (they write landlord data); school-side Actions audit into the school's `audit_events`.
-- Data objects are plain `JsonSerializable` classes (`spatie/laravel-data` is not installed — adding it needs approval). Never send models or internal ids to the browser.
+- Existing Data objects are plain `JsonSerializable` classes; new ones use `spatie/laravel-data` 4.23 (installed 2026-10-22, owner-approved) with `spatie/laravel-typescript-transformer` 3.x. Mark each with `#[TypeScript]` and run `composer types:generate` to refresh the committed `resources/js/types/generated.d.ts` (an architecture test fails if it is stale). Composer platform pin is now `8.3.6` (the 3.x transformer's dependency needs >= 8.3.2). Never send models or internal ids to the browser.
 - Scope containment is conservative: a campus scope cannot be shown to contain specific sections (no section-to-campus lookup in `Scope::contains`), so only a school-wide scope may hand out section scopes.
 - Template changes need a new version in `AccessCatalogSeeder` (never edit an existing version); schools then see "update available".
 - Architecture rule allows only these cross-module uses: other modules' `Actions`, `Queries`, `Data`; `Audit`/`Access` `Enums`; the `Identity` model as the acting principal.

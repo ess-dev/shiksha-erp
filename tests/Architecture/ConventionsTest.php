@@ -108,6 +108,19 @@ it('never exposes the internal id from a Data object', function () {
     expect($offenders)->toBe([]);
 });
 
+it('marks every spatie Data object for TypeScript generation', function () {
+    $offenders = [];
+
+    foreach (sourceFiles('app/Domain') as $path => $contents) {
+        if (preg_match('/extends\s+(Data|Resource)/', $contents) === 1
+            && ! str_contains($contents, '#[TypeScript')) {
+            $offenders[] = $path;
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});
+
 it('keeps Domain modules out of each other\'s internals', function () {
     $offenders = [];
 
