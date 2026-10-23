@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
     BookOpen,
     Building2,
+    CalendarCheck,
     FolderGit2,
     LayoutGrid,
     ShieldCheck,
@@ -24,6 +25,7 @@ import {
 import { useCan } from '@/hooks/use-can';
 import { dashboard } from '@/routes';
 import { index as admissions } from '@/routes/admissions';
+import { index as attendance } from '@/routes/attendance';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
 import { index as students } from '@/routes/students';
@@ -47,6 +49,8 @@ export function AppSidebar() {
     const canViewStudents = useCan('students.view');
     const canViewRoles = useCan('roles.view');
     const canViewAdmissions = useCan('admissions.view');
+    const canViewAttendance =
+        useCan('attendance.view') || useCan('attendance.mark');
 
     const mainNavItems: NavItem[] = [
         {
@@ -69,6 +73,15 @@ export function AppSidebar() {
                       title: 'Admissions',
                       href: admissions(),
                       icon: UserPlus,
+                  },
+              ]
+            : []),
+        ...(canViewAttendance
+            ? [
+                  {
+                      title: 'Attendance',
+                      href: attendance(),
+                      icon: CalendarCheck,
                   },
               ]
             : []),

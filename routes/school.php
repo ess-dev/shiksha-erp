@@ -6,9 +6,13 @@ use App\Http\Controllers\Admissions\AdmissionController;
 use App\Http\Controllers\Admissions\AdmissionSettingsController;
 use App\Http\Controllers\Admissions\ApplicationController;
 use App\Http\Controllers\Admissions\ApplicationDocumentController;
+use App\Http\Controllers\Attendance\AttendanceController;
+use App\Http\Controllers\Attendance\AttendanceSettingsController;
+use App\Http\Controllers\Attendance\HolidayController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
+use App\Http\Controllers\School\ClassTeacherController;
 use App\Http\Controllers\School\SchoolClassController;
 use App\Http\Controllers\School\SectionController;
 use App\Http\Controllers\School\SessionSelectionController;
@@ -37,6 +41,7 @@ Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.
     Route::post('classes', [SchoolClassController::class, 'store'])->name('classes.store');
     Route::post('subjects', [SubjectController::class, 'store'])->name('subjects.store');
     Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
+    Route::put('sections/{section}/class-teacher', [ClassTeacherController::class, 'update'])->name('sections.class-teacher');
 });
 
 Route::middleware(['auth'])->prefix('school/roles')->name('school.roles.')->group(function () {
@@ -99,4 +104,14 @@ Route::middleware(['auth', 'module:admissions'])->prefix('admissions')->name('ad
     Route::put('{application}/documents/{kind}', [ApplicationDocumentController::class, 'received'])->name('documents.received');
     Route::post('{application}/documents/{kind}', [ApplicationDocumentController::class, 'store'])->name('documents.store');
     Route::get('{application}/documents/{kind}', [ApplicationDocumentController::class, 'show'])->middleware('signed')->name('documents.show');
+});
+
+Route::middleware(['auth', 'module:attendance'])->prefix('attendance')->name('attendance.')->group(function () {
+    Route::get('/', [AttendanceController::class, 'index'])->name('index');
+    Route::post('/', [AttendanceController::class, 'store'])->name('store');
+
+    Route::get('settings', [AttendanceSettingsController::class, 'show'])->name('settings');
+    Route::put('settings', [AttendanceSettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings/holidays', [HolidayController::class, 'store'])->name('holidays.store');
+    Route::delete('settings/holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
 });

@@ -46,6 +46,10 @@ full_name: string,
 status: string,
 assignments: App.Domain.Access.Data.AssignmentData[],
 };
+export type StaffOptionData = {
+ulid: string,
+name: string,
+};
 }
 namespace Enums {
 export type PermissionRisk = 'normal' | 'sensitive' | 'critical';
@@ -184,6 +188,51 @@ export type AdmissionSource = 'walk_in' | 'website' | 'referral' | 'facebook_ad'
 export type AdmissionStage = 'enquiry' | 'application' | 'verified' | 'decision' | 'enrolled';
 }
 }
+namespace Attendance {
+namespace Data {
+export type RegisterData = {
+sections: App.Domain.Attendance.Data.SectionChoiceData[],
+section: string | null,
+date: string,
+today: string,
+min_date: string,
+timezone: string,
+state: App.Domain.Attendance.Enums.RegisterState,
+closed_reason: string | null,
+can_edit: boolean,
+needs_reason: boolean,
+age_days: number,
+correction_window_days: number,
+class_teacher_name: string | null,
+saved: App.Domain.Attendance.Data.SavedRegisterData | null,
+students: App.Domain.Attendance.Data.RosterStudentData[],
+can_manage_settings: boolean,
+};
+export type RosterStudentData = {
+ulid: string,
+name: string,
+admission_number: string,
+roll_number: number | null,
+status: App.Domain.Attendance.Enums.AttendanceStatus | null,
+recent_absences: number,
+};
+export type SavedRegisterData = {
+saved_by: string | null,
+saved_at: string,
+reason: string | null,
+};
+export type SectionChoiceData = {
+ulid: string,
+label: string,
+campus_name: string,
+relation: string,
+};
+}
+namespace Enums {
+export type AttendanceStatus = 'present' | 'absent' | 'late';
+export type RegisterState = 'closed' | 'view_only' | 'locked' | 'saved' | 'pending' | 'missed';
+}
+}
 namespace Audit {
 namespace Enums {
 export type AuditActorType = 'user' | 'staff' | 'guardian' | 'platform' | 'system';
@@ -197,6 +246,11 @@ export type SuspensionReason = 'invoice_overdue' | 'requested_by_school' | 'term
 }
 namespace School {
 namespace Data {
+export type AttendanceCalendarData = {
+working_days: number[],
+correction_window_days: number,
+holidays: App.Domain.School.Data.HolidayData[],
+};
 export type CampusOptionData = {
 ulid: string,
 name: string,
@@ -207,6 +261,11 @@ selected: string | null,
 };
 export type ClassLevelOptionData = {
 level: number,
+name: string,
+};
+export type HolidayData = {
+ulid: string,
+holiday_on: string,
 name: string,
 };
 export type HouseData = {

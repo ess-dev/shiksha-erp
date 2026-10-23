@@ -53,6 +53,7 @@ class AccessCatalogSeeder extends Seeder
         'admissions.enroll' => ['admissions', 'sensitive', false, 'Enroll accepted applicants as students', 5],
         'attendance.view' => ['attendance', 'normal', false, 'See attendance', 1],
         'attendance.mark' => ['attendance', 'normal', false, 'Mark attendance', 1],
+        'attendance.correct' => ['attendance', 'sensitive', false, 'Correct attendance registers, including those past the class teacher\'s window', 6],
         'leave.approve' => ['leave', 'normal', false, 'Approve student leave', 1],
         'fees.view' => ['fees', 'normal', false, 'See fee invoices and payments', 1],
         'fees.collect' => ['fees', 'sensitive', false, 'Record fee payments', 1],
@@ -103,6 +104,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const ADMISSIONS_V5 = 'Adds enrolling accepted applicants, and the admissions pipeline for Coordinator and Front office';
 
+    private const ATTENDANCE_V6 = 'Adds correcting attendance registers (Principal, Vice principal, Coordinator)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -125,6 +128,7 @@ class AccessCatalogSeeder extends Seeder
             3 => [self::STUDENTS_V3, '*'],
             4 => [self::SESSIONS_V4, '*'],
             5 => [self::ADMISSIONS_V5, '*'],
+            6 => [self::ATTENDANCE_V6, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -132,6 +136,7 @@ class AccessCatalogSeeder extends Seeder
             3 => [self::STUDENTS_V3, '*-restricted'],
             4 => [self::SESSIONS_V4, '*-restricted'],
             5 => [self::ADMISSIONS_V5, '*-restricted'],
+            6 => [self::ATTENDANCE_V6, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -139,6 +144,7 @@ class AccessCatalogSeeder extends Seeder
             3 => [self::STUDENTS_V3, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS]],
             4 => [self::SESSIONS_V4, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions']],
             5 => [self::ADMISSIONS_V5, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL]],
+            6 => [self::ATTENDANCE_V6, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],

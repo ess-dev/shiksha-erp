@@ -39,6 +39,11 @@ class GuardrailViolation extends DomainException
         return new self('A school must keep at least one owner.');
     }
 
+    public static function automaticAssignment(): self
+    {
+        return new self('This role is given automatically from the class teacher of a section. Change the class teacher in School structure instead.');
+    }
+
     public static function notAuthorised(): self
     {
         return new self('You are not allowed to manage roles in this school.');

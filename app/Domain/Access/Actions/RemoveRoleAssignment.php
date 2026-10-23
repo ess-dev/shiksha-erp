@@ -28,6 +28,10 @@ class RemoveRoleAssignment extends Action
         $this->transaction(function () use ($actor, $assignment) {
             $role = $assignment->role;
 
+            if ($assignment->source === 'auto') {
+                throw GuardrailViolation::automaticAssignment();
+            }
+
             $this->guard->assertActorCoversScope($actor, $role->permissionKeys(), $assignment->toScope());
 
             if ($role->is_owner) {

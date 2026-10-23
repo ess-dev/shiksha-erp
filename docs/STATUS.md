@@ -1,7 +1,7 @@
 # Shiksha ERP — status and what is pending
 
 Quick recall sheet. The detailed record (code map, decisions, verification) is in `docs/PROGRESS.md`; update both when work lands.
-Last updated: 2026-10-22.
+Last updated: 2026-10-23.
 
 ## Working approach
 
@@ -9,7 +9,7 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 
 ## Next up
 
-- Owner to pick the next screen. Students slice 1, the roles screen and Admissions are built; see below.
+- Owner to pick the next screen. Students slice 1, the roles screen, Admissions and Attendance (teacher's daily register, with Coordinator/Principal oversight) are built; see below.
 
 ## To verify later (reminder list for the owner; ask about these in a later session)
 
@@ -24,6 +24,16 @@ Built on 2026-10-22 and covered by automated tests, but not yet tried by the own
 - **Relaxed fields** to tighten later: blood group "Unknown", house "Not assigned".
 
 Admissions, built 2026-10-23: try Add enquiry, moving cards (arrows and drag), the "Documents still missing" prompt, uploading and viewing scans, Accept and Enroll (the scans should appear on the student's Documents tab), the required-documents page, and the board as a Coordinator and as a Front office user. Role templates are at version 5: each school must apply the update (Roles and access) before non-owner roles see the new permissions.
+
+Attendance, built 2026-10-23: sign in as `teacher@greenfield.test` and mark Class 1 A (Mark all present, change a few, Save); try an earlier day (reason dialog) and a day over 7 days old (locked); as the Principal, set a class teacher on School structure, add a holiday and change working days on `/attendance/settings`, and correct a locked day (needs the role-template update to version 6 on each role: Roles and access). Check the working days (Monday to Friday) and the 7-day window against the school's real rules (illustrative defaults). Guardian absence alerts are **not sent** (no provider yet); the approved-leave badge waits for Student leave.
+
+## School screens: Principal and Teacher
+
+| Screen                                     | Status | Notes                                                                                                                                                                                                                                                 |
+| ------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Attendance `/attendance` (teacher's view)  | Done   | Class picker (your class / view only), date, chips, strip, Present/Absent/Late rows, Mark all present, Clear, save with reason on earlier days, summary dialog. Coordinator and Principal use it by scope and can correct (new `attendance.correct`). |
+| Attendance settings `/attendance/settings` | Done   | Not in the prototype: working days, correction window, holidays. Designed from the guide.                                                                                                                                                             |
+| Class teacher on School structure          | Done   | Dropdown per section; gives the automatic Class teacher role over that section.                                                                                                                                                                       |
 
 ## School screens: Principal
 

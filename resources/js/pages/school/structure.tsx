@@ -10,6 +10,7 @@ import type {
     Campus,
     PaginatedSections,
     SchoolClass,
+    StaffOption,
     StructureFilters,
     Subject,
 } from '@/types';
@@ -20,6 +21,7 @@ type Props = {
     classes: SchoolClass[];
     subjects: Subject[];
     sections: PaginatedSections;
+    staffOptions: StaffOption[];
     filters: StructureFilters;
 };
 
@@ -29,6 +31,7 @@ export default function Structure({
     classes,
     subjects,
     sections,
+    staffOptions,
     filters,
 }: Props) {
     const canManage = useCan('structure.manage');
@@ -58,6 +61,7 @@ export default function Structure({
                     campuses={campuses}
                     classes={classes}
                     filters={filters}
+                    staffOptions={staffOptions}
                     canManage={canManage}
                 />
             </div>

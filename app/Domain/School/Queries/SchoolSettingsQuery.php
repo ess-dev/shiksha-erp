@@ -13,11 +13,48 @@ class SchoolSettingsQuery
 
     public const ADMISSION_DOCUMENT_RULES = 'admissions.document_rules';
 
+    public const ATTENDANCE_WORKING_DAYS = 'attendance.working_days';
+
+    public const ATTENDANCE_CORRECTION_DAYS = 'attendance.correction_window_days';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
         self::TC_PREFIX => 'TC',
     ];
+
+    /** illustrative — verify: Monday to Friday, as in the prototype; many schools also work Saturdays. */
+    private const DEFAULT_WORKING_DAYS = [1, 2, 3, 4, 5];
+
+    /** illustrative — verify: the prototype locks a register after 7 days. */
+    private const DEFAULT_CORRECTION_DAYS = 7;
+
+    /**
+     * The weekdays the school is open, as ISO numbers (1 Monday to 7 Sunday).
+     *
+     * @return list<int>
+     */
+    public function attendanceWorkingDays(): array
+    {
+        $value = SchoolSetting::query()->where('key', self::ATTENDANCE_WORKING_DAYS)->value('value');
+
+        if (! is_array($value) || $value === []) {
+            return self::DEFAULT_WORKING_DAYS;
+        }
+
+        return array_values(array_map(intval(...), $value));
+    }
+
+    /**
+     * How many days after a school day its class teacher may still change the
+     * register (with a reason once the day has passed).
+     */
+    public function attendanceCorrectionWindowDays(): int
+    {
+        $value = SchoolSetting::query()->where('key', self::ATTENDANCE_CORRECTION_DAYS)->value('value');
+
+        return is_int($value) && $value >= 0 ? $value : self::DEFAULT_CORRECTION_DAYS;
+    }
 
     public function admissionPrefix(): string
     {

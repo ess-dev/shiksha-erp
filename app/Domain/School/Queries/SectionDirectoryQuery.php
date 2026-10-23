@@ -75,9 +75,11 @@ class SectionDirectoryQuery
             ->join('campuses', 'campuses.id', '=', 'sections.campus_id')
             ->join('school_classes', 'school_classes.id', '=', 'sections.school_class_id')
             ->join('academic_years', 'academic_years.id', '=', 'sections.academic_year_id')
+            ->leftJoin('staff as class_teacher', 'class_teacher.id', '=', 'sections.class_teacher_staff_id')
             ->select([
                 'sections.id', 'sections.ulid', 'sections.name', 'sections.capacity', 'sections.status',
-                'sections.academic_year_id', 'academic_years.ulid as year_ulid',
+                'sections.academic_year_id', 'sections.class_teacher_staff_id', 'academic_years.ulid as year_ulid',
+                'class_teacher.ulid as class_teacher_ulid', 'class_teacher.full_name as class_teacher_name',
                 'campuses.ulid as campus_ulid', 'campuses.name as campus_name',
                 'school_classes.ulid as class_ulid', 'school_classes.name as class_name', 'school_classes.level as class_level',
                 DB::connection($tenant)->raw('(select count(*) from enrollments where enrollments.section_id = sections.id and enrollments.is_current) as enrolled_count'),
@@ -103,6 +105,9 @@ class SectionDirectoryQuery
             className: (string) $row->getAttribute('class_name'),
             classLevel: (int) $row->getAttribute('class_level'),
             status: $row->status,
+            classTeacherStaffKey: $row->getAttribute('class_teacher_staff_id') === null ? null : (int) $row->getAttribute('class_teacher_staff_id'),
+            classTeacherUlid: $row->getAttribute('class_teacher_ulid'),
+            classTeacherName: $row->getAttribute('class_teacher_name'),
         );
     }
 }

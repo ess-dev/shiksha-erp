@@ -1,4 +1,5 @@
 import { Form, Link, router } from '@inertiajs/react';
+import ClassTeacherController from '@/actions/App/Http/Controllers/School/ClassTeacherController';
 import SectionController from '@/actions/App/Http/Controllers/School/SectionController';
 import InputError from '@/components/input-error';
 import Field, { selectClassName } from '@/components/school/field';
@@ -17,6 +18,7 @@ import type {
     Campus,
     PaginatedSections,
     SchoolClass,
+    StaffOption,
     StructureFilters,
 } from '@/types';
 
@@ -26,6 +28,7 @@ type Props = {
     campuses: Campus[];
     classes: SchoolClass[];
     filters: StructureFilters;
+    staffOptions: StaffOption[];
     canManage: boolean;
 };
 
@@ -35,6 +38,7 @@ export default function SectionsCard({
     campuses,
     classes,
     filters,
+    staffOptions,
     canManage,
 }: Props) {
     const currentYear = years.find((year) => year.is_current)?.ulid ?? '';
@@ -131,6 +135,9 @@ export default function SectionsCard({
                                     <th className="py-2 pr-4 font-medium">
                                         Campus
                                     </th>
+                                    <th className="py-2 pr-4 font-medium">
+                                        Class teacher
+                                    </th>
                                     <th className="py-2 text-right font-medium">
                                         Capacity
                                     </th>
@@ -150,6 +157,55 @@ export default function SectionsCard({
                                         </td>
                                         <td className="py-2 pr-4">
                                             {section.campus.name}
+                                        </td>
+                                        <td className="py-2 pr-4">
+                                            {canManage ? (
+                                                <select
+                                                    aria-label={`Class teacher of ${section.class.name} ${section.name}`}
+                                                    value={
+                                                        section.class_teacher
+                                                            ?.ulid ?? ''
+                                                    }
+                                                    onChange={(event) =>
+                                                        router.put(
+                                                            ClassTeacherController.update.url(
+                                                                section.ulid,
+                                                            ),
+                                                            {
+                                                                staff:
+                                                                    event.target
+                                                                        .value ||
+                                                                    null,
+                                                            },
+                                                            {
+                                                                preserveScroll: true,
+                                                            },
+                                                        )
+                                                    }
+                                                    className={selectClassName}
+                                                >
+                                                    <option value="">
+                                                        Not assigned
+                                                    </option>
+                                                    {staffOptions.map(
+                                                        (person) => (
+                                                            <option
+                                                                key={
+                                                                    person.ulid
+                                                                }
+                                                                value={
+                                                                    person.ulid
+                                                                }
+                                                            >
+                                                                {person.name}
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            ) : (
+                                                (section.class_teacher?.name ??
+                                                'Not assigned')
+                                            )}
                                         </td>
                                         <td className="py-2 text-right">
                                             {section.capacity ?? '—'}

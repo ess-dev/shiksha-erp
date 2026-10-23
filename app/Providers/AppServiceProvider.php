@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Domain\Access\Authorizer;
 use App\Domain\Access\Data\ScopeTarget;
+use App\Domain\Attendance\Contracts\AbsenceNotifier;
+use App\Domain\Attendance\LogAbsenceNotifier;
 use App\Domain\Audit\Contracts\ResolvesAuditActor;
 use App\Domain\Audit\SessionAuditActor;
 use App\Domain\Identity\Models\Identity;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(ResolvesAuditActor::class, SessionAuditActor::class);
         $this->app->singleton(Authorizer::class);
+        $this->app->bind(AbsenceNotifier::class, LogAbsenceNotifier::class);
     }
 
     /**
