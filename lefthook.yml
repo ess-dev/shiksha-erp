@@ -1,0 +1,35 @@
+# lefthook.yml — Shiksha ERP git hooks (P8, locked: Lefthook)
+# Install: npm install && npx lefthook install
+#
+# Adapted to the Laravel 13 React starter kit: the kit lints and formats with
+# Vite+ (`vp check` = Oxlint + Oxfmt) instead of ESLint + Prettier, so the
+# frontend steps call the kit's scripts.
+#
+# Do not bypass with --no-verify (see .ai/guidelines/60-workflow-and-docs.md). CI repeats every check.
+
+pre-commit:
+    parallel: true
+    commands:
+        pint:
+            glob: '*.php'
+            run: vendor/bin/pint {staged_files}
+            stage_fixed: true
+        vp-check:
+            glob: 'resources/**/*.{ts,tsx,js,jsx,css}'
+            exclude:
+                - 'resources/js/actions/**'
+                - 'resources/js/routes/**'
+                - 'resources/js/wayfinder/**'
+            run: npx vp check --fix {staged_files}
+            stage_fixed: true
+        types:
+            glob: 'resources/**/*.{ts,tsx}'
+            run: npm run types:check
+
+pre-push:
+    parallel: false
+    commands:
+        larastan:
+            run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+        tests:
+            run: php artisan test --compact

@@ -1,0 +1,49 @@
+# Shiksha ERP — line endings and file types
+# Copy to the repository root. Developers also set: git config --global core.autocrlf false
+
+# Normalise all text files to LF in the repo and working tree (Windows dev, Linux CI/servers)
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binary files: never normalise or diff as text
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.zip   binary
+*.xlsx  binary
+*.docx  binary
+
+# Generated files: collapse in GitHub diffs (still reviewed when relevant)
+resources/js/actions/**  linguist-generated=true
+resources/js/routes/**   linguist-generated=true
+package-lock.json        linguist-generated=true
+composer.lock            linguist-generated=true
+
+# Keep tests, docs and AI guidelines out of export archives
+/tests          export-ignore
+/.ai            export-ignore
+/.github        export-ignore
+/docs           export-ignore
+/lefthook.yml   export-ignore
+
+# From the Laravel starter kit
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+CHANGELOG.md export-ignore
+README.md export-ignore
