@@ -27,6 +27,8 @@ Admissions, built 2026-10-23: try Add enquiry, moving cards (arrows and drag), t
 
 Attendance, built 2026-10-23: sign in as `teacher@greenfield.test` and mark Class 1 A (Mark all present, change a few, Save); try an earlier day (reason dialog) and a day over 7 days old (locked); as the Principal, set a class teacher on School structure, add a holiday and change working days on `/attendance/settings`, and correct a locked day (needs the role-template update to version 6 on each role: Roles and access). Check the working days (Monday to Friday) and the 7-day window against the school's real rules (illustrative defaults). Guardian absence alerts are **not sent** (no provider yet); the approved-leave badge waits for Student leave.
 
+Subjects, built 2026-10-23: apply role-template update 7 on each role (Roles and access), then try Add subject, Edit (rename with a class using it), Delete (unused only), Change on Subjects by class and choosing subject teachers per section. Automatic means the class teacher until staff have campuses and "subjects taught". The parent's Subjects page (chapters, books, teacher notes) is not built.
+
 ## School screens: Principal and Teacher
 
 | Screen                                     | Status | Notes                                                                                                                                                                                                                                                 |

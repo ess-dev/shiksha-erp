@@ -2,6 +2,7 @@
 
 namespace App\Domain\School\Models;
 
+use App\Domain\School\Enums\SubjectType;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
@@ -11,6 +12,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
  * @property string $name
  * @property string $code
  * @property string $status
+ * @property SubjectType $type
  */
 class Subject extends Model
 {
@@ -19,7 +21,10 @@ class Subject extends Model
     protected $table = 'subjects';
 
     /** @var list<string> */
-    protected $fillable = ['ulid', 'name', 'code', 'status'];
+    protected $fillable = ['ulid', 'name', 'code', 'status', 'type'];
+
+    /** @var array<string, string> */
+    protected $casts = ['type' => SubjectType::class];
 
     public function getRouteKeyName(): string
     {

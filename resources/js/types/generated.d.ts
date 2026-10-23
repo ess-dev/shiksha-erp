@@ -348,6 +348,13 @@ label: string,
 campus_name: string,
 campus_ulid: string,
 };
+export type SectionTeachersData = {
+ulid: string,
+name: string,
+class_teacher_name: string | null,
+can_change: boolean,
+rows: App.Domain.School.Data.SubjectTeacherRowData[],
+};
 export type SessionOptionData = {
 ulid: string,
 name: string,
@@ -357,6 +364,46 @@ export type SessionSwitcherData = {
 sessions: App.Domain.School.Data.SessionOptionData[],
 selected: string,
 };
+export type SubjectClassData = {
+ulid: string,
+name: string,
+level: number,
+section_count: number,
+subject_ulids: string[],
+can_change: boolean,
+};
+export type SubjectRowData = {
+ulid: string,
+name: string,
+code: string,
+type: App.Domain.School.Enums.SubjectType,
+taught_in: string[],
+can_change: boolean,
+can_delete: boolean,
+};
+export type SubjectSectionOptionData = {
+ulid: string,
+name: string,
+campus_name: string,
+};
+export type SubjectTeacherRowData = {
+subject_ulid: string,
+subject_name: string,
+teacher_ulid: string | null,
+automatic_name: string | null,
+};
+export type SubjectsOverviewData = {
+can_configure: boolean,
+campus_name: string | null,
+classes: App.Domain.School.Data.SubjectClassData[],
+subjects: App.Domain.School.Data.SubjectRowData[],
+sections: App.Domain.School.Data.SubjectSectionOptionData[],
+selected_section: App.Domain.School.Data.SectionTeachersData | null,
+staff: App.Domain.Access.Data.StaffOptionData[],
+};
+}
+namespace Enums {
+export type SubjectType = 'core' | 'elective' | 'co_scholastic';
 }
 }
 namespace Students {

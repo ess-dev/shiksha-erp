@@ -36,6 +36,7 @@ class AccessCatalogSeeder extends Seeder
         'audit.view' => ['core', 'sensitive', false, 'See the audit trail', 1],
         'structure.view' => ['core', 'normal', false, 'See campuses, academic years, classes, sections and subjects', 2],
         'structure.manage' => ['core', 'sensitive', false, 'Set up campuses, academic years, classes, sections and subjects', 2],
+        'subjects.configure' => ['core', 'sensitive', false, 'Create subjects, assign them to classes and choose subject teachers', 7],
         // Students are part of the core product, not a sellable module: a "students" module row would never
         // exist in tenant_modules, so these permissions are always available (changed 2026-10-30).
         'students.view' => ['core', 'normal', false, 'See students', 1],
@@ -106,6 +107,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const ATTENDANCE_V6 = 'Adds correcting attendance registers (Principal, Vice principal, Coordinator)';
 
+    private const SUBJECTS_V7 = 'Adds configuring subjects: the subject list, subjects by class and subject teachers (Principal, Vice principal, Coordinator)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -129,6 +132,7 @@ class AccessCatalogSeeder extends Seeder
             4 => [self::SESSIONS_V4, '*'],
             5 => [self::ADMISSIONS_V5, '*'],
             6 => [self::ATTENDANCE_V6, '*'],
+            7 => [self::SUBJECTS_V7, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -137,6 +141,7 @@ class AccessCatalogSeeder extends Seeder
             4 => [self::SESSIONS_V4, '*-restricted'],
             5 => [self::ADMISSIONS_V5, '*-restricted'],
             6 => [self::ATTENDANCE_V6, '*-restricted'],
+            7 => [self::SUBJECTS_V7, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -145,6 +150,7 @@ class AccessCatalogSeeder extends Seeder
             4 => [self::SESSIONS_V4, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions']],
             5 => [self::ADMISSIONS_V5, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL]],
             6 => [self::ATTENDANCE_V6, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct']],
+            7 => [self::SUBJECTS_V7, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],

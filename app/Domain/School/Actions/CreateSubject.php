@@ -4,6 +4,7 @@ namespace App\Domain\School\Actions;
 
 use App\Domain\Audit\Data\AuditEntry;
 use App\Domain\Identity\Models\Identity;
+use App\Domain\School\Enums\SubjectType;
 use App\Domain\School\Exceptions\StructureException;
 use App\Domain\School\Models\Subject;
 use App\Domain\School\StructureGuard;
@@ -31,6 +32,7 @@ class CreateSubject extends Action
                 'name' => $name,
                 'code' => $code,
                 'status' => 'active',
+                'type' => SubjectType::Core,
             ]);
 
             $this->audit(new AuditEntry('structure.subject_created', 'subject', $subject->ulid, null, [

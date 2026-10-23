@@ -4,6 +4,7 @@ import {
     Building2,
     CalendarCheck,
     FolderGit2,
+    Library,
     LayoutGrid,
     School,
     ShieldCheck,
@@ -30,6 +31,7 @@ import { index as attendance } from '@/routes/attendance';
 import { index as classes } from '@/routes/school/classes';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
+import { index as subjects } from '@/routes/school/subjects';
 import { index as students } from '@/routes/students';
 import type { NavItem } from '@/types';
 
@@ -75,6 +77,11 @@ export function AppSidebar() {
                       title: 'Classes',
                       href: classes(),
                       icon: School,
+                  },
+                  {
+                      title: 'Subjects',
+                      href: subjects(),
+                      icon: Library,
                   },
               ]
             : []),

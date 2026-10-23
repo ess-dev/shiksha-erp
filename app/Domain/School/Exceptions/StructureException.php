@@ -38,4 +38,29 @@ class StructureException extends DomainException
     {
         return new self("{$what} already exists.");
     }
+
+    public static function subjectInUse(): self
+    {
+        return new self('This subject is still taught in a class or has teachers chosen, so it cannot be deleted.');
+    }
+
+    public static function needsExaminedSubject(): self
+    {
+        return new self('Pick at least one examined subject.');
+    }
+
+    public static function wouldLeaveNoExaminedSubject(): self
+    {
+        return new self('Making this co-scholastic would leave a class with no examined subject.');
+    }
+
+    public static function subjectNotTaught(): self
+    {
+        return new self('That subject is not taught in this class.');
+    }
+
+    public static function teacherUnavailable(): self
+    {
+        return new self('That teacher is not available.');
+    }
 }

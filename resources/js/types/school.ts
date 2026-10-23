@@ -52,6 +52,12 @@ export type StructureFilters = {
     class: string | null;
 };
 
+export type SubjectsOverview = App.Domain.School.Data.SubjectsOverviewData;
+export type SubjectClass = App.Domain.School.Data.SubjectClassData;
+export type SubjectRow = App.Domain.School.Data.SubjectRowData;
+export type SubjectKind = App.Domain.School.Enums.SubjectType;
+export type SectionTeachers = App.Domain.School.Data.SectionTeachersData;
+
 export type ClassesOverview = App.Domain.School.Data.ClassesOverviewData;
 export type ClassSection = App.Domain.School.Data.ClassSectionData;
 export type ClassCampus = App.Domain.School.Data.ClassCampusData;

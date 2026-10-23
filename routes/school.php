@@ -13,12 +13,16 @@ use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
 use App\Http\Controllers\School\ClassesController;
+use App\Http\Controllers\School\ClassSubjectsController;
 use App\Http\Controllers\School\ClassTeacherController;
 use App\Http\Controllers\School\SchoolClassController;
 use App\Http\Controllers\School\SectionController;
 use App\Http\Controllers\School\SessionSelectionController;
 use App\Http\Controllers\School\StructureController;
+use App\Http\Controllers\School\SubjectCatalogController;
 use App\Http\Controllers\School\SubjectController;
+use App\Http\Controllers\School\SubjectsScreenController;
+use App\Http\Controllers\School\SubjectTeacherController;
 use App\Http\Controllers\Students\HouseController;
 use App\Http\Controllers\Students\SiblingController;
 use App\Http\Controllers\Students\StudentController;
@@ -31,6 +35,15 @@ use App\Http\Controllers\Students\TransferCertificateController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->get('classes', [ClassesController::class, 'index'])->name('school.classes.index');
+
+Route::middleware(['auth'])->prefix('subjects')->name('school.subjects.')->group(function () {
+    Route::get('/', [SubjectsScreenController::class, 'index'])->name('index');
+    Route::post('/', [SubjectCatalogController::class, 'store'])->name('store');
+    Route::patch('{subject}', [SubjectCatalogController::class, 'update'])->name('update');
+    Route::delete('{subject}', [SubjectCatalogController::class, 'destroy'])->name('destroy');
+    Route::put('classes/{schoolClass}', [ClassSubjectsController::class, 'update'])->name('classes.update');
+    Route::put('sections/{section}/teachers/{subject}', [SubjectTeacherController::class, 'update'])->name('teachers.update');
+});
 
 Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.')->group(function () {
     Route::get('/', [StructureController::class, 'index'])->name('index');
