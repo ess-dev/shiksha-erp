@@ -2,9 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Platform\Enums\SuspensionReason;
 use App\Tenancy\Tenant;
+use App\Tenancy\TenantStatus;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,7 +26,10 @@ class EnsureSchoolIsAvailable
         }
 
         if (! $tenant->isAccessible()) {
-            return $this->page($request, 'unavailable', 403);
+            return match ($tenant->status) {
+                TenantStatus::Suspended, TenantStatus::Expired => $this->subscriptionPage($request, $tenant),
+                default => $this->page($request, 'unavailable', 403),
+            };
         }
 
         return $next($request);
@@ -35,5 +41,30 @@ class EnsureSchoolIsAvailable
             'title' => __("school.{$key}.title"),
             'message' => __("school.{$key}.message"),
         ])->toResponse($request)->setStatusCode($status);
+    }
+
+    /**
+     * What a suspended or expired school's people see. Data is kept; only the
+     * school's name and status are shown to a visitor who is not signed in.
+     * The suspension reason is for signed-in people of the school, because
+     * this page is reachable by anyone who knows the address.
+     */
+    private function subscriptionPage(Request $request, Tenant $tenant): Response
+    {
+        $key = $tenant->status === TenantStatus::Expired ? 'expired' : 'suspended';
+        $reason = $key === 'suspended' && Auth::check()
+            ? SuspensionReason::tryFrom((string) $tenant->suspended_reason)?->label()
+            : null;
+        $email = config('shiksha.billing_email');
+
+        return Inertia::render('errors/subscription', [
+            'status' => $key,
+            'title' => __("school.{$key}.title"),
+            'message' => __("school.{$key}.message", ['school' => $tenant->name]),
+            'reason' => $reason === null ? null : __('school.suspended.reason', ['reason' => $reason]),
+            'contact' => is_string($email) && $email !== ''
+                ? ['label' => __("school.{$key}.contact"), 'href' => 'mailto:'.$email]
+                : null,
+        ])->toResponse($request)->setStatusCode(403);
     }
 }

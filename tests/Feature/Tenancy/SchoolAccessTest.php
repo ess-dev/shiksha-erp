@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Tenancy;
 
+use App\Domain\Identity\Actions\GrantMembership;
+use App\Domain\Identity\Models\Identity;
 use App\Tenancy\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -58,18 +60,51 @@ class SchoolAccessTest extends TestCase
         $this->get('/_probe')->assertOk();
     }
 
-    public function test_suspended_and_expired_schools_are_blocked(): void
+    public function test_suspended_and_expired_schools_get_their_own_subscription_screen(): void
     {
-        foreach (['suspended', 'expired'] as $status) {
+        foreach (['suspended' => 'Subscription suspended', 'expired' => 'Subscription expired'] as $status => $title) {
             $this->school($status);
 
             $this->get('/_probe')
                 ->assertForbidden()
-                ->assertInertia(fn (Assert $page) => $page->component('errors/school')->where('title', 'School unavailable'));
+                ->assertInertia(fn (Assert $page) => $page
+                    ->component('errors/subscription')
+                    ->where('status', $status)
+                    ->where('title', $title)
+                    ->where('message', fn ($message) => str_contains($message, 'Probe School'))
+                    ->where('reason', null)
+                    ->where('contact', null));
 
             Tenant::forgetCurrent();
             Tenant::query()->delete();
         }
+    }
+
+    public function test_the_suspension_reason_is_only_shown_to_a_signed_in_person(): void
+    {
+        $tenant = $this->school('suspended');
+        $tenant->forceFill(['suspended_reason' => 'invoice_overdue'])->save();
+
+        $this->get('/_probe')->assertInertia(fn (Assert $page) => $page->where('reason', null));
+
+        $member = Identity::factory()->create();
+        app(GrantMembership::class)->handle($member, $tenant);
+
+        $this->actingAs($member)
+            ->get('/_probe')
+            ->assertForbidden()
+            ->assertInertia(fn (Assert $page) => $page->where('reason', 'Reason: Invoice overdue by 60 days'));
+    }
+
+    public function test_a_billing_contact_appears_only_when_one_is_configured(): void
+    {
+        config(['shiksha.billing_email' => 'billing@shiksha.test']);
+
+        $this->school('suspended');
+
+        $this->get('/_probe')->assertInertia(fn (Assert $page) => $page
+            ->where('contact.label', 'Contact billing')
+            ->where('contact.href', 'mailto:billing@shiksha.test'));
     }
 
     public function test_module_outside_the_plan_is_not_found(): void

@@ -81,4 +81,16 @@ return [
         'West Bengal', 'Telangana', 'Other',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Billing contact
+    |--------------------------------------------------------------------------
+    |
+    | Shown on the "Subscription suspended / expired" screen. Not set by
+    | default: with no address the screen shows no contact button.
+    |
+    */
+
+    'billing_email' => env('SHIKSHA_BILLING_EMAIL'),
+
 ];
