@@ -366,6 +366,22 @@ it('offers a newer template version and applies it keeping the edits a school ma
         ->and(AuditEvent::query()->where('action', 'roles.template_update_applied')->sole()->after['added'])->toBe(['structure.view', 'subjects.update']);
 });
 
+it('lets the owner bring the owner role to a newer version that adds permissions nobody holds yet', function () {
+    $owner = accessOwner();
+    $role = Role::query()->where('is_owner', true)->sole();
+
+    $role->permissions()->where('permission_key', 'subjects.update')->delete();
+    $role->forceFill(['source_template_version' => 1])->save();
+    app(Authorizer::class)->flush();
+
+    expect(Gate::forUser($owner)->allows('subjects.update'))->toBeFalse();
+
+    app(ApplyRoleTemplateUpdate::class)->handle($owner, $role, true);
+
+    expect($role->refresh()->permissionKeys())->toContain('subjects.update')
+        ->and(Gate::forUser($owner)->allows('subjects.update'))->toBeTrue();
+});
+
 it('refuses to apply an update when none is waiting', function () {
     $owner = accessOwner();
     $role = accessRole($owner, 'subject_teacher');

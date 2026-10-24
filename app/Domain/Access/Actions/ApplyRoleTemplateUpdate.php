@@ -34,11 +34,16 @@ class ApplyRoleTemplateUpdate extends Action
                 ?? throw new InvalidArgumentException('This role has no template update waiting.');
 
             $this->guard->assertAvailable($plan['added'], $role->is_owner);
-            $this->guard->assertActorHolds($actor, $plan['added']);
             $this->guard->assertCriticalConfirmed($plan['added'], $confirmCritical);
 
-            foreach ($role->assignments as $assignment) {
-                $this->guard->assertActorCoversScope($actor, $plan['added'], $assignment->toScope());
+            // The owner role is brought up to date by an owner (roles.manage is
+            // owner-only): nobody else could hold what a new version adds yet.
+            if (! $role->is_owner) {
+                $this->guard->assertActorHolds($actor, $plan['added']);
+
+                foreach ($role->assignments as $assignment) {
+                    $this->guard->assertActorCoversScope($actor, $plan['added'], $assignment->toScope());
+                }
             }
 
             $from = $role->source_template_version;
