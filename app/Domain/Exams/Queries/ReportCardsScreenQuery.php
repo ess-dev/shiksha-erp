@@ -155,9 +155,10 @@ class ReportCardsScreenQuery
         $roster = $this->roster->for($section->sectionKey, CalendarDate::today());
         $keys = array_map(fn ($row) => $row->studentKey, $roster);
         $ready = $this->access->readiness($exam, $section, $keys);
+        $missing = $this->access->missingSubjects($exam, $section, $keys);
         $cards = ReportCard::query()->where('exam_id', $exam->id)->whereIn('student_id', $keys)->get()->keyBy('student_id');
 
-        return array_map(function ($row) use ($ready, $cards) {
+        return array_map(function ($row) use ($ready, $missing, $cards) {
             /** @var ReportCard|null $card */
             $card = $cards->get($row->studentKey);
 
@@ -166,6 +167,7 @@ class ReportCardsScreenQuery
                 roll_number: $row->rollNumber,
                 name: $row->name,
                 marks: $ready[$row->studentKey],
+                missing_subjects: $missing[$row->studentKey],
                 card: $card === null ? null : new ReportCardSummaryData(
                     ulid: $card->ulid,
                     kind: $card->kind,

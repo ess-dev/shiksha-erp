@@ -17,6 +17,8 @@ class ReportCardRowData extends Data
         public ?int $roll_number,
         public string $name,
         public MarksReadiness $marks,
+        /** @var list<string> */
+        public array $missing_subjects,
         public ?ReportCardSummaryData $card,
     ) {}
 }

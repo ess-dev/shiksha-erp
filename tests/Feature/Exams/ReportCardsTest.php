@@ -121,6 +121,8 @@ it('lists the class with marks readiness, counts and who approves, ulids only', 
             ->where('screen.rows.0.name', 'Riya Sharma')
             ->where('screen.rows.0.marks', 'unpublished')
             ->where('screen.rows.1.marks', 'missing')
+            ->where('screen.rows.0.missing_subjects', [])
+            ->where('screen.rows.1.missing_subjects', ['Mathematics'])
             ->where('screen.rows.0.card', null)
             ->missing('screen.rows.0.id'));
 });

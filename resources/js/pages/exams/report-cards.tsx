@@ -74,7 +74,9 @@ function MarksCell({ row }: { row: ReportCardRow }) {
     return (
         <span className="text-sm text-amber-700 dark:text-amber-400">
             {row.marks === 'missing'
-                ? 'Marks missing'
+                ? row.missing_subjects.length > 0
+                    ? `Missing: ${row.missing_subjects.join(', ')}`
+                    : 'Marks missing'
                 : 'Marks not published yet'}
         </span>
     );

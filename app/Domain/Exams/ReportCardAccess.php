@@ -132,6 +132,49 @@ class ReportCardAccess
     }
 
     /**
+     * The examined subjects each student has no marks for, by name, so the
+     * class teacher knows what to chase. Same subjects as `readiness()`.
+     *
+     * @param  list<int>  $studentKeys
+     * @return array<int, list<string>> by student key
+     */
+    public function missingSubjects(Exam $exam, SectionRefData $section, array $studentKeys): array
+    {
+        $connection = DB::connection(config('multitenancy.tenant_database_connection_name'));
+        $classKey = (int) (array_column($this->reach->classes(), 'id', 'ulid')[$section->classUlid] ?? 0);
+
+        $subjects = $connection->table('school_class_subject as link')
+            ->join('subjects', 'subjects.id', '=', 'link.subject_id')
+            ->where('link.school_class_id', $classKey)
+            ->where('subjects.status', 'active')
+            ->where('subjects.type', '!=', 'co_scholastic')
+            ->orderBy('subjects.name')
+            ->pluck('subjects.name', 'subjects.id')
+            ->all();
+
+        $marked = [];
+
+        foreach ($connection->table('exam_marks')->where('exam_id', $exam->id)->whereIn('student_id', $studentKeys)
+            ->get(['student_id', 'subject_id']) as $row) {
+            $marked[(int) $row->student_id][(int) $row->subject_id] = true;
+        }
+
+        $missing = [];
+
+        foreach ($studentKeys as $studentKey) {
+            $missing[$studentKey] = [];
+
+            foreach ($subjects as $subjectKey => $name) {
+                if (! isset($marked[$studentKey][(int) $subjectKey])) {
+                    $missing[$studentKey][] = (string) $name;
+                }
+            }
+        }
+
+        return $missing;
+    }
+
+    /**
      * How ready each student's marks are for a report card.
      *
      * @param  list<int>  $studentKeys

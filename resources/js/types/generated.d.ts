@@ -446,6 +446,7 @@ student_ulid: string,
 roll_number: number | null,
 name: string,
 marks: App.Domain.Exams.Enums.MarksReadiness,
+missing_subjects: string[],
 card: App.Domain.Exams.Data.ReportCardSummaryData | null,
 };
 export type ReportCardSummaryData = {
