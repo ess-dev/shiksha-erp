@@ -297,6 +297,30 @@ export type AuditScope = 'tenant' | 'platform';
 }
 namespace Exams {
 namespace Data {
+export type ApprovalCardData = {
+ulid: string,
+student_ulid: string,
+student_name: string,
+admission_number: string,
+roll_number: number | null,
+kind: App.Domain.Exams.Enums.ReportCardKind,
+status: App.Domain.Exams.Enums.ReportCardStatus,
+prepared_on: string,
+file_name: string | null,
+return_note: string | null,
+};
+export type ApprovalGroupData = {
+section_ulid: string,
+section_label: string,
+campus_name: string,
+exam_ulid: string,
+exam_name: string,
+class_teacher_name: string | null,
+awaiting_count: number,
+published_count: number,
+student_count: number,
+cards: App.Domain.Exams.Data.ApprovalCardData[],
+};
 export type ExamCampusOptionData = {
 ulid: string,
 name: string,
@@ -440,6 +464,15 @@ ulid: string,
 name: string,
 is_mine: boolean,
 may_enter: boolean,
+};
+export type ReportCardApprovalsData = {
+status: App.Domain.Exams.Enums.ReportCardStatus | null,
+sections: App.Domain.Exams.Data.MarksSectionOptionData[],
+section_ulid: string | null,
+awaiting_count: number,
+published_count: number,
+sent_back_count: number,
+groups: App.Domain.Exams.Data.ApprovalGroupData[],
 };
 export type ReportCardRowData = {
 student_ulid: string,

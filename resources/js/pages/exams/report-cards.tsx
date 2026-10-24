@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { FileBadge, Upload, WandSparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import ConfirmDialog from '@/components/attendance/confirm-dialog';
+import ReportCardApprovalsList from '@/components/exams/report-card-approvals';
 import ReportCardDialog from '@/components/exams/report-card-dialog';
 import InputError from '@/components/input-error';
 import Field, { selectClassName } from '@/components/school/field';
@@ -11,11 +12,17 @@ import { Card } from '@/components/ui/card';
 import { formatCalendarDay } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { generate, index, upload, withdraw } from '@/routes/report-cards';
-import type { ReportCardRow, ReportCardsScreen, ReportCardView } from '@/types';
+import type {
+    ReportCardApprovals,
+    ReportCardRow,
+    ReportCardsScreen,
+    ReportCardView,
+} from '@/types';
 import type { ReportCard } from '@/types/parent';
 
 type Props = {
     screen: ReportCardsScreen;
+    approvals: ReportCardApprovals | null;
     preview?: ReportCard | null;
     view?: ReportCardView | null;
 };
@@ -117,7 +124,11 @@ function CardCell({ row }: { row: ReportCardRow }) {
     );
 }
 
-export default function ReportCards({ screen, preview, view }: Props) {
+function ClassTeacherReportCards({
+    screen,
+    preview,
+    view,
+}: Pick<Props, 'screen' | 'preview' | 'view'>) {
     const [previewing, setPreviewing] = useState<{
         ulid: string;
         name: string;
@@ -681,6 +692,107 @@ export default function ReportCards({ screen, preview, view }: Props) {
                             ),
                         );
                     }}
+                />
+            )}
+        </>
+    );
+}
+
+/**
+ * The class teacher's screen, the approver's list, or both with a switch for
+ * someone who is a class teacher and also approves (the Principal).
+ */
+export default function ReportCards({
+    screen,
+    approvals,
+    preview,
+    view,
+}: Props) {
+    const [mode, setMode] = useState<'class' | 'approve'>(
+        approvals !== null &&
+            (screen.sections.length === 0 || approvals.awaiting_count > 0)
+            ? 'approve'
+            : 'class',
+    );
+
+    if (approvals === null) {
+        return (
+            <ClassTeacherReportCards
+                screen={screen}
+                preview={preview}
+                view={view}
+            />
+        );
+    }
+
+    const showApprovals = screen.sections.length === 0 || mode === 'approve';
+
+    return (
+        <>
+            {screen.sections.length > 0 && (
+                <div className="mx-auto flex w-full max-w-6xl p-4 pb-0">
+                    <div
+                        role="group"
+                        aria-label="Report cards view"
+                        className="flex gap-1 rounded-lg border p-1"
+                    >
+                        {(
+                            [
+                                ['class', 'My class'],
+                                [
+                                    'approve',
+                                    `For approval${approvals.awaiting_count > 0 ? ` (${approvals.awaiting_count})` : ''}`,
+                                ],
+                            ] as const
+                        ).map(([key, label]) => (
+                            <button
+                                key={key}
+                                type="button"
+                                aria-pressed={mode === key}
+                                onClick={() => setMode(key)}
+                                className={cn(
+                                    'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground',
+                                    mode === key &&
+                                        'bg-primary/10 text-primary hover:text-primary',
+                                )}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {showApprovals ? (
+                <>
+                    <Head title="Report cards" />
+                    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4">
+                        <div>
+                            <h1 className="text-xl font-semibold tracking-tight">
+                                Report cards
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Approve or send back the report cards class
+                                teachers prepare. Parents see them once they’re
+                                approved.
+                            </p>
+                        </div>
+                        <ReportCardApprovalsList
+                            data={approvals}
+                            view={view}
+                            url={index.url()}
+                            filters
+                            query={{
+                                status: approvals.status ?? 'all',
+                                class: approvals.section_ulid ?? undefined,
+                            }}
+                        />
+                    </div>
+                </>
+            ) : (
+                <ClassTeacherReportCards
+                    screen={screen}
+                    preview={preview}
+                    view={view}
                 />
             )}
         </>

@@ -7,9 +7,11 @@ use App\Domain\Exams\Actions\GenerateReportCards;
 use App\Domain\Exams\Actions\OpenReportCardFile;
 use App\Domain\Exams\Actions\UploadReportCard;
 use App\Domain\Exams\Actions\WithdrawReportCard;
+use App\Domain\Exams\Enums\ReportCardStatus;
 use App\Domain\Exams\Exceptions\ReportCardException;
 use App\Domain\Exams\Models\Exam;
 use App\Domain\Exams\Models\ReportCard;
+use App\Domain\Exams\Queries\ReportCardApprovalsQuery;
 use App\Domain\Exams\Queries\ReportCardsScreenQuery;
 use App\Domain\Exams\ReportCardAccess;
 use App\Domain\Identity\Models\Identity;
@@ -30,19 +32,23 @@ class ReportCardController extends Controller
 {
     /**
      * The class teacher's Report cards screen (`?section=<ulid>&exam=<ulid>`).
-     * Partial reloads add `preview` (a new card for `?preview=<student ulid>`)
+     * Approvers also get `approvals` (`?status=submitted|published|returned|all`,
+     * `?class=<section ulid>`). Partial reloads add `preview` (a new card for `?preview=<student ulid>`)
      * or `view` (an existing card, `?view=<report card ulid>`).
      */
-    public function index(Request $request, ReportCardsScreenQuery $screen): Response
+    public function index(Request $request, ReportCardsScreenQuery $screen, ReportCardApprovalsQuery $approvals): Response
     {
-        Gate::authorize('reportcards.prepare');
+        $mayApprove = Gate::allows('reportcards.approve');
+        abort_unless($mayApprove || Gate::allows('reportcards.prepare'), 403);
 
         $actor = $this->actor($request);
         $query = fn (string $key): ?string => is_string($request->query($key)) && $request->query($key) !== '' ? $request->query($key) : null;
         $data = $screen->get($actor, $query('section'), $query('exam'));
+        $status = $query('status') === 'all' ? null : (ReportCardStatus::tryFrom((string) $query('status')) ?? ReportCardStatus::Submitted);
 
         return Inertia::render('exams/report-cards', [
             'screen' => $data,
+            'approvals' => $mayApprove ? $approvals->get($actor, $status, $query('class')) : null,
             'preview' => Inertia::optional(fn () => $query('preview') === null || $data->section_ulid === null || $data->exam_ulid === null
                 ? null
                 : $screen->preview($actor, $data->section_ulid, $data->exam_ulid, (string) $query('preview'))),

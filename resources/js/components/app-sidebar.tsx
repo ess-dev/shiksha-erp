@@ -7,6 +7,7 @@ import {
     ClipboardPen,
     FileBadge,
     FolderGit2,
+    Inbox,
     Library,
     LayoutGrid,
     School,
@@ -38,6 +39,7 @@ import { index as structure } from '@/routes/school/structure';
 import { index as subjects } from '@/routes/school/subjects';
 import { index as syllabus } from '@/routes/school/syllabus';
 import { index as marks } from '@/routes/marks';
+import { index as approvals } from '@/routes/approvals';
 import { index as reportCards } from '@/routes/report-cards';
 import { index as students } from '@/routes/students';
 import type { NavItem } from '@/types';
@@ -63,7 +65,9 @@ export function AppSidebar() {
     const canEnter = useCan('marks.enter');
     const canReopen = useCan('marks.reopen');
     const canEnterMarks = canEnter || canReopen;
-    const canPrepareReportCards = useCan('reportcards.prepare');
+    const canPrepareReportCards =
+        useCan('reportcards.prepare') || useCan('reportcards.approve');
+    const canApprove = useCan('reportcards.approve');
     const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
     const canViewAttendance =
@@ -151,6 +155,15 @@ export function AppSidebar() {
                       title: 'Report cards',
                       href: reportCards(),
                       icon: FileBadge,
+                  },
+              ]
+            : []),
+        ...(canApprove
+            ? [
+                  {
+                      title: 'Approvals',
+                      href: approvals(),
+                      icon: Inbox,
                   },
               ]
             : []),

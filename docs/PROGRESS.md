@@ -2,7 +2,7 @@
 
 Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-24, with marks entry, the grading scale and parent Results.
+Update this file in the same commit as the work it describes. Last updated: 2026-10-25, with the report card approvals (Approvals screen and the approver's Report cards view).
 
 ## Where things stand
 
@@ -58,6 +58,13 @@ Details in `docs/modules/exams.md` ("Report cards"). The owner answered: result 
 - **Tests**: `tests/Feature/Exams/ReportCardsTest.php` (11: screen props and readiness, preview with suggested remark, generate rules + snapshot + remark + audit + notifier, approval off, withdraw and prepare again, upload type check + signed file + audit, approve/send back with scope and note, parent list/snapshot/other child 404, permission/plan/suspension, school isolation, approval setting). Run together with Access, Exams, Guardian, Architecture, Unit, GeneratedTypes and the Syllabus screen tests: **215 passed**. Pint, PHPStan (only the old `DemoAttendanceSeeder` warning), `vp check`, `types:check`, `npm run build`.
 - **Browser-checked 2026-10-24** (as `teacher@greenfield.test`): the screen, Generate preview (matches the prototype's card), editing the remark (card updates live), Send for approval, View of the saved card, Withdraw, Generate all missing with its confirmation. Local demo data: the Greenfield owner and Class teacher roles were brought to the new template versions (the owner's directly, see the gap below) and October Unit Test marks were published for every Class 1-A subject. **Not checked in a browser**: Upload (file picker), the approval-off path, the parent list with a published card (covered by tests), mobile width, dark mode.
 - **Gap fixed (owner's decision, option A)**: `ApplyRoleTemplateUpdate` no longer requires the applier to hold the added permissions (or cover their scope) when the role is the owner role, so an owner can bring the owner role to a newer template version. Other roles keep the "nobody grants what they don't hold" rule; availability (plan, owner-only) and critical confirmation still apply to owner roles. Test: `AccessControlTest` ("lets the owner bring the owner role...").
+
+### Report card approvals (2026-10-25; owner-approved answers)
+
+- **What**: approvers (anyone with `reportcards.approve`: Principal, Vice principal, Coordinator over their wing) get the Approvals screen `/approvals` (four tabs as in the prototype; only Report cards has data) and an approver view on `/report-cards` (status filter Awaiting / Published / Sent back / All, class filter; a Principal who is also a class teacher gets a "My class / For approval" switch). Publish all, Send back with a note, per-student Preview and Publish. No new permission, no migration. Details in `docs/modules/exams.md`.
+- **Code**: `ReportCardApprovalsQuery`, Data `ReportCardApprovalsData`/`ApprovalGroupData`/`ApprovalCardData`, `ReportCardAccess::approverSections()`, `School\ApprovalsController`, `components/exams/report-card-approvals.tsx`, pages `school/approvals.tsx` and `exams/report-cards.tsx`; `ReportCardsScreenQuery::view()` now also opens a card for its approver.
+- **Tests**: 3 added to `tests/Feature/Exams/ReportCardsTest.php` (now 14, all pass): approver in scope vs outside scope on both screens, status filter, Approvals gating by permission, plan and suspension. Architecture tests pass. Pint, `vp check`, `types:check`, `npm run build` clean; PHPStan shows only the old `DemoAttendanceSeeder` warning.
+- **Not checked in a browser**: either screen, the Send back dialog, mobile width, dark mode. Not built: Approvals count badge in the sidebar, notifications to the class teacher beyond the log notifier, the other three tabs' data.
 
 ### Marks, grades and results (2026-10-24; owner-approved answers)
 

@@ -7,8 +7,10 @@ use App\Domain\Exams\Actions\SaveMarks;
 use App\Domain\Exams\Actions\UpdateReportCardApproval;
 use App\Domain\Exams\Contracts\ReportCardNotifier;
 use App\Domain\Exams\Enums\ExamStatus;
+use App\Domain\Exams\Exceptions\ReportCardException;
 use App\Domain\Exams\Models\Exam;
 use App\Domain\Exams\Models\ReportCard;
+use App\Domain\Exams\Queries\ReportCardsScreenQuery;
 use App\Domain\Identity\Contracts\OtpSender;
 use App\Domain\School\Actions\AddSubject;
 use App\Domain\School\Actions\SetClassTeacher;
@@ -328,4 +330,84 @@ it('switches report card approval for settings managers only', function () {
         ->assertInertia(fn (Assert $page) => $page->where('screen.report_card_approval', false));
 
     expect(rcAudit('settings.report_card_approval_updated')->count())->toBe(1);
+});
+
+it('lists waiting report cards for approvers in scope on Approvals and Report cards', function () {
+    rcMarks($this->english, '76', '57');
+    rcMarks($this->maths, '80', '51');
+    rcGenerate($this->teacher, [$this->riya->ulid => null, $this->ira->ulid => null]);
+
+    $approver = $this->staffWith(['reportcards.approve'], Scope::wing([$this->main->ulid], 1, 1));
+    $outside = $this->staffWith(['reportcards.approve'], Scope::campuses([$this->north->ulid]));
+    $card = ReportCard::query()->where('student_id', $this->riya->id)->firstOrFail();
+
+    $this->actingAs($approver)->get(route('approvals.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('school/approvals')
+            ->where('report_cards.awaiting_count', 2)
+            ->where('report_cards.groups.0.section_label', 'Class 1-A')
+            ->where('report_cards.groups.0.exam_name', 'Half-Yearly Examination')
+            ->where('report_cards.groups.0.student_count', 2)
+            ->where('report_cards.groups.0.cards.0.student_name', 'Riya Sharma')
+            ->where('report_cards.groups.0.cards.0.status', 'submitted')
+            ->missing('report_cards.groups.0.cards.0.id')
+            ->missing('view'));
+
+    $this->actingAs($approver)->get(route('approvals.index', ['view' => $card->ulid]))
+        ->assertInertia(fn (Assert $page) => $page->reloadOnly('view', fn (Assert $reload) => $reload
+            ->where('view.status', 'submitted')
+            ->where('view.exam_name', 'Half-Yearly Examination')));
+
+    $this->actingAs($approver)->get(route('report-cards.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('screen.sections', [])
+            ->where('approvals.awaiting_count', 2)
+            ->where('approvals.groups.0.cards.1.student_name', 'Ira Nair'));
+
+    $this->actingAs($outside)->get(route('approvals.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('report_cards.groups', [])->where('report_cards.awaiting_count', 0));
+
+    expect(fn () => app(ReportCardsScreenQuery::class)->view($outside, $card->ulid))->toThrow(ReportCardException::class);
+});
+
+it('shows approvers published and sent back cards on the status filter', function () {
+    rcMarks($this->english, '76', '57');
+    rcMarks($this->maths, '80', '51');
+    rcGenerate($this->teacher, [$this->riya->ulid => null, $this->ira->ulid => null]);
+    $approver = $this->staffWith(['reportcards.approve']);
+    $url = route('report-cards.decide', $this->exam);
+
+    $this->actingAs($approver)->post($url, ['section' => $this->main1A->ulid, 'approve' => true, 'students' => [$this->riya->ulid]]);
+    $this->actingAs($approver)->post($url, ['section' => $this->main1A->ulid, 'approve' => false, 'note' => 'Fix the remark']);
+
+    $this->actingAs($approver)->get(route('report-cards.index', ['status' => 'published']))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('approvals.status', 'published')
+            ->where('approvals.awaiting_count', 0)
+            ->where('approvals.published_count', 1)
+            ->where('approvals.sent_back_count', 1)
+            ->where('approvals.groups.0.cards', fn ($cards) => count($cards) === 1 && $cards[0]['student_name'] === 'Riya Sharma'));
+
+    $this->actingAs($approver)->get(route('report-cards.index', ['status' => 'all']))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('approvals.status', null)
+            ->where('approvals.groups.0.cards.1.return_note', 'Fix the remark'));
+});
+
+it('keeps Approvals to approvers, the plan and an active school', function () {
+    $this->actingAs($this->teacher)->get(route('approvals.index'))->assertForbidden();
+    $this->actingAs($this->staffWith(['marks.enter']))->get(route('approvals.index'))->assertForbidden();
+
+    $approver = $this->staffWith(['reportcards.approve']);
+    $unplanned = $this->staffWith(['reportcards.approve']);
+    $suspended = $this->staffWith(['reportcards.approve']);
+    $this->actingAs($approver)->get(route('approvals.index'))->assertOk();
+
+    $this->disableModule('exams');
+    $this->actingAs($unplanned)->get(route('approvals.index'))->assertForbidden();
+    $this->enableModules(['exams']);
+
+    $this->setSchoolStatus(TenantStatus::Suspended);
+    $this->actingAs($suspended)->get(route('approvals.index'))->assertForbidden();
 });

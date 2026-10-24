@@ -13,3 +13,6 @@ export type GradeScaleScreen = App.Domain.Exams.Data.GradeScaleScreenData;
 export type ReportCardsScreen = App.Domain.Exams.Data.ReportCardsScreenData;
 export type ReportCardRow = App.Domain.Exams.Data.ReportCardRowData;
 export type ReportCardView = App.Domain.Exams.Data.ReportCardViewData;
+export type ReportCardApprovals = App.Domain.Exams.Data.ReportCardApprovalsData;
+export type ApprovalGroup = App.Domain.Exams.Data.ApprovalGroupData;
+export type ApprovalCard = App.Domain.Exams.Data.ApprovalCardData;

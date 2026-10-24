@@ -77,6 +77,35 @@ class ReportCardAccess
         throw ReportCardException::notFound();
     }
 
+    public function mayApproveAny(Identity $actor): bool
+    {
+        return $this->scopes->get($actor, 'reportcards.approve')->allows();
+    }
+
+    /**
+     * Current-year sections the person's `reportcards.approve` covers, lowest
+     * class first.
+     *
+     * @return list<SectionRefData>
+     */
+    public function approverSections(Identity $actor): array
+    {
+        $approve = $this->scopes->get($actor, 'reportcards.approve');
+
+        if ($approve->isEmpty()) {
+            return [];
+        }
+
+        $sections = array_values(array_filter(
+            $this->sections->currentYear(),
+            fn (SectionRefData $section) => $approve->allows($section->scopeTarget()),
+        ));
+
+        usort($sections, fn (SectionRefData $a, SectionRefData $b) => [$a->classLevel, $a->campusName, $a->name] <=> [$b->classLevel, $b->campusName, $b->name]);
+
+        return $sections;
+    }
+
     /**
      * A current-year section the person may approve report cards for, or a 404.
      */

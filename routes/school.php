@@ -15,6 +15,7 @@ use App\Http\Controllers\Exams\GradeScaleController;
 use App\Http\Controllers\Exams\MarksController;
 use App\Http\Controllers\Exams\ReportCardController;
 use App\Http\Controllers\School\AcademicYearController;
+use App\Http\Controllers\School\ApprovalsController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
 use App\Http\Controllers\School\ClassesController;
@@ -57,6 +58,8 @@ Route::middleware(['auth'])->prefix('teaching/subjects')->name('school.syllabus.
     Route::put('{section}/{subject}/section', [SyllabusController::class, 'updateSection'])->name('section');
     Route::put('{section}/{subject}/students', [SyllabusController::class, 'updateStudents'])->name('students');
 });
+
+Route::middleware(['auth'])->get('approvals', [ApprovalsController::class, 'index'])->name('approvals.index');
 
 Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.')->group(function () {
     Route::get('/', [StructureController::class, 'index'])->name('index');

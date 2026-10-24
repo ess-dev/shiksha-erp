@@ -109,14 +109,16 @@ class ReportCardsScreenQuery
     }
 
     /**
-     * An existing report card of one of the person's classes.
+     * An existing report card of one of the person's classes, or of a class they
+     * approve for.
      */
     public function view(Identity $actor, string $reportCardUlid): ReportCardViewData
     {
         $card = ReportCard::query()->where('ulid', $reportCardUlid)->first() ?? throw ReportCardException::notFound();
-        $sections = array_filter($this->access->preparerSections($actor), fn (SectionRefData $s) => $s->sectionKey === $card->section_id);
+        $mine = array_filter($this->access->preparerSections($actor), fn (SectionRefData $s) => $s->sectionKey === $card->section_id);
+        $approves = array_filter($this->access->approverSections($actor), fn (SectionRefData $s) => $s->sectionKey === $card->section_id);
 
-        if ($sections === []) {
+        if ($mine === [] && $approves === []) {
             throw ReportCardException::notFound();
         }
 
