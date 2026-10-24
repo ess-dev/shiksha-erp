@@ -70,7 +70,7 @@ it('gives the owner every permission in the plan over the whole school', functio
     expect(Gate::forUser($owner)->allows('roles.manage'))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('fees.refund', [new ScopeTarget(campusUlid: 'any')]))->toBeTrue()
         ->and(app(Authorizer::class)->holdsOwnerRole($owner))->toBeTrue()
-        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(40);
+        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(41);
 });
 
 it('denies people without a staff record or without the permission', function () {
@@ -158,7 +158,7 @@ it('copies a template into a school role, leaving out modules outside the plan',
     $role = accessRole($owner, 'class_teacher', 'Class 5 teacher');
 
     expect($role->source_template_key)->toBe('class_teacher')
-        ->and($role->source_template_version)->toBe(2)
+        ->and($role->source_template_version)->toBe(3)
         ->and($role->is_owner)->toBeFalse()
         ->and($role->permissionKeys())->toContain('attendance.mark', 'marks.enter')
         ->and($role->permissionKeys())->not->toContain('homework.assign', 'homework.view');
@@ -321,9 +321,9 @@ it('seeds ten templates, their versions and the catalog idempotently', function 
         ->where('is_owner_template', true)->where('version', $version)->value('id');
 
     expect($landlord->table('role_templates')->count())->toBe(10)
-        ->and($landlord->table('permissions')->count())->toBe(40)
-        ->and($landlord->table('role_template_versions')->count())->toBe(39)
-        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(8)
+        ->and($landlord->table('permissions')->count())->toBe(41)
+        ->and($landlord->table('role_template_versions')->count())->toBe(44)
+        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(9)
         ->and($landlord->table('role_templates')->where('key', 'librarian')->value('current_version'))->toBe(1)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(1))->count())->toBe(27)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(2))->count())->toBe(29)
@@ -352,18 +352,18 @@ it('offers a newer template version and applies it keeping the edits a school ma
 
     expect($mine)->not->toBeNull()
         ->and($mine['from_version'])->toBe(1)
-        ->and($mine['to_version'])->toBe(2)
-        ->and($mine['added'])->toBe(['structure.view'])
+        ->and($mine['to_version'])->toBe(3)
+        ->and($mine['added'])->toBe(['structure.view', 'subjects.update'])
         ->and($mine['removed'])->toBe([]);
 
     app(ApplyRoleTemplateUpdate::class)->handle($owner, $role);
 
     $role->refresh();
 
-    expect($role->source_template_version)->toBe(2)
-        ->and($role->permissionKeys())->toContain('structure.view', 'notices.send')
+    expect($role->source_template_version)->toBe(3)
+        ->and($role->permissionKeys())->toContain('structure.view', 'subjects.update', 'notices.send')
         ->and(app(RoleTemplateUpdatesQuery::class)->get())->toBe([])
-        ->and(AuditEvent::query()->where('action', 'roles.template_update_applied')->sole()->after['added'])->toBe(['structure.view']);
+        ->and(AuditEvent::query()->where('action', 'roles.template_update_applied')->sole()->after['added'])->toBe(['structure.view', 'subjects.update']);
 });
 
 it('refuses to apply an update when none is waiting', function () {

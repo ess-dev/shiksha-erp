@@ -2,6 +2,7 @@
 
 namespace App\Domain\School\Actions;
 
+use App\Domain\Access\Actions\SyncSubjectTeacherRole;
 use App\Domain\Access\Queries\StaffRefQuery;
 use App\Domain\Audit\Data\AuditEntry;
 use App\Domain\Identity\Models\Identity;
@@ -18,6 +19,7 @@ class SetSectionSubjectTeacher extends Action
     public function __construct(
         private readonly SubjectGuard $guard,
         private readonly StaffRefQuery $staff,
+        private readonly SyncSubjectTeacherRole $syncRole,
     ) {}
 
     /**
@@ -72,6 +74,10 @@ class SetSectionSubjectTeacher extends Action
             ], [
                 'subject' => $subject->code, 'teacher' => $staffUlid,
             ]));
+
+            foreach (array_filter(array_unique([$previousUlid, $staffUlid])) as $affected) {
+                $this->syncRole->handle((string) $affected);
+            }
         });
     }
 }

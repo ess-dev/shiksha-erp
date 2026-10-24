@@ -10,7 +10,7 @@ use RuntimeException;
 
 /**
  * Development stand-in "SMS": emails the code to the guardian's address on
- * file (MailHog locally) and also logs it, so the sign-in flow can be tried
+ * file (MailHog locally; a placeholder address when none is on file) and also logs it, so the sign-in flow can be tried
  * without an SMS provider. Refuses to run in production.
  */
 class MailOtpSender implements OtpSender
@@ -28,7 +28,8 @@ class MailOtpSender implements OtpSender
 
         $this->log->send($phoneE164, $code, $schoolName);
 
-        $emails = $this->guardians->emailsForPhone($phoneE164);
+        // MailHog accepts any recipient, so guardians without an email still get the code at a placeholder address.
+        $emails = $this->guardians->emailsForPhone($phoneE164) ?: [ltrim($phoneE164, '+').'@otp.'.config('shiksha.base_domain', 'shiksha.localhost')];
 
         foreach ($emails as $email) {
             Mail::raw(

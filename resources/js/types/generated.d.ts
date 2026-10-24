@@ -455,6 +455,23 @@ name: string,
 status: string,
 student_count: number,
 };
+export type ParentChapterData = {
+number: number,
+title: string,
+state: App.Domain.School.Enums.ChapterState,
+};
+export type ParentSubjectData = {
+name: string,
+book: string | null,
+teacher_name: string | null,
+periods_per_week: number | null,
+percent_done: number | null,
+current_chapter: string | null,
+teacher_note: string | null,
+student_note: string | null,
+assessment: string | null,
+chapters: App.Domain.School.Data.ParentChapterData[],
+};
 export type SchoolDashboardData = {
 staff_name: string | null,
 part_of_day: string,
@@ -534,6 +551,54 @@ sections: App.Domain.School.Data.SubjectSectionOptionData[],
 selected_section: App.Domain.School.Data.SectionTeachersData | null,
 staff: App.Domain.Access.Data.StaffOptionData[],
 };
+export type SyllabusChoiceData = {
+section_ulid: string,
+subject_ulid: string,
+section_name: string,
+subject_name: string,
+campus_name: string,
+via_class_teacher: boolean,
+};
+export type SyllabusClassData = {
+book: string | null,
+chapters: string[],
+assessment: string | null,
+is_saved: boolean,
+copied_from: string | null,
+updated_on: string | null,
+updated_by: string | null,
+};
+export type SyllabusDetailData = {
+section_ulid: string,
+subject_ulid: string,
+section_name: string,
+class_name: string,
+subject_name: string,
+section_count: number,
+can_edit_class: boolean,
+class_syllabus: App.Domain.School.Data.SyllabusClassData,
+progress: App.Domain.School.Data.SyllabusProgressData,
+students: App.Domain.School.Data.SyllabusStudentNoteData[],
+};
+export type SyllabusProgressData = {
+done_chapters: number[],
+current_chapter: number | null,
+periods_per_week: number | null,
+note: string,
+updated_on: string | null,
+updated_by: string | null,
+};
+export type SyllabusScreenData = {
+year_name: string,
+choices: App.Domain.School.Data.SyllabusChoiceData[],
+selected: App.Domain.School.Data.SyllabusDetailData | null,
+};
+export type SyllabusStudentNoteData = {
+ulid: string,
+roll_number: number | null,
+name: string,
+note: string,
+};
 export type UpcomingHolidayData = {
 name: string,
 starts_on: string,
@@ -542,6 +607,7 @@ days_away: number,
 };
 }
 namespace Enums {
+export type ChapterState = 'done' | 'current' | 'upcoming';
 export type SubjectType = 'core' | 'elective' | 'co_scholastic';
 }
 }

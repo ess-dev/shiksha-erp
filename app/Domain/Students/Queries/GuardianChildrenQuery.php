@@ -76,6 +76,7 @@ class GuardianChildrenQuery
                 $row->getAttribute('roll_number') === null ? null : (int) $row->getAttribute('roll_number'),
                 $section->classTeacherName,
                 $section->classLevel,
+                $section->sectionKey,
             );
         }
 

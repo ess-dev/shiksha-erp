@@ -20,6 +20,7 @@ final readonly class GuardianChildRef
         public ?int $rollNumber,
         public ?string $classTeacherName,
         public int $classLevel,
+        public int $sectionKey = 0,
     ) {}
 
     public function toData(): ParentChildData

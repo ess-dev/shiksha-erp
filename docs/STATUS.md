@@ -31,6 +31,8 @@ Subjects, built 2026-10-23: apply role-template update 7 on each role (Roles and
 
 Exams and tests, built 2026-10-24 (Principal / permitted staff only; parent view and marks entry come later): apply role-template update 8 on each role, then try New test or exam (one subject a day, a wing coordinator's limited class list), Edit, Open marking, Close marking, Publish all (needs results.publish), Cancel / Restore, Delete and the Date sheet CSV. "Tell parents" only logs (no provider); default maximum marks per type are illustrative.
 
+Teacher's Subjects, built 2026-10-24 (`/teaching/subjects`): apply role-template update (Class teacher 3, Subject teacher 3, Principal/Vice principal/Coordinator 9) on each role. Try the Whole class tab (textbook, chapters, assessment), Section ticks and note, Student notes; choose a subject teacher on the Principal's Subjects screen and sign in as them. Teachers chosen before this update need their choice saved again to get the automatic role. Parent Subjects `/parent/subjects` (built the same day) shows what the teacher saved; try a teacher note and a student note, then open it as that child's parent, and switch to a past session.
+
 ## School screens: Principal and Teacher
 
 | Screen                                     | Status | Notes                                                                                                                                                                                                                                                 |

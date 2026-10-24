@@ -7,6 +7,7 @@ use App\Domain\Exams\Exceptions\ExamException;
 use App\Domain\School\Exceptions\CalendarException;
 use App\Domain\School\Exceptions\HouseException;
 use App\Domain\School\Exceptions\StructureException;
+use App\Domain\School\Exceptions\SyllabusException;
 use App\Domain\Students\Exceptions\StudentException;
 use App\Http\DomainRuleResponse;
 use App\Http\Middleware\EnsureActiveMembership;
@@ -72,6 +73,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (AttendanceException $e, Request $request) => DomainRuleResponse::for($e, $request, 'register'));
         $exceptions->render(fn (AdmissionException $e, Request $request) => DomainRuleResponse::for($e, $request, 'application'));
         $exceptions->render(fn (ExamException $e, Request $request) => DomainRuleResponse::for($e, $request, 'exam'));
+        $exceptions->render(fn (SyllabusException $e, Request $request) => DomainRuleResponse::for($e, $request, 'syllabus'));
 
         // Access guardrails (nobody grants what they do not hold, critical confirmation, last owner).
         $exceptions->render(fn (GuardrailViolation $e, Request $request) => DomainRuleResponse::for($e, $request, 'roles'));

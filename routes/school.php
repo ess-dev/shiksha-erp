@@ -25,6 +25,7 @@ use App\Http\Controllers\School\SubjectCatalogController;
 use App\Http\Controllers\School\SubjectController;
 use App\Http\Controllers\School\SubjectsScreenController;
 use App\Http\Controllers\School\SubjectTeacherController;
+use App\Http\Controllers\School\SyllabusController;
 use App\Http\Controllers\Students\HouseController;
 use App\Http\Controllers\Students\SiblingController;
 use App\Http\Controllers\Students\StudentController;
@@ -45,6 +46,13 @@ Route::middleware(['auth'])->prefix('subjects')->name('school.subjects.')->group
     Route::delete('{subject}', [SubjectCatalogController::class, 'destroy'])->name('destroy');
     Route::put('classes/{schoolClass}', [ClassSubjectsController::class, 'update'])->name('classes.update');
     Route::put('sections/{section}/teachers/{subject}', [SubjectTeacherController::class, 'update'])->name('teachers.update');
+});
+
+Route::middleware(['auth'])->prefix('teaching/subjects')->name('school.syllabus.')->group(function () {
+    Route::get('/', [SyllabusController::class, 'index'])->name('index');
+    Route::put('{section}/{subject}/class', [SyllabusController::class, 'updateClass'])->name('class');
+    Route::put('{section}/{subject}/section', [SyllabusController::class, 'updateSection'])->name('section');
+    Route::put('{section}/{subject}/students', [SyllabusController::class, 'updateStudents'])->name('students');
 });
 
 Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.')->group(function () {

@@ -10,3 +10,5 @@ export type StudentDay = App.Domain.Attendance.Data.StudentDayData;
 export type StudentTally = App.Domain.Attendance.Data.StudentTallyData;
 export type DayState = App.Domain.Attendance.Enums.DayState;
 export type SchoolContext = App.Domain.Identity.Data.SchoolContextData;
+export type ParentSubject = App.Domain.School.Data.ParentSubjectData;
+export type ParentChapter = App.Domain.School.Data.ParentChapterData;

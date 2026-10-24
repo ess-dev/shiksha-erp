@@ -70,3 +70,7 @@ export type AttendanceTrendPoint =
     App.Domain.Attendance.Data.AttendanceTrendPointData;
 export type AbsentStudent = App.Domain.Attendance.Data.AbsentStudentData;
 export type AdmissionFunnel = App.Domain.Admissions.Data.AdmissionFunnelData;
+
+export type SyllabusScreen = App.Domain.School.Data.SyllabusScreenData;
+export type SyllabusChoice = App.Domain.School.Data.SyllabusChoiceData;
+export type SyllabusDetail = App.Domain.School.Data.SyllabusDetailData;

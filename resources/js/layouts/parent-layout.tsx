@@ -23,7 +23,7 @@ import {
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import { initials } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { attendance, home, signOut } from '@/routes/parent';
+import { attendance, home, signOut, subjects } from '@/routes/parent';
 import { select as selectSession } from '@/routes/parent/session';
 import { switchMethod } from '@/routes/school/context';
 import type { ParentShell } from '@/types/parent';
@@ -33,7 +33,7 @@ type Props = { shell?: ParentShell };
 /**
  * The parent shell, mirroring the prototype: an indigo top bar with the school,
  * a greeting, the child switcher and the session; a side menu on wide screens
- * and bottom tabs on phones. Only Home and Attendance exist so far; the other
+ * and bottom tabs on phones. Only Home, Attendance and Subjects exist so far; the other
  * menu entries are visible but marked "Soon".
  */
 export default function ParentLayout({ children }: { children: ReactNode }) {
@@ -43,6 +43,11 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
     const shell = page.props.shell;
     const path = page.url.split('?')[0] ?? '/';
     const onHome = path.replace(/\/$/, '') === home.url();
+    const current = onHome
+        ? 'home'
+        : path.startsWith(subjects.url())
+          ? 'subjects'
+          : 'attendance';
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (shell === undefined) {
@@ -58,6 +63,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
         if (key === 'attendance' && shell.attendance_enabled) {
             return attendance.url({ query: childParam });
+        }
+
+        if (key === 'subjects') {
+            return subjects.url({ query: childParam });
         }
 
         return null;
@@ -77,7 +86,11 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         );
     };
 
-    const title = onHome ? `Hi, ${shell.guardian_first_name}` : 'Attendance';
+    const title = onHome
+        ? `Hi, ${shell.guardian_first_name}`
+        : current === 'subjects'
+          ? 'Subjects'
+          : 'Attendance';
 
     return (
         <div className="min-h-svh bg-background text-foreground md:flex">
@@ -102,10 +115,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                             key={item.key}
                             item={item}
                             href={hrefFor(item.key)}
-                            active={
-                                (item.key === 'home' && onHome) ||
-                                (item.key === 'attendance' && !onHome)
-                            }
+                            active={item.key === current}
                             notInPlan={
                                 item.key === 'attendance' &&
                                 !shell.attendance_enabled
@@ -251,9 +261,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
             <nav
                 aria-label="Parent tabs"
-                className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-3 border-t bg-card md:hidden"
+                className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t bg-card md:hidden"
             >
-                {(['home', 'attendance'] as const).map((key) => {
+                {(['home', 'attendance', 'subjects'] as const).map((key) => {
                     const item = parentNav.find((n) => n.key === key);
                     const href = hrefFor(key);
 
@@ -261,9 +271,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                         return null;
                     }
 
-                    const active =
-                        (key === 'home' && onHome) ||
-                        (key === 'attendance' && !onHome);
+                    const active = key === current;
                     const Icon = item.icon;
 
                     return href === null ? (

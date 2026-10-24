@@ -39,6 +39,7 @@ class AccessCatalogSeeder extends Seeder
         'subjects.configure' => ['core', 'sensitive', false, 'Create subjects, assign them to classes and choose subject teachers', 7],
         // Students are part of the core product, not a sellable module: a "students" module row would never
         // exist in tenant_modules, so these permissions are always available (changed 2026-10-30).
+        'subjects.update' => ['core', 'normal', false, 'Update the textbook, chapters, progress and notes parents read under Subjects, for the subjects you teach', 9],
         'students.view' => ['core', 'normal', false, 'See students', 1],
         'students.manage' => ['core', 'sensitive', false, 'Add and edit students, change sections and roll numbers', 1],
         'students.view_sensitive' => ['core', 'sensitive', false, 'See guardian phones, documents and medical notes', 1],
@@ -112,6 +113,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const EXAMS_V8 = 'Adds scheduling exams and unit tests (Principal, Vice principal, Coordinator)';
 
+    private const SYLLABUS_V9 = 'Adds updating subject syllabus, progress and parent notes (Principal, Vice principal, Coordinator, Class teacher, Subject teacher)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -137,6 +140,7 @@ class AccessCatalogSeeder extends Seeder
             6 => [self::ATTENDANCE_V6, '*'],
             7 => [self::SUBJECTS_V7, '*'],
             8 => [self::EXAMS_V8, '*'],
+            9 => [self::SYLLABUS_V9, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -147,6 +151,7 @@ class AccessCatalogSeeder extends Seeder
             6 => [self::ATTENDANCE_V6, '*-restricted'],
             7 => [self::SUBJECTS_V7, '*-restricted'],
             8 => [self::EXAMS_V8, '*-restricted'],
+            9 => [self::SYLLABUS_V9, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -157,14 +162,17 @@ class AccessCatalogSeeder extends Seeder
             6 => [self::ATTENDANCE_V6, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct']],
             7 => [self::SUBJECTS_V7, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure']],
             8 => [self::EXAMS_V8, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule']],
+            9 => [self::SYLLABUS_V9, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],
             2 => [self::STRUCTURE_V2, [...self::CLASS_TEACHER, 'structure.view']],
+            3 => [self::SYLLABUS_V9, [...self::CLASS_TEACHER, 'structure.view', 'subjects.update']],
         ]],
         'subject_teacher' => ['Subject teacher', false, [
             1 => ['Initial version', self::SUBJECT_TEACHER],
             2 => [self::STRUCTURE_V2, [...self::SUBJECT_TEACHER, 'structure.view']],
+            3 => [self::SYLLABUS_V9, [...self::SUBJECT_TEACHER, 'structure.view', 'subjects.update']],
         ]],
         'accountant' => ['Accountant', false, [
             1 => ['Initial version', self::ACCOUNTANT],

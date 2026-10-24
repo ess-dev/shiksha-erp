@@ -34,6 +34,7 @@ import { index as classes } from '@/routes/school/classes';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
 import { index as subjects } from '@/routes/school/subjects';
+import { index as syllabus } from '@/routes/school/syllabus';
 import { index as students } from '@/routes/students';
 import type { NavItem } from '@/types';
 
@@ -55,6 +56,7 @@ export function AppSidebar() {
     const canViewStudents = useCan('students.view');
     const canViewRoles = useCan('roles.view');
     const canScheduleExams = useCan('exams.schedule');
+    const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
     const canViewAttendance =
         useCan('attendance.view') || useCan('attendance.mark');
@@ -85,6 +87,17 @@ export function AppSidebar() {
                       title: 'Subjects',
                       href: subjects(),
                       icon: Library,
+                  },
+              ]
+            : []),
+        ...(canUpdateSubjects
+            ? [
+                  {
+                      title: canViewStructure
+                          ? 'Syllabus and notes'
+                          : 'Subjects',
+                      href: syllabus(),
+                      icon: BookOpen,
                   },
               ]
             : []),

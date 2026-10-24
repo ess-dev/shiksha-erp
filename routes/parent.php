@@ -5,6 +5,7 @@ use App\Http\Controllers\Guardian\ContextController;
 use App\Http\Controllers\Guardian\HomeController;
 use App\Http\Controllers\Guardian\SessionController;
 use App\Http\Controllers\Guardian\SignInController;
+use App\Http\Controllers\Guardian\SubjectsController;
 use Illuminate\Support\Facades\Route;
 
 // Parent portal: phone + one-time code on the school's own host. Included inside
@@ -20,6 +21,7 @@ Route::prefix('parent')->name('parent.')->group(function () {
     Route::middleware('parent.auth')->group(function () {
         Route::get('/', HomeController::class)->name('home');
         Route::get('attendance', AttendanceController::class)->middleware('module:attendance')->name('attendance');
+        Route::get('subjects', SubjectsController::class)->name('subjects');
         Route::put('session', [SessionController::class, 'update'])->name('session.select');
         Route::post('sign-out', [SignInController::class, 'signOut'])->name('sign-out');
     });

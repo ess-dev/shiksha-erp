@@ -2,6 +2,7 @@
 
 namespace App\Domain\School\Actions;
 
+use App\Domain\Access\Actions\SyncSubjectTeacherRole;
 use App\Domain\Audit\Data\AuditEntry;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\School\Exceptions\StructureException;
@@ -11,10 +12,11 @@ use App\Domain\School\Models\SectionSubjectTeacher;
 use App\Domain\School\Models\Subject;
 use App\Domain\School\SubjectGuard;
 use App\Domain\Shared\Action;
+use Illuminate\Support\Facades\DB;
 
 class SetClassSubjects extends Action
 {
-    public function __construct(private readonly SubjectGuard $guard) {}
+    public function __construct(private readonly SubjectGuard $guard, private readonly SyncSubjectTeacherRole $syncRole) {}
 
     /**
      * Replaces the subjects taught in a class. Only active subjects can be
@@ -40,15 +42,20 @@ class SetClassSubjects extends Action
             sort($after);
 
             $removed = array_values(array_diff(array_keys($before), $ids));
-            $cleared = $removed === [] ? 0 : SectionSubjectTeacher::query()
+            $choices = SectionSubjectTeacher::query()
                 ->whereIn('subject_id', $removed)
                 ->whereIn('section_id', Section::query()
                     ->where('school_class_id', $class->id)
                     ->whereHas('academicYear', fn ($year) => $year->where('is_current', true))
-                    ->select('id'))
-                ->delete();
+                    ->select('id'));
+            $affectedStaff = $removed === [] ? [] : DB::connection('tenant')->table('staff')->whereIn('id', (clone $choices)->select('staff_id'))->pluck('ulid')->all();
+            $cleared = $removed === [] ? 0 : $choices->delete();
 
             $class->subjects()->sync($ids);
+
+            foreach ($affectedStaff as $staffUlid) {
+                $this->syncRole->handle((string) $staffUlid);
+            }
 
             $this->audit(new AuditEntry('structure.class_subjects_set', 'school_class', $class->ulid, ['subjects' => array_values($before)], [
                 'subjects' => $after,
