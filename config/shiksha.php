@@ -129,6 +129,20 @@ return [
     ],
 
     /*
+    | Suggested class teacher's remarks on a report card, by the overall
+    | percentage (the first band whose minimum it reaches). The teacher can
+    | change every remark. Wording from the prototype; illustrative - verify.
+    */
+
+    'report_card_remarks' => [
+        ['min_percent' => 90, 'text' => 'Outstanding work across subjects. Keep it up.'],
+        ['min_percent' => 75, 'text' => 'Very good progress. Keep reading every day.'],
+        ['min_percent' => 60, 'text' => 'Good effort. Regular revision will help further.'],
+        ['min_percent' => 40, 'text' => 'Needs more practice; we will share a plan at the PTM.'],
+        ['min_percent' => 0, 'text' => 'Needs support. Please meet the class teacher.'],
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Billing contact
     |--------------------------------------------------------------------------

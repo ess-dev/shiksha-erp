@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import ConfirmDialog from '@/components/attendance/confirm-dialog';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { grading, index } from '@/routes/exams';
+import { approval } from '@/routes/exams/grading';
 import gradingRoutes from '@/routes/exams/grading';
 import type { GradeBand, GradeScaleScreen } from '@/types';
 
@@ -298,6 +299,42 @@ export default function Grading({ screen }: { screen: GradeScaleScreen }) {
                                 </Button>
                             </div>
                         </form>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Report card approval</CardTitle>
+                        <CardDescription>
+                            Who checks a class teacher’s report cards before
+                            parents see them.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <label className="flex items-start gap-3 text-sm">
+                            <input
+                                type="checkbox"
+                                className="mt-1 size-4 accent-primary"
+                                checked={screen.report_card_approval}
+                                onChange={(event) =>
+                                    router.put(
+                                        approval.url(),
+                                        { required: event.target.checked },
+                                        { preserveScroll: true },
+                                    )
+                                }
+                            />
+                            <span>
+                                <strong>Report cards need approval</strong>
+                                <br />
+                                <span className="text-muted-foreground">
+                                    Approved by anyone with “Approve report
+                                    cards” for that class. When this is off,
+                                    report cards go to parents as soon as the
+                                    class teacher sends them.
+                                </span>
+                            </span>
+                        </label>
                     </CardContent>
                 </Card>
 

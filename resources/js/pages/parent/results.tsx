@@ -1,15 +1,15 @@
 import { Head, Link } from '@inertiajs/react';
-import { FileBadge, FileText } from 'lucide-react';
+import { FileBadge, FileText, Hourglass } from 'lucide-react';
 import { useState } from 'react';
 import GradePill from '@/components/exams/grade-pill';
 import { formatTenths } from '@/components/exams/grading';
-import { NotBuiltBadge } from '@/components/parent/not-built';
 import { Button } from '@/components/ui/button';
 import { formatCalendarDate, initials } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { reportCard } from '@/routes/parent/results';
 import type {
     ParentShell,
+    SchoolReportCard,
     StudentExamResult,
     StudentResults,
     StudentSubjectResult,
@@ -25,6 +25,8 @@ type Props = {
     section_label: string | null;
     session_name: string;
     is_current_session: boolean;
+    school_report_cards: SchoolReportCard[];
+    report_card_waiting: boolean;
 };
 
 /** "Periodic Test 1" → "PT 1", "Half-Yearly Examination" → "Half-Yearly", for the chart. */
@@ -42,6 +44,8 @@ export default function ParentResultsPage({
     section_label: section,
     session_name: sessionName,
     is_current_session: isCurrent,
+    school_report_cards: schoolCards,
+    report_card_waiting: reportCardWaiting,
 }: Props) {
     const exams = results?.exams ?? [];
     const [chosen, setChosen] = useState<string | null>(
@@ -74,20 +78,88 @@ export default function ParentResultsPage({
 
             <section
                 aria-labelledby="uploaded-title"
-                className="mb-4 rounded-xl border border-dashed bg-card p-4"
+                className="mb-4 rounded-xl border bg-card p-4"
             >
                 <div className="flex items-center justify-between gap-2">
                     <h2 id="uploaded-title" className="font-semibold">
                         Report cards from school
                     </h2>
-                    <NotBuiltBadge text="Coming soon" />
+                    <span className="text-sm text-muted-foreground">
+                        {sessionName}
+                    </span>
                 </div>
-                <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
-                    <FileBadge className="mt-0.5 size-4 shrink-0" aria-hidden />
-                    Report cards the class teacher uploads after each term will
-                    appear here. Until then, open the report card for any exam
-                    below.
-                </p>
+                {schoolCards.length === 0 ? (
+                    <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
+                        <FileBadge
+                            className="mt-0.5 size-4 shrink-0"
+                            aria-hidden
+                        />
+                        No report cards yet. The class teacher sends them after
+                        each exam; until then, open the report card for any exam
+                        below.
+                    </p>
+                ) : (
+                    <ul className="mt-2 divide-y">
+                        {schoolCards.map((card) => (
+                            <li
+                                key={card.ulid}
+                                className="flex items-center gap-3 py-3"
+                            >
+                                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <FileBadge className="size-5" aria-hidden />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                    <p className="font-semibold">
+                                        {card.exam_name}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {section} ·{' '}
+                                        {card.kind === 'file'
+                                            ? 'uploaded'
+                                            : 'prepared'}{' '}
+                                        by {card.prepared_by} on{' '}
+                                        {formatCalendarDate(card.prepared_on)}
+                                        {card.kind === 'file' &&
+                                            ' · scanned copy'}
+                                    </p>
+                                </div>
+                                <Button asChild size="sm">
+                                    {card.kind === 'file' ? (
+                                        <a
+                                            href={card.view_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            View
+                                            <span className="sr-only">
+                                                {' '}
+                                                {card.exam_name} report card
+                                            </span>
+                                        </a>
+                                    ) : (
+                                        <Link href={card.view_url}>
+                                            View
+                                            <span className="sr-only">
+                                                {' '}
+                                                {card.exam_name} report card
+                                            </span>
+                                        </Link>
+                                    )}
+                                </Button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                {reportCardWaiting && (
+                    <p className="mt-3 flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-sm">
+                        <Hourglass
+                            className="mt-0.5 size-4 shrink-0"
+                            aria-hidden
+                        />
+                        The class teacher has sent a new report card for
+                        approval. It appears here once it is approved.
+                    </p>
+                )}
             </section>
 
             {exams.length === 0 ? (

@@ -389,6 +389,7 @@ grades: App.Domain.Exams.Data.GradeBandData[],
 is_saved: boolean,
 default_grades: App.Domain.Exams.Data.GradeBandData[],
 frozen_exam_count: number,
+report_card_approval: boolean,
 };
 export type MarkRowData = {
 student_ulid: string,
@@ -440,6 +441,56 @@ name: string,
 is_mine: boolean,
 may_enter: boolean,
 };
+export type ReportCardRowData = {
+student_ulid: string,
+roll_number: number | null,
+name: string,
+marks: App.Domain.Exams.Enums.MarksReadiness,
+card: App.Domain.Exams.Data.ReportCardSummaryData | null,
+};
+export type ReportCardSummaryData = {
+ulid: string,
+kind: App.Domain.Exams.Enums.ReportCardKind,
+status: App.Domain.Exams.Enums.ReportCardStatus,
+prepared_on: string,
+file_name: string | null,
+return_note: string | null,
+};
+export type ReportCardViewData = {
+ulid: string,
+kind: App.Domain.Exams.Enums.ReportCardKind,
+status: App.Domain.Exams.Enums.ReportCardStatus,
+exam_name: string,
+session_name: string,
+prepared_by: string,
+prepared_on: string,
+card: App.Domain.Students.Data.ReportCardData | null,
+file_url: string | null,
+file_name: string | null,
+is_image: boolean,
+};
+export type ReportCardsScreenData = {
+sections: App.Domain.Exams.Data.MarksSectionOptionData[],
+section_ulid: string | null,
+exams: App.Domain.Exams.Data.MarksExamOptionData[],
+exam_ulid: string | null,
+exam_name: string | null,
+approval_required: boolean,
+approvers: string | null,
+not_started_count: number,
+sent_back_count: number,
+awaiting_count: number,
+published_count: number,
+rows: App.Domain.Exams.Data.ReportCardRowData[],
+};
+export type SchoolReportCardData = {
+ulid: string,
+exam_name: string,
+kind: App.Domain.Exams.Enums.ReportCardKind,
+prepared_by: string,
+prepared_on: string,
+view_url: string,
+};
 export type StudentExamResultData = {
 ulid: string,
 name: string,
@@ -471,6 +522,9 @@ namespace Enums {
 export type ExamStatus = 'scheduled' | 'marking' | 'published' | 'cancelled';
 export type ExamType = 'unit_test' | 'periodic_test' | 'half_yearly' | 'annual' | 'practical' | 'other';
 export type MarkSheetState = 'editable' | 'view_only' | 'published' | 'closed';
+export type MarksReadiness = 'missing' | 'unpublished' | 'ready';
+export type ReportCardKind = 'generated' | 'file';
+export type ReportCardStatus = 'submitted' | 'returned' | 'published';
 export type SubjectResultState = 'published' | 'absent' | 'not_entered' | 'awaiting';
 }
 }
@@ -836,6 +890,7 @@ class_label: string,
 class_teacher_name: string | null,
 attendance: App.Domain.Attendance.Data.StudentTallyData | null,
 result: App.Domain.Exams.Data.StudentExamResultData,
+remark: string | null,
 };
 export type SectionOptionData = {
 ulid: string,

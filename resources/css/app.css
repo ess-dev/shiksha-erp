@@ -139,3 +139,24 @@
         @apply bg-background text-foreground;
     }
 }
+
+/*
+ * Printing from a dialog (report cards): only the element marked
+ * `print-area` is printed, at the top of the page.
+ */
+@media print {
+    body:has(.print-area) * {
+        visibility: hidden;
+    }
+
+    body:has(.print-area) .print-area,
+    body:has(.print-area) .print-area * {
+        visibility: visible;
+    }
+
+    body:has(.print-area) .print-area {
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+    }
+}

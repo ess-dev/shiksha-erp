@@ -19,6 +19,8 @@ class SchoolSettingsQuery
 
     public const GRADE_SCALE = 'exams.grade_scale';
 
+    public const REPORT_CARD_APPROVAL = 'exams.report_card_approval';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
@@ -93,6 +95,17 @@ class SchoolSettingsQuery
         $value = SchoolSetting::query()->where('key', self::GRADE_SCALE)->value('value');
 
         return is_array($value) ? $value : null;
+    }
+
+    /**
+     * Whether a class teacher's report cards wait for approval before parents
+     * see them. On unless the school switched it off (as in the prototype).
+     */
+    public function reportCardApproval(): bool
+    {
+        $value = SchoolSetting::query()->where('key', self::REPORT_CARD_APPROVAL)->value('value');
+
+        return ! is_bool($value) || $value;
     }
 
     public function data(): SchoolSettingsData

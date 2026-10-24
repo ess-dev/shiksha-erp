@@ -70,7 +70,7 @@ it('gives the owner every permission in the plan over the whole school', functio
     expect(Gate::forUser($owner)->allows('roles.manage'))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('fees.refund', [new ScopeTarget(campusUlid: 'any')]))->toBeTrue()
         ->and(app(Authorizer::class)->holdsOwnerRole($owner))->toBeTrue()
-        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(42);
+        ->and(app(Authorizer::class)->heldPermissions($owner))->toHaveCount(44);
 });
 
 it('denies people without a staff record or without the permission', function () {
@@ -158,7 +158,7 @@ it('copies a template into a school role, leaving out modules outside the plan',
     $role = accessRole($owner, 'class_teacher', 'Class 5 teacher');
 
     expect($role->source_template_key)->toBe('class_teacher')
-        ->and($role->source_template_version)->toBe(3)
+        ->and($role->source_template_version)->toBe(4)
         ->and($role->is_owner)->toBeFalse()
         ->and($role->permissionKeys())->toContain('attendance.mark', 'marks.enter')
         ->and($role->permissionKeys())->not->toContain('homework.assign', 'homework.view');
@@ -321,9 +321,9 @@ it('seeds ten templates, their versions and the catalog idempotently', function 
         ->where('is_owner_template', true)->where('version', $version)->value('id');
 
     expect($landlord->table('role_templates')->count())->toBe(10)
-        ->and($landlord->table('permissions')->count())->toBe(42)
-        ->and($landlord->table('role_template_versions')->count())->toBe(47)
-        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(10)
+        ->and($landlord->table('permissions')->count())->toBe(44)
+        ->and($landlord->table('role_template_versions')->count())->toBe(51)
+        ->and($landlord->table('role_templates')->where('key', 'principal')->value('current_version'))->toBe(11)
         ->and($landlord->table('role_templates')->where('key', 'librarian')->value('current_version'))->toBe(1)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(1))->count())->toBe(27)
         ->and($landlord->table('role_template_version_permissions')->where('role_template_version_id', $principalVersions(2))->count())->toBe(29)

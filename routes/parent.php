@@ -25,6 +25,8 @@ Route::prefix('parent')->name('parent.')->group(function () {
         Route::get('subjects', SubjectsController::class)->name('subjects');
         Route::get('results', [ResultsController::class, 'index'])->middleware('module:exams')->name('results');
         Route::get('results/{exam}/report-card', [ResultsController::class, 'reportCard'])->middleware('module:exams')->name('results.report-card');
+        Route::get('report-cards/{reportCard}', [ResultsController::class, 'schoolCard'])->middleware('module:exams')->name('report-cards.show');
+        Route::get('report-cards/{reportCard}/file', [ResultsController::class, 'schoolCardFile'])->middleware(['module:exams', 'signed'])->name('report-cards.file');
         Route::put('session', [SessionController::class, 'update'])->name('session.select');
         Route::post('sign-out', [SignInController::class, 'signOut'])->name('sign-out');
     });

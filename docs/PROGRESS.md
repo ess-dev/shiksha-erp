@@ -44,7 +44,20 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 
 | 24 | Parent Subjects page `/parent/subjects` (from the owner's prototype screenshots): per subject the book, teacher, periods, % done, "Now" chapter, teacher note, per-child note and a chapters list; past sessions only for children enrolled then (see "Parent Subjects" below) | uncommitted |
 
+| 26 | Teacher's Report cards `/report-cards` (from the owner's screenshots): generate from published marks with an editable remark, upload a scan, withdraw, approval setting; approve/send back server-side; parent "Report cards from school" list (see "Report cards" below) | see `git log` |
+
 | 25 | Marks entry `/marks`, grading scale `/exams/grading`, parent Results `/parent/results` with a printable report card (from the owner's prototype screenshots; see "Marks, grades and results" below and `docs/modules/exams.md`) | see `git log` |
+
+### Report cards (2026-10-24; owner-approved answers)
+
+Details in `docs/modules/exams.md` ("Report cards"). The owner answered: result terms with weights, promotion suggested then confirmed by the teacher, in-app staff notifications for reminders, and a new approval permission with an on/off setting. Built now (screenshots supplied): the teacher's Report cards screen with remarks; the rest waits for screenshots or a design go-ahead.
+
+- **Tenant migration** `2026_11_09_000000_create_report_cards_table`. No landlord table change.
+- **Permissions**: new `reportcards.prepare` (exams, normal; Class teacher template **version 4**) and `reportcards.approve` (exams, sensitive; Principal, Vice principal, Coordinator **version 11**). `AccessControlTest` counts updated (44 permissions, 51 template versions, principal at 11, class teacher at 4).
+- **Settings/config**: school setting `exams.report_card_approval` (default on); config `shiksha.report_card_remarks` (suggested remarks, illustrative — verify).
+- **Tests**: `tests/Feature/Exams/ReportCardsTest.php` (11: screen props and readiness, preview with suggested remark, generate rules + snapshot + remark + audit + notifier, approval off, withdraw and prepare again, upload type check + signed file + audit, approve/send back with scope and note, parent list/snapshot/other child 404, permission/plan/suspension, school isolation, approval setting). Run together with Access, Exams, Guardian, Architecture, Unit, GeneratedTypes and the Syllabus screen tests: **215 passed**. Pint, PHPStan (only the old `DemoAttendanceSeeder` warning), `vp check`, `types:check`, `npm run build`.
+- **Browser-checked 2026-10-24** (as `teacher@greenfield.test`): the screen, Generate preview (matches the prototype's card), editing the remark (card updates live), Send for approval, View of the saved card, Withdraw, Generate all missing with its confirmation. Local demo data: the Greenfield owner and Class teacher roles were brought to the new template versions (the owner's directly, see the gap below) and October Unit Test marks were published for every Class 1-A subject. **Not checked in a browser**: Upload (file picker), the approval-off path, the parent list with a published card (covered by tests), mobile width, dark mode.
+- **Gap found (not changed)**: `ApplyRoleTemplateUpdate` requires the person applying an update to hold every permission it adds, so a school owner cannot bring their own owner role to a template version that adds permissions (no one in the school holds them yet). Needs a decision (e.g. owner-role updates applied automatically, or by the platform).
 
 ### Marks, grades and results (2026-10-24; owner-approved answers)
 

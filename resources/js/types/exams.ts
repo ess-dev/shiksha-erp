@@ -10,3 +10,6 @@ export type MarkRow = App.Domain.Exams.Data.MarkRowData;
 export type MarkSheetState = App.Domain.Exams.Enums.MarkSheetState;
 export type GradeBand = App.Domain.Exams.Data.GradeBandData;
 export type GradeScaleScreen = App.Domain.Exams.Data.GradeScaleScreenData;
+export type ReportCardsScreen = App.Domain.Exams.Data.ReportCardsScreenData;
+export type ReportCardRow = App.Domain.Exams.Data.ReportCardRowData;
+export type ReportCardView = App.Domain.Exams.Data.ReportCardViewData;

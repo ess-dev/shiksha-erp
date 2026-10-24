@@ -13,6 +13,7 @@ use App\Http\Controllers\Exams\ExamController;
 use App\Http\Controllers\Exams\ExamStatusController;
 use App\Http\Controllers\Exams\GradeScaleController;
 use App\Http\Controllers\Exams\MarksController;
+use App\Http\Controllers\Exams\ReportCardController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
@@ -147,6 +148,7 @@ Route::middleware(['auth', 'module:attendance'])->prefix('attendance')->name('at
 Route::middleware(['auth', 'module:exams'])->prefix('exams')->name('exams.')->group(function () {
     Route::get('grading', [GradeScaleController::class, 'show'])->name('grading');
     Route::put('grading', [GradeScaleController::class, 'update'])->name('grading.update');
+    Route::put('grading/report-card-approval', [GradeScaleController::class, 'approval'])->name('grading.approval');
     Route::get('/', [ExamController::class, 'index'])->name('index');
     Route::post('/', [ExamController::class, 'store'])->name('store');
     Route::put('{exam}', [ExamController::class, 'update'])->name('update');
@@ -158,4 +160,13 @@ Route::middleware(['auth', 'module:exams'])->prefix('marks')->name('marks.')->gr
     Route::get('/', [MarksController::class, 'index'])->name('index');
     Route::put('{exam}/{section}/{subject}', [MarksController::class, 'update'])->name('update');
     Route::post('{exam}/{section}/{subject}/reopen', [MarksController::class, 'reopen'])->name('reopen');
+});
+
+Route::middleware(['auth', 'module:exams'])->prefix('report-cards')->name('report-cards.')->group(function () {
+    Route::get('/', [ReportCardController::class, 'index'])->name('index');
+    Route::post('{exam}/generate', [ReportCardController::class, 'generate'])->name('generate');
+    Route::post('{exam}/upload', [ReportCardController::class, 'upload'])->name('upload');
+    Route::post('{exam}/decide', [ReportCardController::class, 'decide'])->name('decide');
+    Route::post('cards/{reportCard}/withdraw', [ReportCardController::class, 'withdraw'])->name('withdraw');
+    Route::get('cards/{reportCard}/file', [ReportCardController::class, 'file'])->middleware('signed')->name('file');
 });

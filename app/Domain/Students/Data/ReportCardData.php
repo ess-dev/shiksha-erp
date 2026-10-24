@@ -10,7 +10,8 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 /**
  * The printable report card for one child and one exam, generated from the
  * published marks. `attendance` covers the session up to the exam's last day
- * (null when Attendance is not in the school's plan).
+ * (null when Attendance is not in the school's plan). `remark` is the class
+ * teacher's remark on a report card they prepared.
  */
 #[TypeScript]
 class ReportCardData extends Data
@@ -28,5 +29,6 @@ class ReportCardData extends Data
         public ?string $class_teacher_name,
         public ?StudentTallyData $attendance,
         public StudentExamResultData $result,
+        public ?string $remark = null,
     ) {}
 }

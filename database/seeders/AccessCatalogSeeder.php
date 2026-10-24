@@ -67,6 +67,8 @@ class AccessCatalogSeeder extends Seeder
         'exams.schedule' => ['exams', 'sensitive', false, 'Schedule unit tests and exams: create, change, open marking, cancel and delete', 8],
         'results.publish' => ['exams', 'sensitive', false, 'Publish results', 1],
         'marks.reopen' => ['exams', 'sensitive', false, 'Enter or correct marks for any subject, and reopen published marks', 10],
+        'reportcards.prepare' => ['exams', 'normal', false, 'Prepare report cards for their class: generate from marks or upload a scan', 11],
+        'reportcards.approve' => ['exams', 'sensitive', false, 'Approve report cards before parents see them, or send them back', 11],
         'notices.view' => ['communication', 'normal', false, 'See notices', 1],
         'notices.send' => ['communication', 'normal', false, 'Send notices', 1],
         'homework.view' => ['homework', 'normal', false, 'See homework', 1],
@@ -118,6 +120,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const MARKS_V10 = 'Adds entering or correcting any subject\'s marks and reopening published marks (Principal, Vice principal, Coordinator)';
 
+    private const REPORT_CARDS_V11 = 'Adds preparing report cards (Class teacher) and approving them (Principal, Vice principal, Coordinator)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -145,6 +149,7 @@ class AccessCatalogSeeder extends Seeder
             8 => [self::EXAMS_V8, '*'],
             9 => [self::SYLLABUS_V9, '*'],
             10 => [self::MARKS_V10, '*'],
+            11 => [self::REPORT_CARDS_V11, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -157,6 +162,7 @@ class AccessCatalogSeeder extends Seeder
             8 => [self::EXAMS_V8, '*-restricted'],
             9 => [self::SYLLABUS_V9, '*-restricted'],
             10 => [self::MARKS_V10, '*-restricted'],
+            11 => [self::REPORT_CARDS_V11, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -169,11 +175,13 @@ class AccessCatalogSeeder extends Seeder
             8 => [self::EXAMS_V8, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule']],
             9 => [self::SYLLABUS_V9, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update']],
             10 => [self::MARKS_V10, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen']],
+            11 => [self::REPORT_CARDS_V11, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],
             2 => [self::STRUCTURE_V2, [...self::CLASS_TEACHER, 'structure.view']],
             3 => [self::SYLLABUS_V9, [...self::CLASS_TEACHER, 'structure.view', 'subjects.update']],
+            4 => [self::REPORT_CARDS_V11, [...self::CLASS_TEACHER, 'structure.view', 'subjects.update', 'reportcards.prepare']],
         ]],
         'subject_teacher' => ['Subject teacher', false, [
             1 => ['Initial version', self::SUBJECT_TEACHER],

@@ -21,5 +21,6 @@ class GradeScaleScreenData extends Data
         public bool $is_saved,
         public array $default_grades,
         public int $frozen_exam_count,
+        public bool $report_card_approval,
     ) {}
 }

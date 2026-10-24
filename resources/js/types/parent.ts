@@ -17,3 +17,4 @@ export type StudentExamResult = App.Domain.Exams.Data.StudentExamResultData;
 export type StudentSubjectResult =
     App.Domain.Exams.Data.StudentSubjectResultData;
 export type ReportCard = App.Domain.Students.Data.ReportCardData;
+export type SchoolReportCard = App.Domain.Exams.Data.SchoolReportCardData;
