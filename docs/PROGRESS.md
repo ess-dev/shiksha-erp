@@ -2,7 +2,7 @@
 
 Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-23, with the Attendance slice (after `1e185a8`, uncommitted at time of writing).
+Update this file in the same commit as the work it describes. Last updated: 2026-10-24, with the Exams and tests screen (uncommitted at time of writing).
 
 ## Where things stand
 
@@ -38,6 +38,8 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 
 | 21 | Staff dashboard `/dashboard` (Principal's view from the prototype screenshot): real attendance, admissions and holidays, scope-filtered; fees, approvals and other events as "Coming soon" sample values (see "Dashboard" below) | uncommitted |
 
+| 22 | Exams and tests screen `/exams` (from the owner's prototype screenshots): create/edit with classes, campuses and date sheet, open/close marking, publish all, cancel/restore, delete; scoped by `exams.schedule` (see `docs/modules/exams.md`) | uncommitted |
+
 ### Dashboard (2026-10-23; owner-approved plan)
 
 `/dashboard` (`School\DashboardController`, page `resources/js/pages/dashboard.tsx`, components `resources/js/components/dashboard/`). Read by `School\Queries\SchoolDashboardQuery` into `SchoolDashboardData`, which composes `Attendance\Queries\AttendanceDashboardQuery` (`AttendanceDashboardData`, `AttendanceTrendPointData`, `AbsentStudentData`) and `Admissions\Queries\AdmissionFunnelQuery` (`AdmissionFunnelData`). Follows the top-bar campus switcher.
@@ -49,6 +51,16 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 - **Tests**: `tests/Feature/School/DashboardTest.php` (10). Also run: `tests/Architecture`, `GeneratedTypesTest`, and the tests that open `/dashboard` (Access, Auth, kit DashboardTest, Example, ParentSignIn, StaffSignIn, PlatformSignIn): all pass. Pint, PHPStan (only the old `DemoAttendanceSeeder` error), `npm run types:check`, `npx vp check`, `npm run build` pass.
 - **Browser-checked 2026-10-23** (built-in browser, demo Coordinator): every block with seeded data, no console errors, 375 px width without horizontal scroll. **Not checked**: Principal view (needs two-step), the campus switcher on this page, a holiday day, dark mode. Full suite not run.
 - **Not built**: a separate dashboard per role (teacher, accountant), coordinator notes, Reports, notices, real fee figures, parent alerts for absences.
+
+### Exams and tests (2026-10-24)
+
+Details in `docs/modules/exams.md`. Screen `/exams` (`ExamController`, `ExamStatusController`, page `resources/js/pages/exams/index.tsx`, components `resources/js/components/exams/`), routes `exams.*` behind `module:exams`. Domain `app/Domain/Exams/` (Actions `CreateExam` `UpdateExam` `ChangeExamStatus` `DeleteExam`, `ExamRules`, `ExamReach`, `ExamsOverviewQuery`, Data, `ExamNotifier` + `LogExamNotifier`).
+
+- **Tenant migration** `2026_11_06_000000_create_exams_tables` (`exams`, `exam_school_class`, `campus_exam`, `exam_date_sheet_entries`). No landlord change.
+- **Permission**: new `exams.schedule` (module `exams`, sensitive), role-template **version 8** (Principal, Vice principal, Coordinator); existing schools see "template update available". Publishing also needs the existing `results.publish`. Access Control test counts updated (40 permissions, 39 versions, principal at 8).
+- **Choices**: scheduling only (marks entry and the "106/123 entered" progress are not built; `Exam::hasMarks()` is a stub); exam scope = every (class, campus) pair it names must be inside the person's scope to change it; hard delete for never-published exams without marks (audited); "Show on the school calendar" is stored only; "Tell parents" goes to a log-only notifier; parent view not built (owner).
+- **Tests**: `tests/Feature/Exams/ExamsTest.php` (14: create, selection storage, screen props, duplicate names, dates and closed days, date sheet rules, update with audit, status flow and publish notification, cancel/restore, delete, wing coordinator, publish permission, authorization matrix, school isolation) and `tests/Architecture` pass (25 together); Access, School and Unit suites pass (142). Pint, PHPStan (only the old `DemoAttendanceSeeder` error), `npm run types:check`, `npx vp check --fix`, `npm run build` pass. Full suite not run.
+- **Browser-checked 2026-10-24** (built-in browser, demo Coordinator after applying template update 8): the page, the New dialog (classes 1 to 3 only), "One subject a day", Create, Open marking and Delete confirmations, no console errors. **Not checked**: the Principal view (needs two-step), Edit and Publish all in a browser, mobile width, dark mode.
 
 ### Classes and sections (2026-10-23)
 

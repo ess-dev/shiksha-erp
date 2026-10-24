@@ -63,6 +63,7 @@ class AccessCatalogSeeder extends Seeder
         'concessions.apply' => ['fees', 'sensitive', false, 'Apply fee concessions', 1],
         'exams.view' => ['exams', 'normal', false, 'See exams and marks', 1],
         'marks.enter' => ['exams', 'normal', false, 'Enter marks', 1],
+        'exams.schedule' => ['exams', 'sensitive', false, 'Schedule unit tests and exams: create, change, open marking, cancel and delete', 8],
         'results.publish' => ['exams', 'sensitive', false, 'Publish results', 1],
         'notices.view' => ['communication', 'normal', false, 'See notices', 1],
         'notices.send' => ['communication', 'normal', false, 'Send notices', 1],
@@ -109,6 +110,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const SUBJECTS_V7 = 'Adds configuring subjects: the subject list, subjects by class and subject teachers (Principal, Vice principal, Coordinator)';
 
+    private const EXAMS_V8 = 'Adds scheduling exams and unit tests (Principal, Vice principal, Coordinator)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -133,6 +136,7 @@ class AccessCatalogSeeder extends Seeder
             5 => [self::ADMISSIONS_V5, '*'],
             6 => [self::ATTENDANCE_V6, '*'],
             7 => [self::SUBJECTS_V7, '*'],
+            8 => [self::EXAMS_V8, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -142,6 +146,7 @@ class AccessCatalogSeeder extends Seeder
             5 => [self::ADMISSIONS_V5, '*-restricted'],
             6 => [self::ATTENDANCE_V6, '*-restricted'],
             7 => [self::SUBJECTS_V7, '*-restricted'],
+            8 => [self::EXAMS_V8, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -151,6 +156,7 @@ class AccessCatalogSeeder extends Seeder
             5 => [self::ADMISSIONS_V5, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL]],
             6 => [self::ATTENDANCE_V6, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct']],
             7 => [self::SUBJECTS_V7, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure']],
+            8 => [self::EXAMS_V8, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],

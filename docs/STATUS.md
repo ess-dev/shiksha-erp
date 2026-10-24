@@ -29,6 +29,8 @@ Attendance, built 2026-10-23: sign in as `teacher@greenfield.test` and mark Clas
 
 Subjects, built 2026-10-23: apply role-template update 7 on each role (Roles and access), then try Add subject, Edit (rename with a class using it), Delete (unused only), Change on Subjects by class and choosing subject teachers per section. Automatic means the class teacher until staff have campuses and "subjects taught". The parent's Subjects page (chapters, books, teacher notes) is not built.
 
+Exams and tests, built 2026-10-24 (Principal / permitted staff only; parent view and marks entry come later): apply role-template update 8 on each role, then try New test or exam (one subject a day, a wing coordinator's limited class list), Edit, Open marking, Close marking, Publish all (needs results.publish), Cancel / Restore, Delete and the Date sheet CSV. "Tell parents" only logs (no provider); default maximum marks per type are illustrative.
+
 ## School screens: Principal and Teacher
 
 | Screen                                     | Status | Notes                                                                                                                                                                                                                                                 |

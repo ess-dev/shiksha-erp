@@ -1,6 +1,7 @@
 export type * from './access';
 export type * from './attendance';
 export type * from './auth';
+export type * from './exams';
 export type * from './navigation';
 export type * from './parent';
 export type * from './platform';

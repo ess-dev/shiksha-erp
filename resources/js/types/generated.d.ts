@@ -295,6 +295,88 @@ export type AuditActorType = 'user' | 'staff' | 'guardian' | 'platform' | 'syste
 export type AuditScope = 'tenant' | 'platform';
 }
 }
+namespace Exams {
+namespace Data {
+export type ExamCampusOptionData = {
+ulid: string,
+name: string,
+};
+export type ExamClassOptionData = {
+ulid: string,
+name: string,
+};
+export type ExamClassSubjectsData = {
+class_ulid: string,
+subjects: App.Domain.Exams.Data.ExamSubjectOptionData[],
+};
+export type ExamClosedDayData = {
+date: string,
+name: string,
+};
+export type ExamDateSheetRowData = {
+subject_ulid: string,
+subject_name: string,
+held_on: string,
+begins_at: string | null,
+};
+export type ExamFormOptionsData = {
+types: App.Domain.Exams.Data.ExamTypeOptionData[],
+classes: App.Domain.Exams.Data.ExamClassOptionData[],
+campuses: App.Domain.Exams.Data.ExamCampusOptionData[],
+may_choose_all_classes: boolean,
+may_choose_all_campuses: boolean,
+subjects_by_class: App.Domain.Exams.Data.ExamClassSubjectsData[],
+working_days: number[],
+holidays: App.Domain.Exams.Data.ExamClosedDayData[],
+today: string,
+default_starts_on: string,
+};
+export type ExamRowData = {
+ulid: string,
+name: string,
+type: App.Domain.Exams.Enums.ExamType,
+type_label: string,
+created_by: string | null,
+starts_on: string,
+ends_on: string,
+status: App.Domain.Exams.Enums.ExamStatus,
+max_marks: number,
+max_marks_locked: boolean,
+instructions: string | null,
+show_on_calendar: boolean,
+all_classes: boolean,
+class_ulids: string[],
+all_campuses: boolean,
+campus_ulids: string[],
+classes_label: string,
+date_sheet: App.Domain.Exams.Data.ExamDateSheetRowData[],
+can_change: boolean,
+can_publish: boolean,
+can_delete: boolean,
+};
+export type ExamSubjectOptionData = {
+ulid: string,
+name: string,
+};
+export type ExamTypeOptionData = {
+value: App.Domain.Exams.Enums.ExamType,
+label: string,
+default_max_marks: number,
+};
+export type ExamsOverviewData = {
+scheduled_count: number,
+marking_count: number,
+published_count: number,
+cancelled_count: number,
+exams: App.Domain.Exams.Data.ExamRowData[],
+form: App.Domain.Exams.Data.ExamFormOptionsData,
+};
+}
+namespace Enums {
+export type ExamStatus = 'scheduled' | 'marking' | 'published' | 'cancelled';
+export type ExamType = 'unit_test' | 'periodic_test' | 'half_yearly' | 'annual' | 'practical' | 'other';
+}
+}
 namespace Identity {
 namespace Data {
 export type SchoolContextData = {
