@@ -41,6 +41,7 @@ class ExamsOverviewQuery
         private readonly SectionDirectoryQuery $sections,
         private readonly AttendanceCalendarQuery $calendar,
         private readonly SchoolDayQuery $days,
+        private readonly ExamMarksProgressQuery $progress,
     ) {}
 
     public function get(Identity $actor): ExamsOverviewData
@@ -64,11 +65,22 @@ class ExamsOverviewQuery
         $campusUlids = array_column($this->reach->campuses(), 'ulid', 'id');
         $campusNames = array_column($this->reach->campuses(), 'name', 'id');
 
+        $classIdsOf = $campusIdsOf = [];
+
+        foreach ($exams as $exam) {
+            $classIdsOf[$exam->id] = $exam->applies_to_all_classes ? $allClassIds : ($classIdsByExam[$exam->id] ?? []);
+            $campusIdsOf[$exam->id] = $exam->applies_to_all_campuses ? $allCampusIds : ($campusIdsByExam[$exam->id] ?? []);
+        }
+
+        $progress = $this->progress->forExams($exams, $classIdsOf, $campusIdsOf);
+        $withMarks = $this->progress->withMarks($ids);
+
         $rows = [];
 
         foreach ($exams as $exam) {
-            $classIds = $exam->applies_to_all_classes ? $allClassIds : ($classIdsByExam[$exam->id] ?? []);
-            $campusIds = $exam->applies_to_all_campuses ? $allCampusIds : ($campusIdsByExam[$exam->id] ?? []);
+            $classIds = $classIdsOf[$exam->id];
+            $campusIds = $campusIdsOf[$exam->id];
+            $hasMarks = isset($withMarks[$exam->id]);
 
             if (! $this->reach->touches($schedule, $classIds, $campusIds)) {
                 continue;
@@ -86,7 +98,7 @@ class ExamsOverviewQuery
                 ends_on: $exam->ends_on,
                 status: $exam->status,
                 max_marks: $exam->max_marks,
-                max_marks_locked: $exam->hasMarks(),
+                max_marks_locked: $hasMarks,
                 instructions: $exam->instructions,
                 show_on_calendar: $exam->show_on_calendar,
                 all_classes: $exam->applies_to_all_classes,
@@ -97,7 +109,8 @@ class ExamsOverviewQuery
                 date_sheet: $sheets[$exam->id] ?? [],
                 can_change: $canChange,
                 can_publish: $canChange && $this->reach->covers($publish, $classIds, $campusIds),
-                can_delete: $canChange && $exam->status !== ExamStatus::Published && ! $exam->hasMarks(),
+                can_delete: $canChange && $exam->status !== ExamStatus::Published && ! $hasMarks,
+                marks_progress: $progress[$exam->id] ?? null,
             );
         }
 

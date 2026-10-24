@@ -17,6 +17,7 @@ class ExamRowData extends Data
      * @param  list<string>  $class_ulids  Empty when it applies to all classes
      * @param  list<string>  $campus_ulids  Empty when it applies to all campuses
      * @param  list<ExamDateSheetRowData>  $date_sheet  Earliest first
+     * @param  ExamMarksProgressData|null  $marks_progress  Only once marking has opened
      */
     public function __construct(
         public string $ulid,
@@ -40,5 +41,6 @@ class ExamRowData extends Data
         public bool $can_change,
         public bool $can_publish,
         public bool $can_delete,
+        public ?ExamMarksProgressData $marks_progress = null,
     ) {}
 }

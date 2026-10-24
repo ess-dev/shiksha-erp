@@ -2,7 +2,7 @@
 
 Pending-work checklist for the owner: `docs/STATUS.md`.
 Read this first when starting a new session (Claude Code or Cursor), then the rules in `.ai/guidelines/`.
-Update this file in the same commit as the work it describes. Last updated: 2026-10-24, with the Exams and tests screen (uncommitted at time of writing).
+Update this file in the same commit as the work it describes. Last updated: 2026-10-24, with marks entry, the grading scale and parent Results.
 
 ## Where things stand
 
@@ -43,6 +43,20 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 | 23 | Teacher's Subjects screen `/teaching/subjects` (from the owner's prototype screenshots): book, chapters and assessment for the whole class, progress and note per section, private note per student (see "Teacher's Subjects" below). The parent Subjects page is the next step | uncommitted |
 
 | 24 | Parent Subjects page `/parent/subjects` (from the owner's prototype screenshots): per subject the book, teacher, periods, % done, "Now" chapter, teacher note, per-child note and a chapters list; past sessions only for children enrolled then (see "Parent Subjects" below) | uncommitted |
+
+| 25 | Marks entry `/marks`, grading scale `/exams/grading`, parent Results `/parent/results` with a printable report card (from the owner's prototype screenshots; see "Marks, grades and results" below and `docs/modules/exams.md`) | see `git log` |
+
+### Marks, grades and results (2026-10-24; owner-approved answers)
+
+Details in `docs/modules/exams.md` (sections "Marks entry", "Grading", "Parent Results").
+
+- **Owner's answers**: the subject teacher enters marks (class teacher when the subject teacher is "Automatic"), and Principal/Coordinator may also enter any subject in scope; reopening is a button on the marks screen behind a new permission; the parent's "Report cards from school" list is "Coming soon" (class teacher upload/approval later); the grading scale is a per-school setting **with** an edit screen now.
+- **Tenant migration** `2026_11_08_000000_create_exam_marks_tables` (`exam_marks` in whole half-marks with `is_absent`, `exam_mark_sheets` for publish/reopen state, nullable `exams.grade_scale` snapshot). No landlord table change.
+- **Permission**: new `marks.reopen` (module `exams`, sensitive): enter or correct any subject's marks in scope and reopen published marks. Role-template **version 10** for Principal, Vice principal, Coordinator; existing schools see "template update available". The grading screen uses the existing `settings.manage`. `AccessControlTest` counts updated (42 permissions, 47 template versions, principal at 10).
+- **Config/settings**: school setting key `exams.grade_scale` (default CBSE-style scale, illustrative — verify). No new config keys.
+- **Exams screen**: `Exam::hasMarks()` is now real (locks maximum marks, blocks delete); each exam with marking open or published shows "x/y entered · z published".
+- **Tests**: `tests/Unit/GradingTest.php` (36: grade boundaries, half-up percentages, parsing typed marks, scale validation), `tests/Feature/Exams/MarksTest.php` (14: screen props, closed marking, draft with audit, invalid marks, roster check, publish rules + scale freeze + notifier, chosen subject teacher vs class teacher, overseer + reopen with reason, Publish all, exam not for the section, Exams list lock/progress, authorization matrix, school isolation, grading scale screen and snapshot), `tests/Feature/Guardian/ParentResultsTest.php` (6).
+- **Browser-checked 2026-10-24** (built-in browser, `php artisan serve` on port 8001): as `teacher@greenfield.test`, typing marks with live % and grade (22.5/25 → 90% → A2), Enter to move down, the invalid-mark message, AB, the publish confirmation and the published read-only state; as the demo parent, `/parent/results` with every subject "Awaiting results" (Riya is in 5-A, where nothing is published), the Coming soon card, the progress chart, "How grades work", and 375 px width with no horizontal scroll. A demo exam "October Unit Test" (marking open) was added to Greenfield by hand for this, and Class 1-A English marks were published. **Not checked in a browser**: published marks on the parent page and the printable report card (covered by tests), the grading scale screen, Reopen, the Principal/Coordinator view (needs template update 10), the Exams list progress, dark mode.
 
 ### Parent Subjects (2026-10-24)
 

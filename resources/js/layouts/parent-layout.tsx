@@ -23,7 +23,7 @@ import {
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import { initials } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { attendance, home, signOut, subjects } from '@/routes/parent';
+import { attendance, home, results, signOut, subjects } from '@/routes/parent';
 import { select as selectSession } from '@/routes/parent/session';
 import { switchMethod } from '@/routes/school/context';
 import type { ParentShell } from '@/types/parent';
@@ -33,7 +33,7 @@ type Props = { shell?: ParentShell };
 /**
  * The parent shell, mirroring the prototype: an indigo top bar with the school,
  * a greeting, the child switcher and the session; a side menu on wide screens
- * and bottom tabs on phones. Only Home, Attendance and Subjects exist so far; the other
+ * and bottom tabs on phones. Only Home, Attendance, Results and Subjects exist so far; the other
  * menu entries are visible but marked "Soon".
  */
 export default function ParentLayout({ children }: { children: ReactNode }) {
@@ -47,7 +47,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         ? 'home'
         : path.startsWith(subjects.url())
           ? 'subjects'
-          : 'attendance';
+          : path.startsWith(results.url())
+            ? 'results'
+            : 'attendance';
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (shell === undefined) {
@@ -67,6 +69,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
         if (key === 'subjects') {
             return subjects.url({ query: childParam });
+        }
+
+        if (key === 'results' && shell.exams_enabled) {
+            return results.url({ query: childParam });
         }
 
         return null;
@@ -90,7 +96,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         ? `Hi, ${shell.guardian_first_name}`
         : current === 'subjects'
           ? 'Subjects'
-          : 'Attendance';
+          : current === 'results'
+            ? 'Report card'
+            : 'Attendance';
 
     return (
         <div className="min-h-svh bg-background text-foreground md:flex">
@@ -117,8 +125,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                             href={hrefFor(item.key)}
                             active={item.key === current}
                             notInPlan={
-                                item.key === 'attendance' &&
-                                !shell.attendance_enabled
+                                (item.key === 'attendance' &&
+                                    !shell.attendance_enabled) ||
+                                (item.key === 'results' && !shell.exams_enabled)
                             }
                         />
                     ))}
@@ -261,44 +270,46 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
             <nav
                 aria-label="Parent tabs"
-                className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t bg-card md:hidden"
+                className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t bg-card md:hidden"
             >
-                {(['home', 'attendance', 'subjects'] as const).map((key) => {
-                    const item = parentNav.find((n) => n.key === key);
-                    const href = hrefFor(key);
+                {(['home', 'attendance', 'results', 'subjects'] as const).map(
+                    (key) => {
+                        const item = parentNav.find((n) => n.key === key);
+                        const href = hrefFor(key);
 
-                    if (item === undefined) {
-                        return null;
-                    }
+                        if (item === undefined) {
+                            return null;
+                        }
 
-                    const active = key === current;
-                    const Icon = item.icon;
+                        const active = key === current;
+                        const Icon = item.icon;
 
-                    return href === null ? (
-                        <span
-                            key={key}
-                            className="flex flex-col items-center gap-0.5 py-2 text-[11px] text-muted-foreground opacity-60"
-                        >
-                            <Icon className="size-5" aria-hidden />
-                            {item.label}
-                        </span>
-                    ) : (
-                        <Link
-                            key={key}
-                            href={href}
-                            aria-current={active ? 'page' : undefined}
-                            className={cn(
-                                'flex flex-col items-center gap-0.5 py-2 text-[11px]',
-                                active
-                                    ? 'font-semibold text-primary'
-                                    : 'text-muted-foreground',
-                            )}
-                        >
-                            <Icon className="size-5" aria-hidden />
-                            {item.label}
-                        </Link>
-                    );
-                })}
+                        return href === null ? (
+                            <span
+                                key={key}
+                                className="flex flex-col items-center gap-0.5 py-2 text-[11px] text-muted-foreground opacity-60"
+                            >
+                                <Icon className="size-5" aria-hidden />
+                                {item.label}
+                            </span>
+                        ) : (
+                            <Link
+                                key={key}
+                                href={href}
+                                aria-current={active ? 'page' : undefined}
+                                className={cn(
+                                    'flex flex-col items-center gap-0.5 py-2 text-[11px]',
+                                    active
+                                        ? 'font-semibold text-primary'
+                                        : 'text-muted-foreground',
+                                )}
+                            >
+                                <Icon className="size-5" aria-hidden />
+                                {item.label}
+                            </Link>
+                        );
+                    },
+                )}
                 <button
                     type="button"
                     onClick={() => setMenuOpen(true)}
@@ -322,8 +333,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                 href={hrefFor(item.key)}
                                 active={false}
                                 notInPlan={
-                                    item.key === 'attendance' &&
-                                    !shell.attendance_enabled
+                                    (item.key === 'attendance' &&
+                                        !shell.attendance_enabled) ||
+                                    (item.key === 'results' &&
+                                        !shell.exams_enabled)
                                 }
                             />
                         ))}

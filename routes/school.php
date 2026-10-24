@@ -11,6 +11,8 @@ use App\Http\Controllers\Attendance\AttendanceSettingsController;
 use App\Http\Controllers\Attendance\HolidayController;
 use App\Http\Controllers\Exams\ExamController;
 use App\Http\Controllers\Exams\ExamStatusController;
+use App\Http\Controllers\Exams\GradeScaleController;
+use App\Http\Controllers\Exams\MarksController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\CampusController;
 use App\Http\Controllers\School\CampusSelectionController;
@@ -143,9 +145,17 @@ Route::middleware(['auth', 'module:attendance'])->prefix('attendance')->name('at
 });
 
 Route::middleware(['auth', 'module:exams'])->prefix('exams')->name('exams.')->group(function () {
+    Route::get('grading', [GradeScaleController::class, 'show'])->name('grading');
+    Route::put('grading', [GradeScaleController::class, 'update'])->name('grading.update');
     Route::get('/', [ExamController::class, 'index'])->name('index');
     Route::post('/', [ExamController::class, 'store'])->name('store');
     Route::put('{exam}', [ExamController::class, 'update'])->name('update');
     Route::delete('{exam}', [ExamController::class, 'destroy'])->name('destroy');
     Route::put('{exam}/status', [ExamStatusController::class, 'update'])->name('status');
+});
+
+Route::middleware(['auth', 'module:exams'])->prefix('marks')->name('marks.')->group(function () {
+    Route::get('/', [MarksController::class, 'index'])->name('index');
+    Route::put('{exam}/{section}/{subject}', [MarksController::class, 'update'])->name('update');
+    Route::post('{exam}/{section}/{subject}/reopen', [MarksController::class, 'reopen'])->name('reopen');
 });

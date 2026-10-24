@@ -17,6 +17,8 @@ class SchoolSettingsQuery
 
     public const ATTENDANCE_CORRECTION_DAYS = 'attendance.correction_window_days';
 
+    public const GRADE_SCALE = 'exams.grade_scale';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
@@ -76,6 +78,19 @@ class SchoolSettingsQuery
     public function admissionDocumentRules(): ?array
     {
         $value = SchoolSetting::query()->where('key', self::ADMISSION_DOCUMENT_RULES)->value('value');
+
+        return is_array($value) ? $value : null;
+    }
+
+    /**
+     * The school's own grading scale as saved (rows of grade, min_percent and
+     * grade_point), or null when it never saved one. Exams checks and applies it.
+     *
+     * @return array<mixed>|null
+     */
+    public function gradeScale(): ?array
+    {
+        $value = SchoolSetting::query()->where('key', self::GRADE_SCALE)->value('value');
 
         return is_array($value) ? $value : null;
     }

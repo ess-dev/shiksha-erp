@@ -27,6 +27,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
  * @property bool $show_on_calendar
  * @property int|null $created_by_staff_id
  * @property Carbon|null $published_at
+ * @property array<mixed>|null $grade_scale The grading scale frozen when its first marks were published
  */
 class Exam extends Model
 {
@@ -37,7 +38,7 @@ class Exam extends Model
     /** @var list<string> */
     protected $fillable = [
         'ulid', 'academic_year_id', 'name', 'type', 'max_marks', 'starts_on', 'ends_on', 'status', 'instructions',
-        'applies_to_all_classes', 'applies_to_all_campuses', 'show_on_calendar', 'created_by_staff_id', 'published_at',
+        'applies_to_all_classes', 'applies_to_all_campuses', 'show_on_calendar', 'created_by_staff_id', 'published_at', 'grade_scale',
     ];
 
     /**
@@ -54,6 +55,7 @@ class Exam extends Model
             'applies_to_all_campuses' => 'boolean',
             'show_on_calendar' => 'boolean',
             'published_at' => 'datetime',
+            'grade_scale' => 'array',
         ];
     }
 
@@ -71,12 +73,19 @@ class Exam extends Model
     }
 
     /**
-     * Whether any marks were entered for this exam. Marks entry is not built
-     * yet, so this is always false; it is the one place to change when it is
-     * (it locks maximum marks and blocks deleting the exam).
+     * @return HasMany<ExamMark, $this>
+     */
+    public function marks(): HasMany
+    {
+        return $this->hasMany(ExamMark::class);
+    }
+
+    /**
+     * Whether any marks were entered for this exam (it locks maximum marks and
+     * blocks deleting the exam).
      */
     public function hasMarks(): bool
     {
-        return false;
+        return $this->marks()->exists();
     }
 }

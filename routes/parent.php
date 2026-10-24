@@ -3,6 +3,7 @@
 use App\Http\Controllers\Guardian\AttendanceController;
 use App\Http\Controllers\Guardian\ContextController;
 use App\Http\Controllers\Guardian\HomeController;
+use App\Http\Controllers\Guardian\ResultsController;
 use App\Http\Controllers\Guardian\SessionController;
 use App\Http\Controllers\Guardian\SignInController;
 use App\Http\Controllers\Guardian\SubjectsController;
@@ -22,6 +23,8 @@ Route::prefix('parent')->name('parent.')->group(function () {
         Route::get('/', HomeController::class)->name('home');
         Route::get('attendance', AttendanceController::class)->middleware('module:attendance')->name('attendance');
         Route::get('subjects', SubjectsController::class)->name('subjects');
+        Route::get('results', [ResultsController::class, 'index'])->middleware('module:exams')->name('results');
+        Route::get('results/{exam}/report-card', [ResultsController::class, 'reportCard'])->middleware('module:exams')->name('results.report-card');
         Route::put('session', [SessionController::class, 'update'])->name('session.select');
         Route::post('sign-out', [SignInController::class, 'signOut'])->name('sign-out');
     });

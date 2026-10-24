@@ -1,5 +1,5 @@
-import { Head } from '@inertiajs/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { Plus, Scale, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import DateSheetDialog from '@/components/exams/date-sheet-dialog';
 import type { ExamAction } from '@/components/exams/exam-confirm-dialog';
@@ -10,7 +10,8 @@ import { relativeDays } from '@/components/exams/exam-calendar';
 import { Button } from '@/components/ui/button';
 import { formatCalendarDay } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { index } from '@/routes/exams';
+import { useCan } from '@/hooks/use-can';
+import { grading, index } from '@/routes/exams';
 import type { ExamRow, ExamsOverview } from '@/types';
 
 type Tab = 'open' | 'published' | 'cancelled';
@@ -39,6 +40,7 @@ function Counter({ label, value }: { label: string; value: number }) {
 export default function Exams({ overview }: { overview: ExamsOverview }) {
     const [tab, setTab] = useState<Tab>('open');
     const [dialog, setDialog] = useState<Dialog>(null);
+    const canChangeScale = useCan('settings.manage');
 
     const groups: Record<Tab, ExamRow[]> = {
         open: overview.exams.filter(
@@ -73,12 +75,23 @@ export default function Exams({ overview }: { overview: ExamsOverview }) {
                             sheet, open marking and publish results.
                         </p>
                     </div>
-                    <Button
-                        onClick={() => setDialog({ kind: 'form', exam: null })}
-                    >
-                        <Plus aria-hidden />
-                        New test or exam
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                        {canChangeScale && (
+                            <Button asChild variant="outline">
+                                <Link href={grading()}>
+                                    <Scale aria-hidden /> Grading scale
+                                </Link>
+                            </Button>
+                        )}
+                        <Button
+                            onClick={() =>
+                                setDialog({ kind: 'form', exam: null })
+                            }
+                        >
+                            <Plus aria-hidden />
+                            New test or exam
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -205,6 +218,26 @@ export default function Exams({ overview }: { overview: ExamsOverview }) {
                                                 <ExamStatusBadge
                                                     status={exam.status}
                                                 />
+                                                {exam.marks_progress !==
+                                                    null && (
+                                                    <p className="mt-1 text-xs whitespace-nowrap text-muted-foreground">
+                                                        {
+                                                            exam.marks_progress
+                                                                .entered
+                                                        }
+                                                        /
+                                                        {
+                                                            exam.marks_progress
+                                                                .sheets
+                                                        }{' '}
+                                                        entered ·{' '}
+                                                        {
+                                                            exam.marks_progress
+                                                                .published
+                                                        }{' '}
+                                                        published
+                                                    </p>
+                                                )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-wrap items-center justify-end gap-1.5">

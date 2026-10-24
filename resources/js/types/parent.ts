@@ -12,3 +12,8 @@ export type DayState = App.Domain.Attendance.Enums.DayState;
 export type SchoolContext = App.Domain.Identity.Data.SchoolContextData;
 export type ParentSubject = App.Domain.School.Data.ParentSubjectData;
 export type ParentChapter = App.Domain.School.Data.ParentChapterData;
+export type StudentResults = App.Domain.Exams.Data.StudentResultsData;
+export type StudentExamResult = App.Domain.Exams.Data.StudentExamResultData;
+export type StudentSubjectResult =
+    App.Domain.Exams.Data.StudentSubjectResultData;
+export type ReportCard = App.Domain.Students.Data.ReportCardData;

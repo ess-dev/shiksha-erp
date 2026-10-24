@@ -4,6 +4,7 @@ import {
     Building2,
     CalendarCheck,
     ClipboardCheck,
+    ClipboardPen,
     FolderGit2,
     Library,
     LayoutGrid,
@@ -35,6 +36,7 @@ import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
 import { index as subjects } from '@/routes/school/subjects';
 import { index as syllabus } from '@/routes/school/syllabus';
+import { index as marks } from '@/routes/marks';
 import { index as students } from '@/routes/students';
 import type { NavItem } from '@/types';
 
@@ -56,6 +58,9 @@ export function AppSidebar() {
     const canViewStudents = useCan('students.view');
     const canViewRoles = useCan('roles.view');
     const canScheduleExams = useCan('exams.schedule');
+    const canEnter = useCan('marks.enter');
+    const canReopen = useCan('marks.reopen');
+    const canEnterMarks = canEnter || canReopen;
     const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
     const canViewAttendance =
@@ -125,6 +130,15 @@ export function AppSidebar() {
                       title: 'Exams and tests',
                       href: exams(),
                       icon: ClipboardCheck,
+                  },
+              ]
+            : []),
+        ...(canEnterMarks
+            ? [
+                  {
+                      title: 'Marks entry',
+                      href: marks(),
+                      icon: ClipboardPen,
                   },
               ]
             : []),

@@ -26,6 +26,7 @@ class ParentShellData extends Data
         public ?SessionSwitcherData $sessions,
         public bool $has_staff_context = false,
         public bool $attendance_enabled = false,
+        public bool $exams_enabled = false,
         public string $timezone = 'Asia/Kolkata',
     ) {}
 }

@@ -331,6 +331,11 @@ holidays: App.Domain.Exams.Data.ExamClosedDayData[],
 today: string,
 default_starts_on: string,
 };
+export type ExamMarksProgressData = {
+sheets: number,
+entered: number,
+published: number,
+};
 export type ExamRowData = {
 ulid: string,
 name: string,
@@ -353,6 +358,7 @@ date_sheet: App.Domain.Exams.Data.ExamDateSheetRowData[],
 can_change: boolean,
 can_publish: boolean,
 can_delete: boolean,
+marks_progress: App.Domain.Exams.Data.ExamMarksProgressData | null,
 };
 export type ExamSubjectOptionData = {
 ulid: string,
@@ -371,10 +377,101 @@ cancelled_count: number,
 exams: App.Domain.Exams.Data.ExamRowData[],
 form: App.Domain.Exams.Data.ExamFormOptionsData,
 };
+export type GradeBandData = {
+grade: string,
+min_percent: number,
+max_percent: number,
+grade_point: number,
+is_lowest: boolean,
+};
+export type GradeScaleScreenData = {
+grades: App.Domain.Exams.Data.GradeBandData[],
+is_saved: boolean,
+default_grades: App.Domain.Exams.Data.GradeBandData[],
+frozen_exam_count: number,
+};
+export type MarkRowData = {
+student_ulid: string,
+roll_number: number | null,
+name: string,
+value: string,
+};
+export type MarksExamOptionData = {
+ulid: string,
+name: string,
+max_marks: number,
+status: App.Domain.Exams.Enums.ExamStatus,
+};
+export type MarksScreenData = {
+exams: App.Domain.Exams.Data.MarksExamOptionData[],
+sections: App.Domain.Exams.Data.MarksSectionOptionData[],
+subjects: App.Domain.Exams.Data.MarksSubjectOptionData[],
+sheet: App.Domain.Exams.Data.MarksSheetData | null,
+scale: App.Domain.Exams.Data.GradeBandData[],
+pass_percent: number,
+can_change_scale: boolean,
+};
+export type MarksSectionOptionData = {
+ulid: string,
+label: string,
+campus_name: string,
+};
+export type MarksSheetData = {
+exam_ulid: string,
+section_ulid: string,
+subject_ulid: string,
+exam_name: string,
+exam_status: App.Domain.Exams.Enums.ExamStatus,
+section_label: string,
+subject_name: string,
+max_marks: number,
+state: App.Domain.Exams.Enums.MarkSheetState,
+teacher_name: string | null,
+published_on: string | null,
+published_by: string | null,
+reopened_by: string | null,
+reopen_reason: string | null,
+can_reopen: boolean,
+rows: App.Domain.Exams.Data.MarkRowData[],
+};
+export type MarksSubjectOptionData = {
+ulid: string,
+name: string,
+is_mine: boolean,
+may_enter: boolean,
+};
+export type StudentExamResultData = {
+ulid: string,
+name: string,
+held_on: string,
+max_marks: number,
+pending_count: number,
+subjects: App.Domain.Exams.Data.StudentSubjectResultData[],
+total_marks: string | null,
+total_max: number | null,
+percent_tenths: number | null,
+grade: string | null,
+is_lowest_grade: boolean,
+};
+export type StudentResultsData = {
+exams: App.Domain.Exams.Data.StudentExamResultData[],
+scale: App.Domain.Exams.Data.GradeBandData[],
+};
+export type StudentSubjectResultData = {
+subject_name: string,
+state: App.Domain.Exams.Enums.SubjectResultState,
+marks: string | null,
+percent: number | null,
+grade: string | null,
+grade_point: number | null,
+is_lowest_grade: boolean,
+};
 }
 namespace Enums {
 export type ExamStatus = 'scheduled' | 'marking' | 'published' | 'cancelled';
 export type ExamType = 'unit_test' | 'periodic_test' | 'half_yearly' | 'annual' | 'practical' | 'other';
+export type MarkSheetState = 'editable' | 'view_only' | 'published' | 'closed';
+export type SubjectResultState = 'published' | 'absent' | 'not_entered' | 'awaiting';
 }
 }
 namespace Identity {
@@ -723,7 +820,22 @@ selected_child: string | null,
 sessions: App.Domain.School.Data.SessionSwitcherData | null,
 has_staff_context: boolean,
 attendance_enabled: boolean,
+exams_enabled: boolean,
 timezone: string,
+};
+export type ReportCardData = {
+school_name: string,
+board: string | null,
+campus_name: string,
+campus_address: string | null,
+session_name: string,
+student_name: string,
+admission_number: string,
+born_on: string,
+class_label: string,
+class_teacher_name: string | null,
+attendance: App.Domain.Attendance.Data.StudentTallyData | null,
+result: App.Domain.Exams.Data.StudentExamResultData,
 };
 export type SectionOptionData = {
 ulid: string,

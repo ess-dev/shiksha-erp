@@ -9,7 +9,9 @@ use App\Domain\Attendance\LogAbsenceNotifier;
 use App\Domain\Audit\Contracts\ResolvesAuditActor;
 use App\Domain\Audit\SessionAuditActor;
 use App\Domain\Exams\Contracts\ExamNotifier;
+use App\Domain\Exams\Contracts\MarksNotifier;
 use App\Domain\Exams\LogExamNotifier;
+use App\Domain\Exams\LogMarksNotifier;
 use App\Domain\Identity\Authentication\LogOtpSender;
 use App\Domain\Identity\Authentication\MailOtpSender;
 use App\Domain\Identity\Contracts\OtpSender;
@@ -36,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(Authorizer::class);
         $this->app->bind(AbsenceNotifier::class, LogAbsenceNotifier::class);
         $this->app->bind(ExamNotifier::class, LogExamNotifier::class);
+        $this->app->bind(MarksNotifier::class, LogMarksNotifier::class);
         // The SMS provider is an open decision: only the development drivers (log, mail) exist until one is chosen.
         $this->app->bind(OtpSender::class, fn () => match (config('shiksha.otp.driver')) {
             'mail' => $this->app->make(MailOtpSender::class),

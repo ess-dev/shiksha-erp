@@ -52,6 +52,7 @@ class ParentPortalContextQuery
             count($sessionOptions) > 1 ? new SessionSwitcherData($sessionOptions, $session['ulid']) : null,
             $hasStaffContext,
             Tenant::current()?->hasModule('attendance') ?? false,
+            Tenant::current()?->hasModule('exams') ?? false,
             (string) config('shiksha.timezone'),
         );
 

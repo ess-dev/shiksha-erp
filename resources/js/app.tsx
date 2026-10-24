@@ -17,6 +17,8 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            case name === 'parent/report-card':
+                return PrintLayout;
             case name.startsWith('parent/auth/'):
                 return ParentAuthLayout;
             case name.startsWith('parent/'):

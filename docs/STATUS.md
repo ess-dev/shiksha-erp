@@ -1,7 +1,7 @@
 # Shiksha ERP — status and what is pending
 
 Quick recall sheet. The detailed record (code map, decisions, verification) is in `docs/PROGRESS.md`; update both when work lands.
-Last updated: 2026-10-23.
+Last updated: 2026-10-24.
 
 ## Working approach
 
@@ -33,12 +33,17 @@ Exams and tests, built 2026-10-24 (Principal / permitted staff only; parent view
 
 Teacher's Subjects, built 2026-10-24 (`/teaching/subjects`): apply role-template update (Class teacher 3, Subject teacher 3, Principal/Vice principal/Coordinator 9) on each role. Try the Whole class tab (textbook, chapters, assessment), Section ticks and note, Student notes; choose a subject teacher on the Principal's Subjects screen and sign in as them. Teachers chosen before this update need their choice saved again to get the automatic role. Parent Subjects `/parent/subjects` (built the same day) shows what the teacher saved; try a teacher note and a student note, then open it as that child's parent, and switch to a past session.
 
+Marks, grades and results, built 2026-10-24: apply role-template update 10 on the Principal, Vice principal and Coordinator roles (Roles and access). As `teacher@greenfield.test` open Marks entry (a demo "October Unit Test" with marking open was added locally), type marks, AB and a wrong value, Save draft, Publish; as the Principal or Coordinator open the same sheet and Reopen it with a reason; change the grading scale on Exams and tests → Grading scale (check the CBSE-style default against current board guidance; exams with published marks keep their old scale). As the parent of a child in a published class, open Results and "Open as report card" (print or save as PDF). "Report cards from school" is Coming soon; parents are **not** notified (no provider yet).
+
 ## School screens: Principal and Teacher
 
 | Screen                                     | Status | Notes                                                                                                                                                                                                                                                 |
 | ------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Attendance `/attendance` (teacher's view)  | Done   | Class picker (your class / view only), date, chips, strip, Present/Absent/Late rows, Mark all present, Clear, save with reason on earlier days, summary dialog. Coordinator and Principal use it by scope and can correct (new `attendance.correct`). |
 | Attendance settings `/attendance/settings` | Done   | Not in the prototype: working days, correction window, holidays. Designed from the guide.                                                                                                                                                             |
+| Marks entry `/marks`                       | Done   | Exam / Class / Subject pickers, live % and grade, class summary, grading scale, Save draft, Publish to parents, Reopen (new `marks.reopen`). Coordinator progress page with nudges not built.                                                         |
+| Grading scale `/exams/grading`             | Done   | Not in the prototype as a screen: edit grades, starting %, grade points (needs `settings.manage`). Designed from the guide.                                                                                                                           |
+| Parent Results `/parent/results`           | Done   | Exam chips, result card, progress chart, How grades work, printable report card. "Report cards from school" is Coming soon.                                                                                                                           |
 | Class teacher on School structure          | Done   | Dropdown per section; gives the automatic Class teacher role over that section.                                                                                                                                                                       |
 
 ## School screens: Principal
