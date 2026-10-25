@@ -30,6 +30,7 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
  * @property string|null $renews_on
  * @property string|null $suspended_reason
  * @property string|null $contact_phone
+ * @property string|null $payment_gateway
  */
 class Tenant extends BaseTenant
 {
@@ -58,6 +59,7 @@ class Tenant extends BaseTenant
         'since_on',
         'trial_ends_on',
         'renews_on',
+        'payment_gateway',
     ];
 
     /** @var list<string> */

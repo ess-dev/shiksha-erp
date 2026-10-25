@@ -46,6 +46,24 @@ export function formatPaise(paise: number): string {
     return rupees.format(paise / 100);
 }
 
+/**
+ * Shows integer paise compactly for summary cards: "₹54.85 L" from one lakh
+ * up, "₹1.2 Cr" from one crore, whole rupees below. Display only.
+ */
+export function formatPaiseCompact(paise: number): string {
+    const rupees = paise / 100;
+
+    if (rupees >= 10_000_000) {
+        return `₹${(rupees / 10_000_000).toFixed(2).replace(/\.?0+$/, '')} Cr`;
+    }
+
+    if (rupees >= 100_000) {
+        return `₹${(rupees / 100_000).toFixed(2).replace(/\.?0+$/, '')} L`;
+    }
+
+    return formatPaise(paise);
+}
+
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /**
@@ -90,6 +108,32 @@ export function formatClock(value: string, timeZone: string): string {
         hour12: true,
         timeZone,
     }).format(new Date(value));
+}
+
+/**
+ * Shows an instant (ISO string) as a date in the given time zone ("14 Oct").
+ */
+export function formatInstantDate(value: string, timeZone: string): string {
+    return new Intl.DateTimeFormat('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        timeZone,
+    }).format(new Date(value));
+}
+
+/**
+ * Shows an instant (ISO string) as a date and clock time in the given time
+ * zone ("14 Oct 2026, 7:59 pm").
+ */
+export function formatInstantLong(value: string, timeZone: string): string {
+    const date = new Intl.DateTimeFormat('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone,
+    }).format(new Date(value));
+
+    return `${date}, ${formatClock(value, timeZone)}`;
 }
 
 /**

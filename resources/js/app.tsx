@@ -18,6 +18,9 @@ void createInertiaApp({
     layout: (name) => {
         switch (true) {
             case name === 'parent/report-card':
+            case name === 'parent/fee-receipt':
+            case name === 'parent/fee-statement':
+            case name === 'fees/receipt':
                 return PrintLayout;
             case name.startsWith('parent/auth/'):
                 return ParentAuthLayout;

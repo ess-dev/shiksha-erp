@@ -11,6 +11,8 @@ class SchoolSettingsQuery
 
     public const TC_PREFIX = 'students.tc_prefix';
 
+    public const RECEIPT_PREFIX = 'fees.receipt_prefix';
+
     public const ADMISSION_DOCUMENT_RULES = 'admissions.document_rules';
 
     public const ATTENDANCE_WORKING_DAYS = 'attendance.working_days';
@@ -25,6 +27,7 @@ class SchoolSettingsQuery
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
         self::TC_PREFIX => 'TC',
+        self::RECEIPT_PREFIX => 'RCPT',
     ];
 
     /** illustrative — verify: Monday to Friday, as in the prototype; many schools also work Saturdays. */
@@ -68,6 +71,11 @@ class SchoolSettingsQuery
     public function tcPrefix(): string
     {
         return $this->string(self::TC_PREFIX);
+    }
+
+    public function receiptPrefix(): string
+    {
+        return $this->string(self::RECEIPT_PREFIX);
     }
 
     /**

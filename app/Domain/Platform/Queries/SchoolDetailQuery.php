@@ -3,6 +3,7 @@
 namespace App\Domain\Platform\Queries;
 
 use App\Domain\Audit\Queries\PlatformActivityQuery;
+use App\Domain\Fees\Queries\PaymentGatewayOptionsQuery;
 use App\Domain\Platform\Data\SchoolDetailData;
 use App\Domain\Platform\Enums\SuspensionReason;
 use App\Domain\Platform\Models\Plan;
@@ -16,7 +17,10 @@ class SchoolDetailQuery
 {
     private const ACTIVITY_LIMIT = 6;
 
-    public function __construct(private readonly PlatformActivityQuery $activity) {}
+    public function __construct(
+        private readonly PlatformActivityQuery $activity,
+        private readonly PaymentGatewayOptionsQuery $gateways,
+    ) {}
 
     public function get(Tenant $tenant): SchoolDetailData
     {
@@ -83,6 +87,12 @@ class SchoolDetailQuery
             ),
             activity: $this->activity($tenant, $labels),
             timezone: (string) config('shiksha.timezone'),
+            paymentGateway: $tenant->payment_gateway,
+            gatewayOptions: array_map(
+                fn (string $key, string $label) => ['key' => $key, 'label' => $label],
+                array_keys($this->gateways->get()),
+                array_values($this->gateways->get()),
+            ),
         );
     }
 

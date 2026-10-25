@@ -54,6 +54,7 @@ class ParentPortalContextQuery
             Tenant::current()?->hasModule('attendance') ?? false,
             Tenant::current()?->hasModule('exams') ?? false,
             (string) config('shiksha.timezone'),
+            fees_enabled: Tenant::current()?->hasModule('fees') ?? false,
         );
 
         return new ParentPortalContext($shell, $selected, $session);

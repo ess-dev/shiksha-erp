@@ -7,6 +7,7 @@ use App\Domain\Platform\Actions\DeleteSchool;
 use App\Domain\Platform\Actions\ReactivateSchool;
 use App\Domain\Platform\Actions\RetrySchoolDeletion;
 use App\Domain\Platform\Actions\SetSchoolModule;
+use App\Domain\Platform\Actions\SetSchoolPaymentGateway;
 use App\Domain\Platform\Actions\SuspendSchool;
 use App\Domain\Platform\Exceptions\SchoolChangeException;
 use App\Domain\Platform\Models\Plan;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\ChangeSchoolPlanRequest;
 use App\Http\Requests\Platform\DeleteSchoolRequest;
 use App\Http\Requests\Platform\SetSchoolModuleRequest;
+use App\Http\Requests\Platform\SetSchoolPaymentGatewayRequest;
 use App\Http\Requests\Platform\SuspendSchoolRequest;
 use App\Tenancy\Tenant;
 use Illuminate\Http\RedirectResponse;
@@ -78,6 +80,19 @@ class SchoolManagementController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __(':module turned :state for :school', [
             'module' => $label, 'state' => $enabled ? 'on' : 'off', 'school' => $school->name,
         ])]);
+
+        return back();
+    }
+
+    public function setPaymentGateway(SetSchoolPaymentGatewayRequest $request, Tenant $school, SetSchoolPaymentGateway $setGateway): RedirectResponse
+    {
+        try {
+            $setGateway->handle($school, $request->input('gateway'));
+        } catch (SchoolChangeException $exception) {
+            return $this->refused($exception);
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Payment gateway updated for :school', ['school' => $school->name])]);
 
         return back();
     }

@@ -5,9 +5,13 @@ import {
     CalendarCheck,
     ClipboardCheck,
     ClipboardPen,
+    CreditCard,
     FileBadge,
     FolderGit2,
+    HandCoins,
     Inbox,
+    Landmark,
+    ReceiptIndianRupee,
     Library,
     LayoutGrid,
     School,
@@ -33,6 +37,10 @@ import { dashboard } from '@/routes';
 import { index as admissions } from '@/routes/admissions';
 import { index as attendance } from '@/routes/attendance';
 import { index as exams } from '@/routes/exams';
+import { index as collectFee } from '@/routes/fees/collect';
+import { index as feeDues } from '@/routes/fees/dues';
+import { index as feePayments } from '@/routes/fees/payments';
+import { index as feeStructure } from '@/routes/fees/structure';
 import { index as classes } from '@/routes/school/classes';
 import { index as roles } from '@/routes/school/roles';
 import { index as structure } from '@/routes/school/structure';
@@ -70,6 +78,8 @@ export function AppSidebar() {
     const canApprove = useCan('reportcards.approve');
     const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
+    const canViewFees = useCan('fees.view');
+    const canCollectFees = useCan('fees.collect');
     const canViewAttendance =
         useCan('attendance.view') || useCan('attendance.mark');
 
@@ -164,6 +174,34 @@ export function AppSidebar() {
                       title: 'Approvals',
                       href: approvals(),
                       icon: Inbox,
+                  },
+              ]
+            : []),
+        ...(canCollectFees
+            ? [
+                  {
+                      title: 'Collect fee',
+                      href: collectFee(),
+                      icon: HandCoins,
+                  },
+              ]
+            : []),
+        ...(canViewFees
+            ? [
+                  {
+                      title: 'Dues',
+                      href: feeDues(),
+                      icon: ReceiptIndianRupee,
+                  },
+                  {
+                      title: 'Payments',
+                      href: feePayments(),
+                      icon: CreditCard,
+                  },
+                  {
+                      title: 'Fee structure',
+                      href: feeStructure(),
+                      icon: Landmark,
                   },
               ]
             : []),

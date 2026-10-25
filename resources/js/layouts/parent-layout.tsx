@@ -23,7 +23,14 @@ import {
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import { initials } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { attendance, home, results, signOut, subjects } from '@/routes/parent';
+import {
+    attendance,
+    fees,
+    home,
+    results,
+    signOut,
+    subjects,
+} from '@/routes/parent';
 import { select as selectSession } from '@/routes/parent/session';
 import { switchMethod } from '@/routes/school/context';
 import type { ParentShell } from '@/types/parent';
@@ -49,7 +56,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
           ? 'subjects'
           : path.startsWith(results.url())
             ? 'results'
-            : 'attendance';
+            : path.startsWith(fees.url())
+              ? 'fees'
+              : 'attendance';
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (shell === undefined) {
@@ -69,6 +78,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
         if (key === 'subjects') {
             return subjects.url({ query: childParam });
+        }
+
+        if (key === 'fees' && shell.fees_enabled) {
+            return fees.url({ query: childParam });
         }
 
         if (key === 'results' && shell.exams_enabled) {
@@ -98,7 +111,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
           ? 'Subjects'
           : current === 'results'
             ? 'Report card'
-            : 'Attendance';
+            : current === 'fees'
+              ? 'Fees'
+              : 'Attendance';
 
     return (
         <div className="min-h-svh bg-background text-foreground md:flex">
@@ -127,7 +142,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                             notInPlan={
                                 (item.key === 'attendance' &&
                                     !shell.attendance_enabled) ||
-                                (item.key === 'results' && !shell.exams_enabled)
+                                (item.key === 'results' &&
+                                    !shell.exams_enabled) ||
+                                (item.key === 'fees' && !shell.fees_enabled)
                             }
                         />
                     ))}
@@ -336,7 +353,8 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                     (item.key === 'attendance' &&
                                         !shell.attendance_enabled) ||
                                     (item.key === 'results' &&
-                                        !shell.exams_enabled)
+                                        !shell.exams_enabled) ||
+                                    (item.key === 'fees' && !shell.fees_enabled)
                                 }
                             />
                         ))}

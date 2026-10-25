@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Guardian\AttendanceController;
 use App\Http\Controllers\Guardian\ContextController;
+use App\Http\Controllers\Guardian\FeesController;
 use App\Http\Controllers\Guardian\HomeController;
 use App\Http\Controllers\Guardian\ResultsController;
 use App\Http\Controllers\Guardian\SessionController;
@@ -23,6 +24,9 @@ Route::prefix('parent')->name('parent.')->group(function () {
         Route::get('/', HomeController::class)->name('home');
         Route::get('attendance', AttendanceController::class)->middleware('module:attendance')->name('attendance');
         Route::get('subjects', SubjectsController::class)->name('subjects');
+        Route::get('fees', [FeesController::class, 'index'])->middleware('module:fees')->name('fees');
+        Route::get('fees/statement', [FeesController::class, 'statement'])->middleware('module:fees')->name('fees.statement');
+        Route::get('fees/receipts/{payment}', [FeesController::class, 'receipt'])->middleware('module:fees')->name('fees.receipt');
         Route::get('results', [ResultsController::class, 'index'])->middleware('module:exams')->name('results');
         Route::get('results/{exam}/report-card', [ResultsController::class, 'reportCard'])->middleware('module:exams')->name('results.report-card');
         Route::get('report-cards/{reportCard}', [ResultsController::class, 'schoolCard'])->middleware('module:exams')->name('report-cards.show');

@@ -3,6 +3,7 @@
 namespace App\Domain\Students\Actions;
 
 use App\Domain\Audit\Data\AuditEntry;
+use App\Domain\Fees\Actions\BillStudent;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\School\Queries\SchoolSettingsQuery;
 use App\Domain\School\Queries\SectionDirectoryQuery;
@@ -27,6 +28,7 @@ class CreateStudent extends Action
         private readonly NumberSequences $numbers,
         private readonly SectionDirectoryQuery $sections,
         private readonly SchoolSettingsQuery $settings,
+        private readonly BillStudent $fees,
     ) {}
 
     /**
@@ -115,6 +117,8 @@ class CreateStudent extends Action
                 'result' => EnrollmentResult::InProgress,
                 'is_current' => true,
             ]);
+
+            $this->fees->handle($student->id, $student->ulid, $section->academicYearKey);
 
             $this->audit(new AuditEntry('students.student_created', 'student', $student->ulid, null, [
                 'admission_number' => $admissionNumber,

@@ -20,7 +20,7 @@ export type ParentNavItem = {
     key: string;
     label: string;
     icon: LucideIcon;
-    /** Home, Attendance, Results and Subjects exist; the rest are shown as "Soon". */
+    /** Home, Fees, Attendance, Results and Subjects exist; the rest are shown as "Soon". */
     built: boolean;
 };
 
@@ -29,7 +29,7 @@ export const parentNav: ParentNavItem[] = [
     { key: 'home', label: 'Home', icon: House, built: true },
     { key: 'feed', label: 'Feed', icon: Newspaper, built: false },
     { key: 'bus', label: 'Bus tracking', icon: Bus, built: false },
-    { key: 'fees', label: 'Fees', icon: Wallet, built: false },
+    { key: 'fees', label: 'Fees', icon: Wallet, built: true },
     {
         key: 'attendance',
         label: 'Attendance',

@@ -12,6 +12,7 @@ final readonly class SchoolDetailData implements JsonSerializable
 {
     /**
      * @param  list<array{key: string, label: string, enabled: bool, badge: ?string}>  $modules  badge: "in_plan", "add_on", "turned_off" or null
+     * @param  list<array{key: string, label: string}>  $gatewayOptions  the payment gateways that can be chosen in this environment
      * @param  list<array{ulid: string, name: string, price_per_student_year_paise: int}>  $plans
      * @param  list<array{key: string, label: string}>  $suspensionReasons
      * @param  list<array{summary: string, at: string}>  $activity
@@ -41,6 +42,8 @@ final readonly class SchoolDetailData implements JsonSerializable
         public array $suspensionReasons,
         public array $activity,
         public string $timezone,
+        public ?string $paymentGateway = null,
+        public array $gatewayOptions = [],
     ) {}
 
     /**
@@ -73,6 +76,8 @@ final readonly class SchoolDetailData implements JsonSerializable
             'suspension_reasons' => $this->suspensionReasons,
             'activity' => $this->activity,
             'timezone' => $this->timezone,
+            'payment_gateway' => $this->paymentGateway,
+            'gateway_options' => $this->gatewayOptions,
         ];
     }
 }

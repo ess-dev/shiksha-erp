@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Fees\Gateways\FakePaymentGateway;
+
 return [
 
     /*
@@ -140,6 +142,39 @@ return [
         ['min_percent' => 60, 'text' => 'Good effort. Regular revision will help further.'],
         ['min_percent' => 40, 'text' => 'Needs more practice; we will share a plan at the PTM.'],
         ['min_percent' => 0, 'text' => 'Needs support. Please meet the class teacher.'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fees
+    |--------------------------------------------------------------------------
+    |
+    | The installment schedule created for a new academic year: how many terms
+    | (they split the year evenly in months), and the day of the month each is
+    | due. illustrative - verify with the owner; the prototype used four terms
+    | due on the 15th (the Term 3 date was the 20th).
+    |
+    */
+
+    'fee_schedule' => [
+        'terms' => 4,
+        'due_day' => 15,
+    ],
+
+    /*
+    | Payment gateways the Super Admin can choose for a school. The app only
+    | talks to the PaymentGateway interface; add a provider by writing a class
+    | and listing it here. `environments` limits where a driver may be chosen
+    | (the test gateway never takes real money and must not run in production).
+    | The payment provider is still an open decision.
+    */
+
+    'payment_gateways' => [
+        'fake' => [
+            'label' => 'Test gateway (no real money)',
+            'class' => FakePaymentGateway::class,
+            'environments' => ['local', 'testing'],
+        ],
     ],
 
     /*

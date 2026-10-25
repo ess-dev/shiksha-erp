@@ -114,6 +114,8 @@ export type PlatformSchoolDetail = {
     suspension_reasons: { key: string; label: string }[];
     activity: { summary: string; at: string }[];
     timezone: string;
+    payment_gateway: string | null;
+    gateway_options: { key: string; label: string }[];
 };
 
 export type OnboardingOptions = {

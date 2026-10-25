@@ -562,6 +562,271 @@ export type ReportCardStatus = 'submitted' | 'returned' | 'published';
 export type SubjectResultState = 'published' | 'absent' | 'not_entered' | 'awaiting';
 }
 }
+namespace Fees {
+namespace Data {
+export type CollectInstallmentData = {
+ulid: string,
+label: string,
+due_on: string,
+status: App.Domain.Fees.Enums.InvoiceStatus,
+net_paise: number,
+paid_paise: number,
+balance_paise: number,
+concession_note: string | null,
+pending_note: string | null,
+};
+export type CollectScreenData = {
+search: string,
+results: App.Domain.Fees.Data.CollectSearchResultData[],
+student: App.Domain.Fees.Data.CollectStudentData | null,
+modes: App.Domain.Fees.Data.FeeOptionData[],
+today: string,
+has_schedule: boolean,
+};
+export type CollectSearchResultData = {
+ulid: string,
+name: string,
+admission_number: string,
+section_label: string,
+campus_name: string,
+due_paise: number,
+};
+export type CollectStudentData = {
+ulid: string,
+name: string,
+admission_number: string,
+section_label: string,
+campus_name: string,
+guardian_name: string | null,
+guardian_relation: string | null,
+due_paise: number,
+installments: App.Domain.Fees.Data.CollectInstallmentData[],
+};
+export type ConcessionData = {
+ulid: string,
+name: string,
+description: string,
+is_automatic_sibling: boolean,
+needs_approval: boolean,
+students: number,
+};
+export type DueRowData = {
+ulid: string,
+student_ulid: string,
+student_name: string,
+admission_number: string,
+section_label: string,
+campus_name: string,
+installment_label: string,
+due_on: string,
+paid_paise: number,
+balance_paise: number,
+status: App.Domain.Fees.Enums.InvoiceStatus,
+payment_pending: boolean,
+reminded_today: boolean,
+can_collect: boolean,
+can_remind: boolean,
+};
+export type DuesScreenData = {
+rows: App.Domain.Fees.Data.DueRowData[],
+summary: App.Domain.Fees.Data.DuesSummaryData,
+total: number,
+from: number,
+to: number,
+current_page: number,
+last_page: number,
+sections: App.Domain.Fees.Data.FeeOptionData[],
+installments: App.Domain.Fees.Data.FeeOptionData[],
+academic_year: string,
+today: string,
+has_schedule: boolean,
+can_export: boolean,
+};
+export type DuesSummaryData = {
+installments: number,
+students: number,
+balance_paise: number,
+overdue_paise: number,
+};
+export type FeeClassRowData = {
+ulid: string,
+name: string,
+fee_group_ulid: string | null,
+term_paise: number | null,
+students: number,
+};
+export type FeeGroupData = {
+ulid: string,
+name: string,
+heads: App.Domain.Fees.Data.FeeHeadData[],
+term_paise: number,
+year_paise: number,
+class_names: string[],
+students: number,
+can_delete: boolean,
+};
+export type FeeHeadData = {
+name: string,
+amount_paise: number,
+};
+export type FeeOptionData = {
+value: string,
+label: string,
+};
+export type FeeStructureData = {
+academic_year: string,
+today: string,
+has_schedule: boolean,
+classes: App.Domain.Fees.Data.FeeClassRowData[],
+groups: App.Domain.Fees.Data.FeeGroupData[],
+installments: App.Domain.Fees.Data.InstallmentData[],
+concessions: App.Domain.Fees.Data.ConcessionData[],
+head_names: string[],
+classes_without_group: string[],
+can_manage: boolean,
+};
+export type GatewayInfoData = {
+label: string,
+simulated: boolean,
+};
+export type InstallmentData = {
+ulid: string,
+label: string,
+due_on: string,
+is_billed: boolean,
+};
+export type ParentFeesData = {
+session_name: string,
+is_current_session: boolean,
+child_name: string,
+child_first_name: string,
+section_label: string,
+today: string,
+has_fees: boolean,
+installments: App.Domain.Fees.Data.ParentInstallmentData[],
+payments: App.Domain.Fees.Data.ParentPaymentData[],
+failed_alerts: App.Domain.Fees.Data.ParentPaymentData[],
+total_paid_paise: number,
+total_due_paise: number,
+total_billed_paise: number,
+};
+export type ParentInstallmentData = {
+ulid: string,
+label: string,
+due_on: string,
+status: App.Domain.Fees.Enums.InvoiceStatus,
+net_paise: number,
+paid_paise: number,
+balance_paise: number,
+paid_on: string | null,
+heads: App.Domain.Fees.Data.FeeHeadData[],
+concession_paise: number,
+concession_note: string | null,
+payment_pending: boolean,
+};
+export type ParentPaymentData = {
+ulid: string,
+amount_paise: number,
+paid_at: string,
+mode_label: string,
+status: App.Domain.Fees.Enums.PaymentStatus,
+receipt_number: string | null,
+for_label: string,
+note: string | null,
+receipt: App.Domain.Fees.Data.ReceiptData | null,
+};
+export type PaymentDetailData = {
+payment_id: string,
+status: App.Domain.Fees.Enums.PaymentStatus,
+mode_label: string,
+is_counter: boolean,
+gateway: string | null,
+reference: string | null,
+receipt_number: string | null,
+paid_at: string,
+collected_by: string | null,
+note: string | null,
+failure_reason: string | null,
+cheque_details: string | null,
+excess_paise: number,
+lines: App.Domain.Fees.Data.PaymentLineData[],
+};
+export type PaymentLineData = {
+student_name: string,
+section_label: string,
+installment_label: string,
+amount_paise: number,
+fully_paid: boolean,
+};
+export type PaymentRowData = {
+ulid: string,
+paid_at: string,
+student_name: string,
+section_label: string,
+receipt_number: string | null,
+mode_label: string,
+is_counter: boolean,
+reference: string | null,
+amount_paise: number,
+status: App.Domain.Fees.Enums.PaymentStatus,
+status_note: string,
+can_check: boolean,
+can_clear_cheque: boolean,
+can_recheck: boolean,
+can_send_link: boolean,
+link_sent: boolean,
+receipt: App.Domain.Fees.Data.ReceiptData | null,
+detail: App.Domain.Fees.Data.PaymentDetailData,
+};
+export type PaymentsScreenData = {
+rows: App.Domain.Fees.Data.PaymentRowData[],
+summary: App.Domain.Fees.Data.PaymentsSummaryData,
+total: number,
+from: number,
+to: number,
+current_page: number,
+last_page: number,
+modes: App.Domain.Fees.Data.FeeOptionData[],
+gateway: App.Domain.Fees.Data.GatewayInfoData | null,
+bounce_reasons: string[],
+today: string,
+can_export: boolean,
+};
+export type PaymentsSummaryData = {
+successful_paise: number,
+successful_count: number,
+pending_count: number,
+pending_paise: number,
+failed_count: number,
+failed_paise: number,
+};
+export type ReceiptData = {
+receipt_number: string,
+school_name: string,
+school_address: string | null,
+paid_at: string,
+received_from: string | null,
+mode_label: string,
+is_counter: boolean,
+reference: string | null,
+collected_by: string | null,
+academic_year: string,
+lines: App.Domain.Fees.Data.PaymentLineData[],
+total_paise: number,
+amount_in_words: string,
+is_archived: boolean,
+};
+}
+namespace Enums {
+export type ConcessionKind = 'standard' | 'sibling';
+export type ConcessionType = 'percent' | 'flat';
+export type GatewayReport = 'captured' | 'failed' | 'pending';
+export type InvoiceStatus = 'paid' | 'overdue' | 'partial_overdue' | 'partial' | 'due' | 'upcoming';
+export type PaymentChannel = 'counter' | 'online';
+export type PaymentMode = 'cash' | 'cheque' | 'upi' | 'card' | 'net_banking' | 'bank_transfer';
+export type PaymentStatus = 'pending' | 'success' | 'failed';
+}
+}
 namespace Identity {
 namespace Data {
 export type SchoolContextData = {
@@ -910,6 +1175,7 @@ has_staff_context: boolean,
 attendance_enabled: boolean,
 exams_enabled: boolean,
 timezone: string,
+fees_enabled: boolean,
 };
 export type ReportCardData = {
 school_name: string,

@@ -33,4 +33,9 @@ class SchoolChangeException extends DomainException
     {
         return new self("[{$key}] is not a sellable module.");
     }
+
+    public static function unknownGateway(string $key): self
+    {
+        return new self("[{$key}] is not a payment gateway that can be used here.");
+    }
 }

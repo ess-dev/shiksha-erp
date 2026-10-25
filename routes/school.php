@@ -14,6 +14,11 @@ use App\Http\Controllers\Exams\ExamStatusController;
 use App\Http\Controllers\Exams\GradeScaleController;
 use App\Http\Controllers\Exams\MarksController;
 use App\Http\Controllers\Exams\ReportCardController;
+use App\Http\Controllers\Fees\CollectController;
+use App\Http\Controllers\Fees\DuesController;
+use App\Http\Controllers\Fees\FeeStructureController;
+use App\Http\Controllers\Fees\PaymentController;
+use App\Http\Controllers\Fees\ReceiptController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\ApprovalsController;
 use App\Http\Controllers\School\CampusController;
@@ -146,6 +151,32 @@ Route::middleware(['auth', 'module:attendance'])->prefix('attendance')->name('at
     Route::put('settings', [AttendanceSettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/holidays', [HolidayController::class, 'store'])->name('holidays.store');
     Route::delete('settings/holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
+});
+
+Route::middleware(['auth', 'module:fees'])->prefix('fees')->name('fees.')->group(function () {
+    Route::get('dues', [DuesController::class, 'index'])->name('dues.index');
+    Route::get('dues/export', [DuesController::class, 'export'])->name('dues.export');
+    Route::post('dues/remind', [DuesController::class, 'remind'])->name('dues.remind');
+
+    Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('payments/export', [PaymentController::class, 'export'])->name('payments.export');
+    Route::post('payments/{payment}/check', [PaymentController::class, 'check'])->name('payments.check');
+    Route::post('payments/{payment}/recheck', [PaymentController::class, 'recheck'])->name('payments.recheck');
+    Route::post('payments/{payment}/cheque', [PaymentController::class, 'cheque'])->name('payments.cheque');
+    Route::post('payments/{payment}/link', [PaymentController::class, 'link'])->name('payments.link');
+    Route::get('receipts/{payment}', [ReceiptController::class, 'show'])->name('receipts.show');
+
+    Route::get('collect', [CollectController::class, 'index'])->name('collect.index');
+    Route::post('collect', [CollectController::class, 'store'])->name('collect.store');
+
+    Route::get('structure', [FeeStructureController::class, 'index'])->name('structure.index');
+    Route::post('structure/schedule', [FeeStructureController::class, 'schedule'])->name('structure.schedule');
+    Route::post('structure/groups', [FeeStructureController::class, 'storeGroup'])->name('structure.groups.store');
+    Route::put('structure/groups/{group}', [FeeStructureController::class, 'updateHeads'])->name('structure.groups.update');
+    Route::patch('structure/groups/{group}', [FeeStructureController::class, 'rename'])->name('structure.groups.rename');
+    Route::delete('structure/groups/{group}', [FeeStructureController::class, 'destroyGroup'])->name('structure.groups.destroy');
+    Route::put('structure/classes/{schoolClass}', [FeeStructureController::class, 'assignClass'])->name('structure.classes.assign');
+    Route::post('structure/concessions', [FeeStructureController::class, 'storeConcession'])->name('structure.concessions.store');
 });
 
 Route::middleware(['auth', 'module:exams'])->prefix('exams')->name('exams.')->group(function () {

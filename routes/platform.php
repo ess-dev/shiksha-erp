@@ -54,6 +54,7 @@ Route::middleware('platform.host')->name('platform.')->group(function () {
             Route::post('schools/{school}/retry-deletion', [SchoolManagementController::class, 'retryDeletion'])->name('schools.retry-deletion');
             Route::patch('schools/{school}/plan', [SchoolManagementController::class, 'changePlan'])->name('schools.plan');
             Route::patch('schools/{school}/modules', [SchoolManagementController::class, 'setModule'])->name('schools.modules');
+            Route::patch('schools/{school}/payment-gateway', [SchoolManagementController::class, 'setPaymentGateway'])->name('schools.payment-gateway');
 
             Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
             Route::patch('plans/{plan}', [PlanController::class, 'update'])->name('plans.update');

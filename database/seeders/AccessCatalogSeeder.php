@@ -62,6 +62,8 @@ class AccessCatalogSeeder extends Seeder
         'fees.refund' => ['fees', 'critical', false, 'Refund fee payments', 1],
         'fee_structures.manage' => ['fees', 'sensitive', false, 'Edit fee structures', 1],
         'concessions.apply' => ['fees', 'sensitive', false, 'Apply fee concessions', 1],
+        'fees.remind' => ['fees', 'sensitive', false, 'Send fee reminders and payment links to guardians', 12],
+        'fees.reconcile' => ['fees', 'sensitive', false, 'Confirm, clear or re-check pending and failed payments', 12],
         'exams.view' => ['exams', 'normal', false, 'See exams and marks', 1],
         'marks.enter' => ['exams', 'normal', false, 'Enter marks', 1],
         'exams.schedule' => ['exams', 'sensitive', false, 'Schedule unit tests and exams: create, change, open marking, cancel and delete', 8],
@@ -122,6 +124,10 @@ class AccessCatalogSeeder extends Seeder
 
     private const REPORT_CARDS_V11 = 'Adds preparing report cards (Class teacher) and approving them (Principal, Vice principal, Coordinator)';
 
+    private const FEES_V12 = 'Adds sending fee reminders and reconciling payments (Principal, Vice principal, Accountant) and viewing fee dues, payments and the fee structure (Coordinator, for their wing)';
+
+    private const FEES_V12_ACCOUNTANT = 'Adds sending fee reminders and payment links, and confirming, clearing or re-checking payments';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -150,6 +156,7 @@ class AccessCatalogSeeder extends Seeder
             9 => [self::SYLLABUS_V9, '*'],
             10 => [self::MARKS_V10, '*'],
             11 => [self::REPORT_CARDS_V11, '*'],
+            12 => [self::FEES_V12, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -163,6 +170,7 @@ class AccessCatalogSeeder extends Seeder
             9 => [self::SYLLABUS_V9, '*-restricted'],
             10 => [self::MARKS_V10, '*-restricted'],
             11 => [self::REPORT_CARDS_V11, '*-restricted'],
+            12 => [self::FEES_V12, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -176,6 +184,7 @@ class AccessCatalogSeeder extends Seeder
             9 => [self::SYLLABUS_V9, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update']],
             10 => [self::MARKS_V10, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen']],
             11 => [self::REPORT_CARDS_V11, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve']],
+            12 => [self::FEES_V12, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve', 'fees.view']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],
@@ -191,6 +200,7 @@ class AccessCatalogSeeder extends Seeder
         'accountant' => ['Accountant', false, [
             1 => ['Initial version', self::ACCOUNTANT],
             2 => [self::STRUCTURE_V2, [...self::ACCOUNTANT, 'structure.view']],
+            3 => [self::FEES_V12_ACCOUNTANT, [...self::ACCOUNTANT, 'structure.view', 'fees.remind', 'fees.reconcile']],
         ]],
         'admission_officer' => ['Admission officer', false, [
             1 => ['Initial version', self::ADMISSION_OFFICER],

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import {
     modules as modulesRoute,
     index as schoolsIndex,
+    paymentGateway,
     plan as planRoute,
     reactivate,
     retryDeletion,
@@ -351,11 +352,48 @@ export default function PlatformSchoolDetail({ school }: Props) {
             </div>
 
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <Card title="Billing" subtitle="Invoices">
-                    <p className="text-sm text-muted-foreground">
-                        No invoices yet. Billing is not built.
-                    </p>
-                </Card>
+                <div className="grid gap-4 self-start">
+                    <Card title="Billing" subtitle="Invoices">
+                        <p className="text-sm text-muted-foreground">
+                            No invoices yet. Billing is not built.
+                        </p>
+                    </Card>
+
+                    <Card
+                        title="Payment gateway"
+                        subtitle="Used for this school's online fee payments"
+                    >
+                        <div className="grid gap-1.5">
+                            <label htmlFor="school-gateway" className="text-sm">
+                                Gateway
+                            </label>
+                            <select
+                                id="school-gateway"
+                                value={school.payment_gateway ?? ''}
+                                onChange={(event) =>
+                                    router.patch(
+                                        paymentGateway.url(school.ulid),
+                                        { gateway: event.target.value },
+                                        { preserveScroll: true },
+                                    )
+                                }
+                                className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                            >
+                                <option value="">None</option>
+                                {school.gateway_options.map((option) => (
+                                    <option key={option.key} value={option.key}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="text-[13px] text-muted-foreground">
+                                Without a gateway, the school can still record
+                                counter payments and cheques. Real providers
+                                appear here once they are added.
+                            </p>
+                        </div>
+                    </Card>
+                </div>
 
                 <Card title="Contact and activity">
                     <dl className="grid gap-3 sm:grid-cols-2">

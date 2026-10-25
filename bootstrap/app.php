@@ -7,6 +7,7 @@ use App\Domain\Exams\Exceptions\ExamException;
 use App\Domain\Exams\Exceptions\GradeScaleException;
 use App\Domain\Exams\Exceptions\MarksException;
 use App\Domain\Exams\Exceptions\ReportCardException;
+use App\Domain\Fees\Exceptions\FeeException;
 use App\Domain\School\Exceptions\CalendarException;
 use App\Domain\School\Exceptions\HouseException;
 use App\Domain\School\Exceptions\StructureException;
@@ -80,6 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (GradeScaleException $e, Request $request) => DomainRuleResponse::for($e, $request, 'grades'));
         $exceptions->render(fn (ReportCardException $e, Request $request) => DomainRuleResponse::for($e, $request, 'report_cards'));
         $exceptions->render(fn (SyllabusException $e, Request $request) => DomainRuleResponse::for($e, $request, 'syllabus'));
+        $exceptions->render(fn (FeeException $e, Request $request) => DomainRuleResponse::for($e, $request, 'fees'));
 
         // Access guardrails (nobody grants what they do not hold, critical confirmation, last owner).
         $exceptions->render(fn (GuardrailViolation $e, Request $request) => DomainRuleResponse::for($e, $request, 'roles'));
