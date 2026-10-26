@@ -4,6 +4,7 @@ use App\Http\Controllers\Guardian\AttendanceController;
 use App\Http\Controllers\Guardian\ContextController;
 use App\Http\Controllers\Guardian\FeesController;
 use App\Http\Controllers\Guardian\HomeController;
+use App\Http\Controllers\Guardian\HomeworkController;
 use App\Http\Controllers\Guardian\ResultsController;
 use App\Http\Controllers\Guardian\SessionController;
 use App\Http\Controllers\Guardian\SignInController;
@@ -31,6 +32,10 @@ Route::prefix('parent')->name('parent.')->group(function () {
         Route::get('results/{exam}/report-card', [ResultsController::class, 'reportCard'])->middleware('module:exams')->name('results.report-card');
         Route::get('report-cards/{reportCard}', [ResultsController::class, 'schoolCard'])->middleware('module:exams')->name('report-cards.show');
         Route::get('report-cards/{reportCard}/file', [ResultsController::class, 'schoolCardFile'])->middleware(['module:exams', 'signed'])->name('report-cards.file');
+        Route::get('homework', [HomeworkController::class, 'index'])->middleware('module:homework')->name('homework');
+        Route::post('homework/{assignment}/submit', [HomeworkController::class, 'submit'])->middleware('module:homework')->name('homework.submit');
+        Route::get('homework/files/{file}', [HomeworkController::class, 'attachment'])->middleware(['module:homework', 'signed'])->name('homework.files.show');
+        Route::get('homework/submission-files/{file}', [HomeworkController::class, 'submission'])->middleware(['module:homework', 'signed'])->name('homework.submission-files.show');
         Route::put('session', [SessionController::class, 'update'])->name('session.select');
         Route::post('sign-out', [SignInController::class, 'signOut'])->name('sign-out');
     });

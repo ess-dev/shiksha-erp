@@ -3,6 +3,7 @@ export type * from './attendance';
 export type * from './auth';
 export type * from './exams';
 export type * from './fees';
+export type * from './homework';
 export type * from './navigation';
 export type * from './parent';
 export type * from './platform';

@@ -27,6 +27,7 @@ import {
     attendance,
     fees,
     home,
+    homework,
     results,
     signOut,
     subjects,
@@ -54,11 +55,13 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         ? 'home'
         : path.startsWith(subjects.url())
           ? 'subjects'
-          : path.startsWith(results.url())
-            ? 'results'
-            : path.startsWith(fees.url())
-              ? 'fees'
-              : 'attendance';
+          : path.startsWith(homework.url())
+            ? 'homework'
+            : path.startsWith(results.url())
+              ? 'results'
+              : path.startsWith(fees.url())
+                ? 'fees'
+                : 'attendance';
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (shell === undefined) {
@@ -78,6 +81,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
         if (key === 'subjects') {
             return subjects.url({ query: childParam });
+        }
+
+        if (key === 'homework' && shell.homework_enabled) {
+            return homework.url({ query: childParam });
         }
 
         if (key === 'fees' && shell.fees_enabled) {
@@ -109,11 +116,13 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         ? `Hi, ${shell.guardian_first_name}`
         : current === 'subjects'
           ? 'Subjects'
-          : current === 'results'
-            ? 'Report card'
-            : current === 'fees'
-              ? 'Fees'
-              : 'Attendance';
+          : current === 'homework'
+            ? 'Homework'
+            : current === 'results'
+              ? 'Report card'
+              : current === 'fees'
+                ? 'Fees'
+                : 'Attendance';
 
     return (
         <div className="min-h-svh bg-background text-foreground md:flex">
@@ -144,7 +153,9 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                     !shell.attendance_enabled) ||
                                 (item.key === 'results' &&
                                     !shell.exams_enabled) ||
-                                (item.key === 'fees' && !shell.fees_enabled)
+                                (item.key === 'fees' && !shell.fees_enabled) ||
+                                (item.key === 'homework' &&
+                                    !shell.homework_enabled)
                             }
                         />
                     ))}
@@ -354,7 +365,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                         !shell.attendance_enabled) ||
                                     (item.key === 'results' &&
                                         !shell.exams_enabled) ||
-                                    (item.key === 'fees' && !shell.fees_enabled)
+                                    (item.key === 'fees' &&
+                                        !shell.fees_enabled) ||
+                                    (item.key === 'homework' &&
+                                        !shell.homework_enabled)
                                 }
                             />
                         ))}

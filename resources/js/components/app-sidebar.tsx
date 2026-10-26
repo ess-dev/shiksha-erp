@@ -14,6 +14,7 @@ import {
     ReceiptIndianRupee,
     Library,
     LayoutGrid,
+    NotebookPen,
     School,
     ShieldCheck,
     UserPlus,
@@ -37,6 +38,7 @@ import { dashboard } from '@/routes';
 import { index as admissions } from '@/routes/admissions';
 import { index as attendance } from '@/routes/attendance';
 import { index as exams } from '@/routes/exams';
+import { index as homework } from '@/routes/homework';
 import { index as collectFee } from '@/routes/fees/collect';
 import { index as feeDues } from '@/routes/fees/dues';
 import { index as feePayments } from '@/routes/fees/payments';
@@ -76,6 +78,8 @@ export function AppSidebar() {
     const canPrepareReportCards =
         useCan('reportcards.prepare') || useCan('reportcards.approve');
     const canApprove = useCan('reportcards.approve');
+    const canViewHomework =
+        useCan('homework.view') || useCan('homework.assign');
     const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
     const canViewFees = useCan('fees.view');
@@ -174,6 +178,15 @@ export function AppSidebar() {
                       title: 'Approvals',
                       href: approvals(),
                       icon: Inbox,
+                  },
+              ]
+            : []),
+        ...(canViewHomework
+            ? [
+                  {
+                      title: 'Homework',
+                      href: homework(),
+                      icon: NotebookPen,
                   },
               ]
             : []),

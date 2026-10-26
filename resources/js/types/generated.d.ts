@@ -827,6 +827,115 @@ export type PaymentMode = 'cash' | 'cheque' | 'upi' | 'card' | 'net_banking' | '
 export type PaymentStatus = 'pending' | 'success' | 'failed';
 }
 }
+namespace Homework {
+namespace Data {
+export type HomeworkDetailData = {
+ulid: string,
+title: string,
+section_ulid: string,
+section_label: string,
+subject_ulid: string,
+subject: string,
+instructions: string | null,
+assigned_on: string,
+assigned_by: string,
+due_on: string,
+days_left: number,
+submission_type: App.Domain.Homework.Enums.SubmissionType,
+submitted: number,
+total: number,
+to_check: number,
+can_manage: boolean,
+attachments: App.Domain.Homework.Data.HomeworkFileData[],
+rows: App.Domain.Homework.Data.HomeworkStudentRowData[],
+};
+export type HomeworkFileData = {
+ulid: string,
+name: string,
+mime_type: string,
+size_bytes: number,
+url: string,
+is_image: boolean,
+};
+export type HomeworkFormOptionsData = {
+sections: App.Domain.Homework.Data.HomeworkSectionOptionData[],
+min_due_on: string,
+suggested_due_on: string,
+max_files: number,
+max_file_mb: number,
+title_max: number,
+instructions_max: number,
+feedback_max: number,
+};
+export type HomeworkListItemData = {
+ulid: string,
+title: string,
+section_label: string,
+subject: string,
+due_on: string,
+days_left: number,
+submission_type: App.Domain.Homework.Enums.SubmissionType,
+submitted: number,
+total: number,
+to_check: number,
+};
+export type HomeworkScreenData = {
+today: string,
+can_assign: boolean,
+sections: App.Domain.Homework.Data.HomeworkSectionFilterData[],
+section_ulid: string | null,
+assignments: App.Domain.Homework.Data.HomeworkListItemData[],
+selected_ulid: string | null,
+selected: App.Domain.Homework.Data.HomeworkDetailData | null,
+form: App.Domain.Homework.Data.HomeworkFormOptionsData | null,
+};
+export type HomeworkSectionFilterData = {
+ulid: string,
+label: string,
+};
+export type HomeworkSectionOptionData = {
+ulid: string,
+label: string,
+subjects: App.Domain.Homework.Data.HomeworkSubjectOptionData[],
+};
+export type HomeworkStudentRowData = {
+student_ulid: string,
+roll_number: number | null,
+name: string,
+status: App.Domain.Homework.Enums.StudentHomeworkStatus,
+submitted_on: string | null,
+is_checked: boolean,
+feedback: string | null,
+files: App.Domain.Homework.Data.HomeworkFileData[],
+};
+export type HomeworkSubjectOptionData = {
+ulid: string,
+name: string,
+};
+export type ParentHomeworkItemData = {
+ulid: string,
+subject: string,
+teacher_name: string,
+title: string,
+instructions: string | null,
+assigned_on: string,
+due_on: string,
+days_left: number,
+submission_type: App.Domain.Homework.Enums.SubmissionType,
+state: App.Domain.Homework.Enums.ParentHomeworkState,
+is_late: boolean,
+feedback: string | null,
+can_upload: boolean,
+attachments: App.Domain.Homework.Data.HomeworkFileData[],
+my_files: App.Domain.Homework.Data.HomeworkFileData[],
+};
+}
+namespace Enums {
+export type ParentHomeworkState = 'due' | 'done' | 'missed';
+export type StudentHomeworkStatus = 'not_yet' | 'submitted' | 'late' | 'missing';
+export type SubmissionType = 'notebook' | 'upload';
+}
+}
 namespace Identity {
 namespace Data {
 export type SchoolContextData = {
@@ -1176,6 +1285,7 @@ attendance_enabled: boolean,
 exams_enabled: boolean,
 timezone: string,
 fees_enabled: boolean,
+homework_enabled: boolean,
 };
 export type ReportCardData = {
 school_name: string,

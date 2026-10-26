@@ -29,5 +29,6 @@ class ParentShellData extends Data
         public bool $exams_enabled = false,
         public string $timezone = 'Asia/Kolkata',
         public bool $fees_enabled = false,
+        public bool $homework_enabled = false,
     ) {}
 }

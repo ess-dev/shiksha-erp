@@ -19,6 +19,8 @@ use App\Http\Controllers\Fees\DuesController;
 use App\Http\Controllers\Fees\FeeStructureController;
 use App\Http\Controllers\Fees\PaymentController;
 use App\Http\Controllers\Fees\ReceiptController;
+use App\Http\Controllers\Homework\HomeworkController;
+use App\Http\Controllers\Homework\HomeworkFileController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\ApprovalsController;
 use App\Http\Controllers\School\CampusController;
@@ -203,4 +205,15 @@ Route::middleware(['auth', 'module:exams'])->prefix('report-cards')->name('repor
     Route::post('{exam}/decide', [ReportCardController::class, 'decide'])->name('decide');
     Route::post('cards/{reportCard}/withdraw', [ReportCardController::class, 'withdraw'])->name('withdraw');
     Route::get('cards/{reportCard}/file', [ReportCardController::class, 'file'])->middleware('signed')->name('file');
+});
+
+Route::middleware(['auth', 'module:homework'])->prefix('homework')->name('homework.')->group(function () {
+    Route::get('/', [HomeworkController::class, 'index'])->name('index');
+    Route::post('/', [HomeworkController::class, 'store'])->name('store');
+    Route::put('{assignment}', [HomeworkController::class, 'update'])->name('update');
+    Route::delete('{assignment}', [HomeworkController::class, 'destroy'])->name('destroy');
+    Route::post('{assignment}/checked', [HomeworkController::class, 'checked'])->name('checked');
+    Route::put('{assignment}/feedback', [HomeworkController::class, 'feedback'])->name('feedback');
+    Route::get('files/{file}', [HomeworkFileController::class, 'attachment'])->middleware('signed')->name('files.show');
+    Route::get('submission-files/{file}', [HomeworkFileController::class, 'submission'])->middleware('signed')->name('submission-files.show');
 });

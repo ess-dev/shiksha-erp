@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             DemoAttendanceSeeder::class,
             DemoSyllabusSeeder::class,
             DemoFeesSeeder::class,
+            DemoHomeworkSeeder::class,
         ]);
     }
 }

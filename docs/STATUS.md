@@ -1,7 +1,7 @@
 # Shiksha ERP — status and what is pending
 
 Quick recall sheet. The detailed record (code map, decisions, verification) is in `docs/PROGRESS.md`; update both when work lands.
-Last updated: 2026-10-25.
+Last updated: 2026-10-26.
 
 ## Working approach
 
@@ -12,6 +12,8 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 - Owner to pick the next screen. Students slice 1, the roles screen, Admissions and Attendance (teacher's daily register, with Coordinator/Principal oversight) are built; see below.
 
 ## To verify later (reminder list for the owner; ask about these in a later session)
+
+Homework, built 2026-10-26: try it as `teacher@greenfield.test` (set homework with and without attachments, edit, delete, mark notebook work checked, give feedback) and as the demo parent (To do / Submitted / Missed tabs, upload photos and a Word file, the session dropdown). Remember: notifications are **log only**, there is no notification row yet, and the per-school S3 switch for files is not built. When the alerts and notifications module is built, wire the five homework events into it. No role-template update is needed (no new permissions).
 
 Built on 2026-10-22 and covered by automated tests, but not yet tried by the owner with real data:
 

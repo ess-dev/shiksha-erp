@@ -16,6 +16,8 @@ use App\Domain\Exams\LogMarksNotifier;
 use App\Domain\Exams\LogReportCardNotifier;
 use App\Domain\Fees\Contracts\FeeNotifier;
 use App\Domain\Fees\LogFeeNotifier;
+use App\Domain\Homework\Contracts\HomeworkNotifier;
+use App\Domain\Homework\LogHomeworkNotifier;
 use App\Domain\Identity\Authentication\LogOtpSender;
 use App\Domain\Identity\Authentication\MailOtpSender;
 use App\Domain\Identity\Contracts\OtpSender;
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MarksNotifier::class, LogMarksNotifier::class);
         $this->app->bind(ReportCardNotifier::class, LogReportCardNotifier::class);
         $this->app->bind(FeeNotifier::class, LogFeeNotifier::class);
+        $this->app->bind(HomeworkNotifier::class, LogHomeworkNotifier::class);
         // The SMS provider is an open decision: only the development drivers (log, mail) exist until one is chosen.
         $this->app->bind(OtpSender::class, fn () => match (config('shiksha.otp.driver')) {
             'mail' => $this->app->make(MailOtpSender::class),
