@@ -48,7 +48,16 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 
 | 27 | Fees: Dues, Payments and reconciliation, Collect fee, Fee structure, parent Fees, per-school payment gateway (see "Fees" below and `docs/modules/fees.md`) | see `git log` |
 | 28 | Homework: teacher screen (set, edit, delete, check, feedback) and parent Homework page with uploads and past sessions (see "Homework" below and `docs/modules/homework.md`) | uncommitted |
+| 29 | Student leave: parent Leave page, teacher Student leave screen, long leave to the coordinator on Approvals, leave settings, approved leave on attendance (see `docs/modules/leave.md`) | uncommitted |
 | 25 | Marks entry `/marks`, grading scale `/exams/grading`, parent Results `/parent/results` with a printable report card (from the owner's prototype screenshots; see "Marks, grades and results" below and `docs/modules/exams.md`) | see `git log` |
+
+### Student leave (2026-10-26; owner-approved answers)
+
+Full detail in `docs/modules/leave.md`. Built from the owner's screenshots (parent Leave, teacher Student leave). Owner's answers: full two-step flow (long leave to the coordinator on Approvals), the limit is a school setting (default 3), approved leave wired into attendance, `leave.approve` moved to core plus new `leave.approve_long`, prototype rules kept (3 days back, 30 days max, no overlaps, cancel while pending, certificate rules like student documents).
+
+- **Tenant migration** `2026_11_12_000000_create_student_leave_tables`. No landlord table change. Permissions: `leave.approve` module changed to `core`, new `leave.approve_long`; Principal, Vice principal, Coordinator template **version 13** (existing schools apply the update). Setting `leave.escalation_days`.
+- **Attendance**: roster rows carry `leave_reason`; Mark all present marks them absent; `SaveRegister` leaves them out of the absence alert; `StudentDayData.leave_reason` for the parent page.
+- **Not built**: exam-overlap warning, naming the coordinator on the parent form, notification rows, staff leave.
 
 ### Homework (2026-10-26; owner-approved answers)
 

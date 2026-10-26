@@ -14,6 +14,7 @@ use App\Domain\Attendance\Enums\RegisterState;
 use App\Domain\Attendance\Models\AttendanceMark;
 use App\Domain\Attendance\Models\AttendanceRegister;
 use App\Domain\Identity\Models\Identity;
+use App\Domain\Leave\Queries\ApprovedLeaveQuery;
 use App\Domain\School\Data\SectionRefData;
 use App\Domain\School\Queries\SchoolDayQuery;
 use App\Domain\School\Queries\SectionDirectoryQuery;
@@ -33,6 +34,7 @@ class RegisterQuery
         private readonly SchoolDayQuery $days,
         private readonly StaffRefQuery $staff,
         private readonly PermissionScopesQuery $scopes,
+        private readonly ApprovedLeaveQuery $leave,
     ) {}
 
     /**
@@ -74,13 +76,15 @@ class RegisterQuery
         $showRoster = $day->isSchoolDay && ($register !== null || $rights->canEdit);
         $recent = $showRoster ? $this->recentAbsences($section->sectionKey, $date) : [];
 
-        $students = $showRoster
-            ? array_map(fn ($row) => new RosterStudentData(
-                $row->ulid, $row->name, $row->admissionNumber, $row->rollNumber,
-                isset($marks[$row->studentKey]) ? $this->status($marks[$row->studentKey]) : null,
-                $recent[$row->studentKey] ?? 0,
-            ), $this->roster->for($section->sectionKey, $date, $register?->id))
-            : [];
+        $rows = $showRoster ? $this->roster->for($section->sectionKey, $date, $register?->id) : [];
+        $onLeave = $this->leave->onDate(array_map(fn ($row) => $row->studentKey, $rows), $date);
+
+        $students = array_map(fn ($row) => new RosterStudentData(
+            $row->ulid, $row->name, $row->admissionNumber, $row->rollNumber,
+            isset($marks[$row->studentKey]) ? $this->status($marks[$row->studentKey]) : null,
+            $recent[$row->studentKey] ?? 0,
+            $onLeave[$row->studentKey] ?? null,
+        ), $rows);
 
         return new RegisterData(
             sections: array_map(fn (array $choice) => $choice['data'], $choices),

@@ -13,6 +13,8 @@ Screens are built one at a time from prototype screenshots the owner supplies (r
 
 ## To verify later (reminder list for the owner; ask about these in a later session)
 
+Student leave, built 2026-10-26: as the demo parent apply for leave (short, then more than 3 school days, with a certificate) and cancel one; as `teacher@greenfield.test` approve, reject and recommend; as the Coordinator or Principal decide the recommended one on Approvals > Student leave (each role must apply role-template version 13 first); change the limit on Leave settings (needs `settings.manage`); check the approved-leave badge on the attendance register and on the parent's Attendance page. Notifications are log only.
+
 Homework, built 2026-10-26: try it as `teacher@greenfield.test` (set homework with and without attachments, edit, delete, mark notebook work checked, give feedback) and as the demo parent (To do / Submitted / Missed tabs, upload photos and a Word file, the session dropdown). Remember: notifications are **log only**, there is no notification row yet, and the per-school S3 switch for files is not built. When the alerts and notifications module is built, wire the five homework events into it. No role-template update is needed (no new permissions).
 
 Built on 2026-10-22 and covered by automated tests, but not yet tried by the owner with real data:

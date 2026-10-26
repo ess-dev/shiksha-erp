@@ -3,10 +3,15 @@ import { CalendarCheck, FileCheck, UserCheck } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import ReportCardApprovalsList from '@/components/exams/report-card-approvals';
+import LeaveCard from '@/components/leave/leave-card';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { index } from '@/routes/approvals';
-import type { ReportCardApprovals, ReportCardView } from '@/types';
+import type {
+    LeaveApprovals,
+    ReportCardApprovals,
+    ReportCardView,
+} from '@/types';
 
 type TabKey = 'profile' | 'leave' | 'reportcards' | 'staff';
 
@@ -38,20 +43,28 @@ function Empty({
  */
 export default function Approvals({
     report_cards,
+    student_leave,
     view,
 }: {
-    report_cards: ReportCardApprovals;
+    report_cards: ReportCardApprovals | null;
+    student_leave: LeaveApprovals | null;
     view?: ReportCardView | null;
 }) {
-    const [tab, setTab] = useState<TabKey>('reportcards');
+    const [tab, setTab] = useState<TabKey>(
+        report_cards === null ? 'leave' : 'reportcards',
+    );
 
     const tabs: { key: TabKey; label: string; count: number }[] = [
         { key: 'profile', label: 'Profile changes', count: 0 },
-        { key: 'leave', label: 'Student leave', count: 0 },
+        {
+            key: 'leave',
+            label: 'Student leave',
+            count: student_leave?.items.length ?? 0,
+        },
         {
             key: 'reportcards',
             label: 'Report cards',
-            count: report_cards.awaiting_count,
+            count: report_cards?.awaiting_count ?? 0,
         },
         { key: 'staff', label: 'Teacher leave', count: 0 },
     ];
@@ -101,14 +114,45 @@ export default function Approvals({
                         body="When parents edit a child’s profile, the changes wait here until someone approves them."
                     />
                 )}
-                {tab === 'leave' && (
+                {tab === 'leave' && student_leave === null && (
                     <Empty
                         icon={<CalendarCheck className="size-6" />}
-                        title="No long leave waiting"
-                        body="Class teachers approve short leave themselves. Longer leave comes here after the class teacher’s recommendation."
+                        title="You do not decide student leave"
                     />
                 )}
-                {tab === 'reportcards' && (
+                {tab === 'leave' &&
+                    student_leave !== null &&
+                    student_leave.items.length > 0 && (
+                        <Card className="gap-0 p-0">
+                            <ul className="divide-y">
+                                {student_leave.items.map((item) => (
+                                    <LeaveCard
+                                        key={item.ulid}
+                                        item={item}
+                                        escalationDays={
+                                            student_leave.escalation_days
+                                        }
+                                    />
+                                ))}
+                            </ul>
+                        </Card>
+                    )}
+                {tab === 'leave' &&
+                    student_leave !== null &&
+                    student_leave.items.length === 0 && (
+                        <Empty
+                            icon={<CalendarCheck className="size-6" />}
+                            title="No long leave waiting"
+                            body="Class teachers approve short leave themselves. Longer leave comes here after the class teacher’s recommendation."
+                        />
+                    )}
+                {tab === 'reportcards' && report_cards === null && (
+                    <Empty
+                        icon={<FileCheck className="size-6" />}
+                        title="You do not approve report cards"
+                    />
+                )}
+                {tab === 'reportcards' && report_cards !== null && (
                     <ReportCardApprovalsList
                         data={report_cards}
                         view={view}

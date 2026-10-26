@@ -243,6 +243,8 @@ function DayDetail({
                 day.marked_at !== null &&
                 ` · marked by ${day.marked_by} at ${formatClock(day.marked_at, timezone)}`}
             {day.reason !== null && ` · corrected: “${day.reason}”`}
+            {day.leave_reason !== null &&
+                ` · approved leave (${day.leave_reason.toLowerCase()})`}
             {day.state === 'unmarked' &&
                 day.date === today &&
                 ' · the class teacher marks attendance each school day'}
@@ -419,6 +421,11 @@ function Absences({
                             <div>
                                 <p className="font-semibold">
                                     {formatCalendarDay(day.date)}
+                                    {day.leave_reason !== null && (
+                                        <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                                            Approved leave
+                                        </span>
+                                    )}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     {day.marked_by !== null &&

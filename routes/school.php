@@ -21,6 +21,9 @@ use App\Http\Controllers\Fees\PaymentController;
 use App\Http\Controllers\Fees\ReceiptController;
 use App\Http\Controllers\Homework\HomeworkController;
 use App\Http\Controllers\Homework\HomeworkFileController;
+use App\Http\Controllers\Leave\LeaveController;
+use App\Http\Controllers\Leave\LeaveFileController;
+use App\Http\Controllers\Leave\LeaveSettingsController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\ApprovalsController;
 use App\Http\Controllers\School\CampusController;
@@ -205,6 +208,15 @@ Route::middleware(['auth', 'module:exams'])->prefix('report-cards')->name('repor
     Route::post('{exam}/decide', [ReportCardController::class, 'decide'])->name('decide');
     Route::post('cards/{reportCard}/withdraw', [ReportCardController::class, 'withdraw'])->name('withdraw');
     Route::get('cards/{reportCard}/file', [ReportCardController::class, 'file'])->middleware('signed')->name('file');
+});
+
+// Student leave is core, not a sellable module: reachable by `leave.approve` or `leave.approve_long` holders (checked in the Actions).
+Route::middleware(['auth'])->prefix('leave')->name('leave.')->group(function () {
+    Route::get('/', [LeaveController::class, 'index'])->name('index');
+    Route::get('settings', [LeaveSettingsController::class, 'show'])->name('settings');
+    Route::put('settings', [LeaveSettingsController::class, 'update'])->name('settings.update');
+    Route::post('{leave}/decide', [LeaveController::class, 'decide'])->name('decide');
+    Route::get('{leave}/attachment', [LeaveFileController::class, 'attachment'])->middleware('signed')->name('attachment');
 });
 
 Route::middleware(['auth', 'module:homework'])->prefix('homework')->name('homework.')->group(function () {

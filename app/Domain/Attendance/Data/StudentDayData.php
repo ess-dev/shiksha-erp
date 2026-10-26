@@ -20,5 +20,6 @@ class StudentDayData extends Data
         public ?string $marked_by = null,
         public ?string $marked_at = null,
         public ?string $reason = null,
+        public ?string $leave_reason = null,
     ) {}
 }

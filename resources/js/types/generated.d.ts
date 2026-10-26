@@ -255,6 +255,7 @@ admission_number: string,
 roll_number: number | null,
 status: App.Domain.Attendance.Enums.AttendanceStatus | null,
 recent_absences: number,
+leave_reason: string | null,
 };
 export type SavedRegisterData = {
 saved_by: string | null,
@@ -274,6 +275,7 @@ note: string | null,
 marked_by: string | null,
 marked_at: string | null,
 reason: string | null,
+leave_reason: string | null,
 };
 export type StudentTallyData = {
 present: number,
@@ -943,6 +945,93 @@ is_parent_view: boolean,
 can_open_parent_view: boolean,
 can_open_staff_view: boolean,
 };
+}
+}
+namespace Leave {
+namespace Data {
+export type LeaveApprovalsData = {
+items: App.Domain.Leave.Data.StaffLeaveItemData[],
+escalation_days: number,
+};
+export type LeaveAttachmentData = {
+name: string,
+mime_type: string,
+size_bytes: number,
+url: string,
+is_image: boolean,
+};
+export type LeaveFormData = {
+today: string,
+min_date: string,
+max_days: number,
+escalation_days: number,
+reason_min: number,
+reason_max: number,
+max_file_mb: number,
+class_teacher_name: string | null,
+working_days: number[],
+holidays: string[],
+reasons: App.Domain.Leave.Data.LeaveReasonOptionData[],
+};
+export type LeaveReasonOptionData = {
+value: string,
+label: string,
+};
+export type LeaveSettingsData = {
+escalation_days: number,
+};
+export type ParentLeaveItemData = {
+ulid: string,
+from_on: string,
+to_on: string,
+school_days: number,
+reason_label: string,
+reason: string,
+status: App.Domain.Leave.Enums.LeaveStatus,
+needs_coordinator: boolean,
+applied_at: string,
+recommended_by: string | null,
+decided_by: string | null,
+note: string | null,
+attachment_name: string | null,
+can_cancel: boolean,
+};
+export type StaffLeaveItemData = {
+ulid: string,
+student_name: string,
+section_label: string,
+roll_number: number | null,
+status: App.Domain.Leave.Enums.LeaveStatus,
+needs_coordinator: boolean,
+reason_type: string,
+reason_label: string,
+reason: string,
+from_on: string,
+to_on: string,
+school_days: number,
+parent_name: string,
+applied_on: string,
+attachment: App.Domain.Leave.Data.LeaveAttachmentData | null,
+recommended_by: string | null,
+recommendation_note: string | null,
+decided_by: string | null,
+decision_note: string | null,
+can_approve: boolean,
+can_reject: boolean,
+can_recommend: boolean,
+};
+export type StaffLeaveScreenData = {
+tab: string,
+items: App.Domain.Leave.Data.StaffLeaveItemData[],
+review_count: number,
+on_leave_today: string[],
+escalation_days: number,
+can_configure: boolean,
+};
+}
+namespace Enums {
+export type LeaveReason = 'sick' | 'family_function' | 'family_emergency' | 'travel' | 'religious' | 'other';
+export type LeaveStatus = 'pending' | 'recommended' | 'approved' | 'rejected' | 'cancelled';
 }
 }
 namespace Platform {

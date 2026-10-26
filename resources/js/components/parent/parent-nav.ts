@@ -39,7 +39,7 @@ export const parentNav: ParentNavItem[] = [
     { key: 'results', label: 'Results', icon: Award, built: true },
     { key: 'subjects', label: 'Subjects', icon: BookMarked, built: true },
     { key: 'homework', label: 'Homework', icon: BookOpen, built: true },
-    { key: 'leave', label: 'Leave', icon: CalendarX, built: false },
+    { key: 'leave', label: 'Leave', icon: CalendarX, built: true },
     {
         key: 'appointments',
         label: 'Appointments',

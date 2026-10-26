@@ -25,6 +25,11 @@ class CalendarException extends DomainException
         return new self('The correction window is a whole number of days from 0 to 60.');
     }
 
+    public static function invalidLeaveLimit(): self
+    {
+        return new self('Enter a whole number of school days from 1 to 30.');
+    }
+
     public static function invalidDate(): self
     {
         return new self('Enter a real date for the holiday.');

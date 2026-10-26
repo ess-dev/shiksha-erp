@@ -5,6 +5,7 @@ use App\Http\Controllers\Guardian\ContextController;
 use App\Http\Controllers\Guardian\FeesController;
 use App\Http\Controllers\Guardian\HomeController;
 use App\Http\Controllers\Guardian\HomeworkController;
+use App\Http\Controllers\Guardian\LeaveController;
 use App\Http\Controllers\Guardian\ResultsController;
 use App\Http\Controllers\Guardian\SessionController;
 use App\Http\Controllers\Guardian\SignInController;
@@ -36,6 +37,9 @@ Route::prefix('parent')->name('parent.')->group(function () {
         Route::post('homework/{assignment}/submit', [HomeworkController::class, 'submit'])->middleware('module:homework')->name('homework.submit');
         Route::get('homework/files/{file}', [HomeworkController::class, 'attachment'])->middleware(['module:homework', 'signed'])->name('homework.files.show');
         Route::get('homework/submission-files/{file}', [HomeworkController::class, 'submission'])->middleware(['module:homework', 'signed'])->name('homework.submission-files.show');
+        Route::get('leave', [LeaveController::class, 'index'])->name('leave');
+        Route::post('leave', [LeaveController::class, 'store'])->name('leave.store');
+        Route::post('leave/{leave}/cancel', [LeaveController::class, 'cancel'])->name('leave.cancel');
         Route::put('session', [SessionController::class, 'update'])->name('session.select');
         Route::post('sign-out', [SignInController::class, 'signOut'])->name('sign-out');
     });

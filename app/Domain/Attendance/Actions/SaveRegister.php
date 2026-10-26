@@ -12,6 +12,7 @@ use App\Domain\Attendance\Models\AttendanceRegister;
 use App\Domain\Attendance\Queries\RosterQuery;
 use App\Domain\Audit\Data\AuditEntry;
 use App\Domain\Identity\Models\Identity;
+use App\Domain\Leave\Queries\ApprovedLeaveQuery;
 use App\Domain\School\Queries\SchoolDayQuery;
 use App\Domain\School\Queries\SectionDirectoryQuery;
 use App\Domain\Shared\Action;
@@ -29,6 +30,7 @@ class SaveRegister extends Action
         private readonly RosterQuery $roster,
         private readonly StaffRefQuery $staff,
         private readonly AbsenceNotifier $notifier,
+        private readonly ApprovedLeaveQuery $leave,
     ) {}
 
     /**
@@ -182,6 +184,18 @@ class SaveRegister extends Action
 
             return $register;
         });
+
+        // A student on approved leave is expected to be absent, so parents get no alert about it.
+        $onLeave = $this->leave->onDate(array_map(fn ($row) => $row->studentKey, $roster), $date);
+        $leaveUlids = [];
+
+        foreach ($roster as $row) {
+            if (isset($onLeave[$row->studentKey])) {
+                $leaveUlids[$row->ulid] = true;
+            }
+        }
+
+        $changes = array_diff_key($changes, $leaveUlids);
 
         $this->notifier->notify(
             $section->ulid,

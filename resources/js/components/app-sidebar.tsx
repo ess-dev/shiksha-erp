@@ -3,6 +3,7 @@ import {
     BookOpen,
     Building2,
     CalendarCheck,
+    CalendarX,
     ClipboardCheck,
     ClipboardPen,
     CreditCard,
@@ -39,6 +40,7 @@ import { index as admissions } from '@/routes/admissions';
 import { index as attendance } from '@/routes/attendance';
 import { index as exams } from '@/routes/exams';
 import { index as homework } from '@/routes/homework';
+import { index as leave } from '@/routes/leave';
 import { index as collectFee } from '@/routes/fees/collect';
 import { index as feeDues } from '@/routes/fees/dues';
 import { index as feePayments } from '@/routes/fees/payments';
@@ -77,7 +79,10 @@ export function AppSidebar() {
     const canEnterMarks = canEnter || canReopen;
     const canPrepareReportCards =
         useCan('reportcards.prepare') || useCan('reportcards.approve');
-    const canApprove = useCan('reportcards.approve');
+    const canApprove =
+        useCan('reportcards.approve') || useCan('leave.approve_long');
+    const canViewLeave =
+        useCan('leave.approve') || useCan('leave.approve_long');
     const canViewHomework =
         useCan('homework.view') || useCan('homework.assign');
     const canUpdateSubjects = useCan('subjects.update');
@@ -178,6 +183,15 @@ export function AppSidebar() {
                       title: 'Approvals',
                       href: approvals(),
                       icon: Inbox,
+                  },
+              ]
+            : []),
+        ...(canViewLeave
+            ? [
+                  {
+                      title: 'Student leave',
+                      href: leave(),
+                      icon: CalendarX,
                   },
               ]
             : []),

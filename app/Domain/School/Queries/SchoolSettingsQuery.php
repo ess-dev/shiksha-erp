@@ -23,6 +23,8 @@ class SchoolSettingsQuery
 
     public const REPORT_CARD_APPROVAL = 'exams.report_card_approval';
 
+    public const LEAVE_ESCALATION_DAYS = 'leave.escalation_days';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
@@ -35,6 +37,9 @@ class SchoolSettingsQuery
 
     /** illustrative — verify: the prototype locks a register after 7 days. */
     private const DEFAULT_CORRECTION_DAYS = 7;
+
+    /** illustrative — verify: the prototype sends leave longer than 3 school days to the coordinator. */
+    private const DEFAULT_LEAVE_ESCALATION_DAYS = 3;
 
     /**
      * The weekdays the school is open, as ISO numbers (1 Monday to 7 Sunday).
@@ -61,6 +66,17 @@ class SchoolSettingsQuery
         $value = SchoolSetting::query()->where('key', self::ATTENDANCE_CORRECTION_DAYS)->value('value');
 
         return is_int($value) && $value >= 0 ? $value : self::DEFAULT_CORRECTION_DAYS;
+    }
+
+    /**
+     * Student leave of up to this many school days is decided by the class
+     * teacher; longer leave also goes to the coordinator.
+     */
+    public function leaveEscalationDays(): int
+    {
+        $value = SchoolSetting::query()->where('key', self::LEAVE_ESCALATION_DAYS)->value('value');
+
+        return is_int($value) && $value >= 1 && $value <= 30 ? $value : self::DEFAULT_LEAVE_ESCALATION_DAYS;
     }
 
     public function admissionPrefix(): string

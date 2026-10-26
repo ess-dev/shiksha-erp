@@ -56,7 +56,9 @@ class AccessCatalogSeeder extends Seeder
         'attendance.view' => ['attendance', 'normal', false, 'See attendance', 1],
         'attendance.mark' => ['attendance', 'normal', false, 'Mark attendance', 1],
         'attendance.correct' => ['attendance', 'sensitive', false, 'Correct attendance registers, including those past the class teacher\'s window', 6],
-        'leave.approve' => ['leave', 'normal', false, 'Approve student leave', 1],
+        // Student leave is part of the core product, not a sellable module (no `leave` row can exist in tenant_modules).
+        'leave.approve' => ['core', 'normal', false, 'Approve student leave up to the school\'s limit, or recommend longer leave to the coordinator', 1],
+        'leave.approve_long' => ['core', 'sensitive', false, 'Decide student leave longer than the class teacher\'s limit', 13],
         'fees.view' => ['fees', 'normal', false, 'See fee invoices and payments', 1],
         'fees.collect' => ['fees', 'sensitive', false, 'Record fee payments', 1],
         'fees.refund' => ['fees', 'critical', false, 'Refund fee payments', 1],
@@ -128,6 +130,8 @@ class AccessCatalogSeeder extends Seeder
 
     private const FEES_V12_ACCOUNTANT = 'Adds sending fee reminders and payment links, and confirming, clearing or re-checking payments';
 
+    private const LEAVE_V13 = 'Adds deciding long student leave (Principal, Vice principal, Coordinator)';
+
     private const TRANSPORT_INCHARGE = ['students.view', 'notices.view', 'notices.send'];
 
     private const LIBRARIAN = ['students.view', 'notices.view'];
@@ -157,6 +161,7 @@ class AccessCatalogSeeder extends Seeder
             10 => [self::MARKS_V10, '*'],
             11 => [self::REPORT_CARDS_V11, '*'],
             12 => [self::FEES_V12, '*'],
+            13 => [self::LEAVE_V13, '*'],
         ]],
         'vice_principal' => ['Vice principal', false, [
             1 => ['Initial version', '*-restricted'],
@@ -171,6 +176,7 @@ class AccessCatalogSeeder extends Seeder
             10 => [self::MARKS_V10, '*-restricted'],
             11 => [self::REPORT_CARDS_V11, '*-restricted'],
             12 => [self::FEES_V12, '*-restricted'],
+            13 => [self::LEAVE_V13, '*-restricted'],
         ]],
         'coordinator' => ['Coordinator', false, [
             1 => ['Initial version', self::COORDINATOR],
@@ -185,6 +191,7 @@ class AccessCatalogSeeder extends Seeder
             10 => [self::MARKS_V10, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen']],
             11 => [self::REPORT_CARDS_V11, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve']],
             12 => [self::FEES_V12, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve', 'fees.view']],
+            13 => [self::LEAVE_V13, [...self::COORDINATOR, 'structure.view', ...self::COORDINATOR_V3_ADDS, 'students.view_past_sessions', ...self::ADMISSIONS_FULL, 'attendance.correct', 'subjects.configure', 'exams.schedule', 'subjects.update', 'marks.reopen', 'reportcards.approve', 'fees.view', 'leave.approve_long']],
         ]],
         'class_teacher' => ['Class teacher', false, [
             1 => ['Initial version', self::CLASS_TEACHER],

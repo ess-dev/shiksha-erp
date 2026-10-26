@@ -28,6 +28,7 @@ import {
     fees,
     home,
     homework,
+    leave,
     results,
     signOut,
     subjects,
@@ -57,11 +58,13 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
           ? 'subjects'
           : path.startsWith(homework.url())
             ? 'homework'
-            : path.startsWith(results.url())
-              ? 'results'
-              : path.startsWith(fees.url())
-                ? 'fees'
-                : 'attendance';
+            : path.startsWith(leave.url())
+              ? 'leave'
+              : path.startsWith(results.url())
+                ? 'results'
+                : path.startsWith(fees.url())
+                  ? 'fees'
+                  : 'attendance';
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (shell === undefined) {
@@ -85,6 +88,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
 
         if (key === 'homework' && shell.homework_enabled) {
             return homework.url({ query: childParam });
+        }
+
+        if (key === 'leave') {
+            return leave.url({ query: childParam });
         }
 
         if (key === 'fees' && shell.fees_enabled) {
@@ -118,11 +125,13 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
           ? 'Subjects'
           : current === 'homework'
             ? 'Homework'
-            : current === 'results'
-              ? 'Report card'
-              : current === 'fees'
-                ? 'Fees'
-                : 'Attendance';
+            : current === 'leave'
+              ? 'Leave'
+              : current === 'results'
+                ? 'Report card'
+                : current === 'fees'
+                  ? 'Fees'
+                  : 'Attendance';
 
     return (
         <div className="min-h-svh bg-background text-foreground md:flex">

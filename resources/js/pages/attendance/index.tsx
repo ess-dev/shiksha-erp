@@ -166,13 +166,24 @@ function RegisterView({
             Object.fromEntries(
                 students.map((student) => [
                     student.ulid,
-                    'present' as AttendanceStatus,
+                    (student.leave_reason === null
+                        ? 'present'
+                        : 'absent') as AttendanceStatus,
                 ]),
             ),
         );
         setConfirmAll(false);
         setError(undefined);
-        toast.success('Everyone marked present. Now change any exceptions.');
+
+        const onLeave = students.filter(
+            (student) => student.leave_reason !== null,
+        ).length;
+
+        toast.success(
+            onLeave > 0
+                ? `Everyone marked present except ${onLeave} on approved leave.`
+                : 'Everyone marked present. Now change any exceptions.',
+        );
     };
 
     const commit = (reason: string | null) => {
@@ -420,6 +431,14 @@ function RegisterView({
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                                 {student.admission_number}
+                                                {student.leave_reason !==
+                                                    null && (
+                                                    <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                                                        On approved leave ·{' '}
+                                                        {student.leave_reason} ·
+                                                        no alert
+                                                    </span>
+                                                )}
                                                 {student.recent_absences >=
                                                     2 && (
                                                     <span className="ml-2 font-medium text-destructive">

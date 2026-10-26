@@ -8,6 +8,7 @@ use App\Domain\Attendance\Data\StudentTallyData;
 use App\Domain\Attendance\Enums\AttendanceStatus;
 use App\Domain\Attendance\Enums\DayState;
 use App\Domain\Attendance\Models\AttendanceMark;
+use App\Domain\Leave\Queries\ApprovedLeaveQuery;
 use App\Domain\School\Queries\SchoolDayQuery;
 use App\Domain\Shared\CalendarDate;
 use DateTimeImmutable;
@@ -21,6 +22,7 @@ class StudentAttendanceQuery
     public function __construct(
         private readonly SchoolDayQuery $schoolDays,
         private readonly StaffRefQuery $staff,
+        private readonly ApprovedLeaveQuery $leave,
     ) {}
 
     /**
@@ -53,6 +55,7 @@ class StudentAttendanceQuery
         }
 
         $checks = $this->schoolDays->range($from, $to);
+        $onLeave = $this->leave->forStudent($studentKey, $from, $to);
         $days = [];
 
         foreach ($checks as $date => $check) {
@@ -75,6 +78,7 @@ class StudentAttendanceQuery
                     $staffKey === null ? null : ($names[(int) $staffKey] ?? null),
                     $savedAt === null ? null : (new DateTimeImmutable((string) $savedAt))->format(DATE_ATOM),
                     $mark->getAttribute('last_reason'),
+                    $status === AttendanceStatus::Absent ? ($onLeave[$date] ?? null) : null,
                 );
 
                 continue;
