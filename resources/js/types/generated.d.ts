@@ -801,6 +801,7 @@ pending_count: number,
 pending_paise: number,
 failed_count: number,
 failed_paise: number,
+open_refunds_count: number,
 };
 export type ReceiptData = {
 receipt_number: string,
@@ -818,6 +819,53 @@ total_paise: number,
 amount_in_words: string,
 is_archived: boolean,
 };
+export type RefundCandidateData = {
+ulid: string,
+name: string,
+section_label: string,
+admission_number: string,
+refundable_paise: number,
+payments: App.Domain.Fees.Data.RefundCandidatePaymentData[],
+};
+export type RefundCandidatePaymentData = {
+ulid: string,
+receipt_number: string | null,
+mode_label: string,
+paid_on: string,
+amount_paise: number,
+refundable_paise: number,
+};
+export type RefundRowData = {
+ulid: string,
+requested_on: string,
+source: App.Domain.Fees.Enums.RefundSource,
+student_name: string,
+section_label: string,
+admission_number: string,
+reason: string,
+receipt_number: string | null,
+amount_paise: number,
+status: App.Domain.Fees.Enums.RefundStatus,
+method: App.Domain.Fees.Enums.RefundMethod | null,
+reference: string | null,
+decided_on: string | null,
+reject_reason: string | null,
+needs_principal: boolean,
+original_label: string,
+};
+export type RefundsScreenData = {
+rows: App.Domain.Fees.Data.RefundRowData[],
+tab: string,
+pending_count: number,
+pending_paise: number,
+approved_count: number,
+approved_paise: number,
+rejected_count: number,
+limit_paise: number,
+methods: App.Domain.Fees.Data.FeeOptionData[],
+search: string,
+candidates: App.Domain.Fees.Data.RefundCandidateData[],
+};
 }
 namespace Enums {
 export type ConcessionKind = 'standard' | 'sibling';
@@ -827,6 +875,9 @@ export type InvoiceStatus = 'paid' | 'overdue' | 'partial_overdue' | 'partial' |
 export type PaymentChannel = 'counter' | 'online';
 export type PaymentMode = 'cash' | 'cheque' | 'upi' | 'card' | 'net_banking' | 'bank_transfer';
 export type PaymentStatus = 'pending' | 'success' | 'failed';
+export type RefundMethod = 'original' | 'bank_transfer' | 'cheque' | 'adjustment';
+export type RefundSource = 'parent' | 'accounts' | 'system';
+export type RefundStatus = 'pending' | 'approved' | 'rejected';
 }
 }
 namespace Homework {

@@ -15,6 +15,7 @@ import {
     Landmark,
     ReceiptIndianRupee,
     Library,
+    RotateCcw,
     LayoutGrid,
     NotebookPen,
     School,
@@ -48,6 +49,7 @@ import { index as staffLeave } from '@/routes/staff-leave';
 import { index as collectFee } from '@/routes/fees/collect';
 import { index as feeDues } from '@/routes/fees/dues';
 import { index as feePayments } from '@/routes/fees/payments';
+import { index as feeRefunds } from '@/routes/fees/refunds';
 import { index as feeStructure } from '@/routes/fees/structure';
 import { index as classes } from '@/routes/school/classes';
 import { index as roles } from '@/routes/school/roles';
@@ -94,6 +96,7 @@ export function AppSidebar() {
     const canUpdateSubjects = useCan('subjects.update');
     const canViewAdmissions = useCan('admissions.view');
     const canViewFees = useCan('fees.view');
+    const canRefundFees = useCan('fees.refund');
     const canCollectFees = useCan('fees.collect');
     const canViewAttendance =
         useCan('attendance.view') || useCan('attendance.mark');
@@ -249,6 +252,15 @@ export function AppSidebar() {
                       title: 'Fee structure',
                       href: feeStructure(),
                       icon: Landmark,
+                  },
+              ]
+            : []),
+        ...(canRefundFees
+            ? [
+                  {
+                      title: 'Refunds',
+                      href: feeRefunds(),
+                      icon: RotateCcw,
                   },
               ]
             : []),

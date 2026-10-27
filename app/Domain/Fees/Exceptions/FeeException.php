@@ -110,4 +110,24 @@ class FeeException extends DomainException
     {
         return new self("Enter {$what}.");
     }
+
+    public static function refundNotPending(): self
+    {
+        return new self('This refund has already been decided.');
+    }
+
+    public static function refundTooMuch(string $limit): self
+    {
+        return new self("That is more than the {$limit} that can still be refunded.");
+    }
+
+    public static function signOffRequired(string $limit): self
+    {
+        return new self("Refunds above {$limit} need the principal’s sign-off. Confirm it to approve.");
+    }
+
+    public static function adjustmentShort(string $balance): self
+    {
+        return new self("Only {$balance} is unpaid on this student’s installments, which is less than the refund. Choose another way to refund.");
+    }
 }

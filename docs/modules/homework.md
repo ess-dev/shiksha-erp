@@ -8,11 +8,11 @@ Teachers set homework for a section and subject they teach, see who handed it in
 
 ## Screens
 
-| Screen                | Route                                  | Needs                                                  | Notes                                                                                                                                                              |
-| --------------------- | -------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Teacher Homework      | `/homework`                            | `homework.view` or `homework.assign`, module `homework` | List (newest first, at most 100, optional class filter) and the selected assignment with every student's status. `?section=<ulid>`, `?assignment=<ulid>`.           |
-| New / Edit assignment | dialog on `/homework`                  | `homework.assign` + teaches the section and subject    | Class, subject, title, instructions, due date, submission type, up to 5 attachments (10 MB each).                                                                   |
-| Parent Homework       | `/parent/homework?child=<ulid>`        | parent sign-in, module `homework`                      | Tabs To do / Submitted / Missed / All, attachments, upload, teacher's feedback. Past sessions through the session dropdown (view only).                            |
+| Screen                | Route                           | Needs                                                   | Notes                                                                                                                                                     |
+| --------------------- | ------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Teacher Homework      | `/homework`                     | `homework.view` or `homework.assign`, module `homework` | List (newest first, at most 100, optional class filter) and the selected assignment with every student's status. `?section=<ulid>`, `?assignment=<ulid>`. |
+| New / Edit assignment | dialog on `/homework`           | `homework.assign` + teaches the section and subject     | Class, subject, title, instructions, due date, submission type, up to 5 attachments (10 MB each).                                                         |
+| Parent Homework       | `/parent/homework?child=<ulid>` | parent sign-in, module `homework`                       | Tabs To do / Submitted / Missed / All, attachments, upload, teacher's feedback. Past sessions through the session dropdown (view only).                   |
 
 ## Rules
 

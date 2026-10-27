@@ -20,4 +20,9 @@ class LogFeeNotifier implements FeeNotifier
     {
         Log::info('Payment link would be sent (no provider configured).', ['payment' => $paymentUlid]);
     }
+
+    public function refundDecided(string $refundUlid, bool $approved): void
+    {
+        Log::info('Refund decision would be sent (no provider configured).', ['refund' => $refundUlid, 'approved' => $approved]);
+    }
 }

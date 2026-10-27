@@ -9,6 +9,7 @@ use App\Domain\Access\Queries\PermissionScopesQuery;
 use App\Domain\Fees\Exceptions\FeeException;
 use App\Domain\Fees\Models\FeeInvoice;
 use App\Domain\Fees\Models\FeePayment;
+use App\Domain\Fees\Models\FeeRefund;
 use App\Domain\Identity\Models\Identity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +82,34 @@ class FeeVisibility
             ->join('school_classes as sc', 'sc.id', '=', 's.school_class_id')
             ->join('campuses as c', 'c.id', '=', 's.campus_id')
             ->select('fee_payments.*');
+
+        $this->limit($query, $set);
+
+        return $query;
+    }
+
+    /**
+     * Refunds of students the person may see under a permission; null when it is not held.
+     *
+     * @return Builder<FeeRefund>|null
+     */
+    public function refunds(Identity $actor, string $permission = 'fees.refund'): ?Builder
+    {
+        $set = $this->scopes->get($actor, $permission);
+
+        if ($set->isEmpty()) {
+            return null;
+        }
+
+        $query = FeeRefund::query()
+            ->join('students as st', 'st.id', '=', 'fee_refunds.student_id')
+            ->join('enrollments as e', function ($join) {
+                $join->whereRaw('e.id = (select en.id from enrollments en where en.student_id = fee_refunds.student_id order by en.is_current desc, en.id desc limit 1)');
+            })
+            ->join('sections as s', 's.id', '=', 'e.section_id')
+            ->join('school_classes as sc', 'sc.id', '=', 's.school_class_id')
+            ->join('campuses as c', 'c.id', '=', 's.campus_id')
+            ->select('fee_refunds.*');
 
         $this->limit($query, $set);
 

@@ -18,5 +18,6 @@ class PaymentsSummaryData extends Data
         public int $pending_paise,
         public int $failed_count,
         public int $failed_paise,
+        public int $open_refunds_count,
     ) {}
 }

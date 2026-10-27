@@ -1,6 +1,6 @@
 # Fees module
 
-Built 2026-10-25 from the owner's prototype screenshots (Accountant: Dues, Payments, Fee structure; Parent: Fees). Refunds come in the next sprint; online payment by parents waits for the payment-provider decision.
+Built 2026-10-25 from the owner's prototype screenshots (Accountant: Dues, Payments, Fee structure; Parent: Fees). Refunds were added on 2026-10-27 (see "Refunds" below); online payment by parents waits for the payment-provider decision.
 
 ## Purpose
 
@@ -28,7 +28,7 @@ Landlord: `tenants.payment_gateway` (migration `2026_11_10_000000_add_payment_ga
 - **Invoices**: all terms are billed when a student has a priced class group (a group with no heads bills nobody; saving its heads bills the waiting students). A student admitted mid-year is billed only for terms that have not ended on their admission day (`ends_on >= admitted_on`). The one-time admission fee in the prototype is **not built**.
 - **Sibling concession**: created with the schedule (10% of tuition, illustrative — verify); applied automatically to a student who shares a guardian with an enrolled student admitted earlier. Concessions made on the Fee structure screen are definitions only: **assigning them to students is not built** (needs a student-profile screen). A percentage above 50 is flagged "needs the principal's approval", but no approval flow exists yet.
 - **Re-pricing**: changing a group's heads, or moving a class to another group, re-prices only installments due after today with nothing paid. Paid, part-paid and past-due installments keep their amounts.
-- **Payments**: confirmed counter payments apply oldest due date first, inside a transaction with the invoice rows locked; a cheque stays pending until cleared. The same idempotency key never records a second payment. If an installment was paid another way before a pending payment is confirmed, the part that cannot be applied is kept as `details.excess_paise` (shown as "due back"); refunds are the next sprint.
+- **Payments**: confirmed counter payments apply oldest due date first, inside a transaction with the invoice rows locked; a cheque stays pending until cleared. The same idempotency key never records a second payment. If an installment was paid another way before a pending payment is confirmed, the part that cannot be applied is kept as `details.excess_paise` (shown as "due back") and a pending system refund request is raised for it.
 - **Receipts**: `PREFIX/YYYY/0001` (prefix is the school setting `fees.receipt_prefix`, default `RCPT`, no screen to edit it yet; year is the academic year's starting year).
 - **Scope**: every list and record check goes through `FeeVisibility` (the section's campus / wing / sections scope of the permission). Out-of-scope records are 404. The top-bar campus switcher narrows Dues, Payments and Collect fee.
 
@@ -36,9 +36,20 @@ Landlord: `tenants.payment_gateway` (migration `2026_11_10_000000_add_payment_ga
 
 The app only talks to `Fees\Contracts\PaymentGateway` (`status(reference)` and a few flags). Drivers are listed in `config/shiksha.payment_gateways`; the **Super Admin chooses a driver per school** on School details → Payment gateway (landlord column, platform audit event). The only driver today is the `fake` test gateway, allowed in `local` and `testing` only: it reports whatever the accountant picks in the dialog ("Test gateway only: what the gateway reports"). Add a real provider by writing a class that implements the interface and listing it in the config; nothing else changes. Without a gateway the school can still collect at the counter and clear cheques; Check status / Retry check explain that no gateway is set up.
 
+## Refunds (2026-10-27)
+
+Screen `/fees/refunds` (needs `fees.refund`, scoped like every fee screen; the top-bar campus narrows it), built from the owner's Accountant screenshots (list with Pending / Approved / Rejected / All tabs, Approve and Reject dialogs). Tenant migration `2026_11_15_000000_create_fee_refunds_table` (`fee_refunds`, never deleted; a partial unique index allows one system request per payment).
+
+- **Requests**: raised by the system when a confirmed payment could not be applied (`PaymentSettlement`, source `system`, amount = `excess_paise`) or by the office with "New refund request" (`RequestRefund`, source `accounts`: a student with a confirmed payment, optionally one payment, an amount in whole rupees, a reason). A request cannot exceed what was received less pending and approved refunds (a rejected one frees its amount). Parent-raised requests (source `parent`) are in the schema, but the parent form is **not built**.
+- **Approve** (`ApproveRefund`): choose how the money goes back (original method, bank transfer, cheque, adjust against next term) and an optional reference. Above the school's limit (setting `fees.refund_principal_limit_paise`) the person must tick that the principal has signed off; the server refuses without it (owner's choice: a confirmation, not a separate permission). Original, bank transfer and cheque only **record** the payout: the money moves outside the app and invoices are not changed. **Adjust against next term** credits the amount at once to the student's unpaid installments, oldest due date first, all or nothing (`applied_to` keeps which); if less is unpaid it is refused.
+- **Reject** (`RejectRefund`): a reason of at least 5 characters, shared with the parent.
+- **Notifier**: `FeeNotifier::refundDecided` (log driver) tells the parent of the decision.
+- **Payments screen**: the "Refund requests open" card counts pending refunds and links to Refunds.
+- **Not built**: a parent refund request form and refund status on the parent Fees page; reversing invoice payments for a refund (withdrawal); a screen for the sign-off limit; pagination (the list shows the latest 100 of the chosen tab).
+
 ## Permissions
 
-Existing: `fees.view`, `fees.collect`, `fees.refund` (critical, not used yet), `fee_structures.manage`, `concessions.apply` (not used yet). **New (role-template version 12)**: `fees.remind` (reminders and pay links), `fees.reconcile` (confirm, clear, re-check payments), both sensitive.
+Existing: `fees.view`, `fees.collect`, `fees.refund` (critical; the Refunds screen), `fee_structures.manage`, `concessions.apply` (not used yet). **New (role-template version 12)**: `fees.remind` (reminders and pay links), `fees.reconcile` (confirm, clear, re-check payments), both sensitive.
 
 | Role              | Gets                                                                                                              |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -51,17 +62,17 @@ Existing schools see "template update available" and must apply it on Roles and 
 
 ## Actions (all audited)
 
-`SetUpFeeSchedule` · `CreateFeeGroup` · `RenameFeeGroup` · `DeleteFeeGroup` · `SaveFeeGroupHeads` · `AssignClassToFeeGroup` · `AddConcession` · `BillStudent` (called by `CreateStudent`) · `RecordCounterPayment` · `SettleChequePayment` · `CheckGatewayPayment` (also re-check) · `SendPaymentLink` · `SendFeeReminders` · `ExportDues` · `ExportPayments`. Platform: `SetSchoolPaymentGateway`.
+`SetUpFeeSchedule` · `CreateFeeGroup` · `RenameFeeGroup` · `DeleteFeeGroup` · `SaveFeeGroupHeads` · `AssignClassToFeeGroup` · `AddConcession` · `BillStudent` (called by `CreateStudent`) · `RecordCounterPayment` · `SettleChequePayment` · `CheckGatewayPayment` (also re-check) · `SendPaymentLink` · `SendFeeReminders` · `RequestRefund` · `ApproveRefund` · `RejectRefund` · `ExportDues` · `ExportPayments`. Platform: `SetSchoolPaymentGateway`.
 
-Audit keys: `fees.schedule_created`, `fees.group_created/renamed/deleted`, `fees.group_heads_saved`, `fees.class_moved`, `fees.concession_added`, `fees.student_billed`, `fees.payment_recorded`, `fees.cheque_settled`, `fees.payment_checked/rechecked`, `fees.payment_link_sent`, `fees.reminders_sent`, `fees.dues_exported`, `fees.payments_exported`, `platform.school_payment_gateway_set`.
+Audit keys: `fees.schedule_created`, `fees.group_created/renamed/deleted`, `fees.group_heads_saved`, `fees.class_moved`, `fees.concession_added`, `fees.student_billed`, `fees.payment_recorded`, `fees.cheque_settled`, `fees.payment_checked/rechecked`, `fees.payment_link_sent`, `fees.reminders_sent`, `fees.refund_requested/approved/rejected`, `fees.dues_exported`, `fees.payments_exported`, `platform.school_payment_gateway_set`.
 
 ## Settings and config
 
-Config: `shiksha.fee_schedule` (terms 4, due day 15 — illustrative, verify), `shiksha.payment_gateways`. School setting: `fees.receipt_prefix`. Interface bindings: `FeeNotifier` → `LogFeeNotifier` (reminders and pay links are only logged until an SMS/push provider is chosen).
+Config: `shiksha.fee_schedule` (terms 4, due day 15 — illustrative, verify), `shiksha.payment_gateways`. School settings: `fees.receipt_prefix`, `fees.refund_principal_limit_paise` (default 1,000,000 = ₹10,000, illustrative — verify; no edit screen yet). Interface bindings: `FeeNotifier` → `LogFeeNotifier` (reminders and pay links are only logged until an SMS/push provider is chosen).
 
 ## Known limitations
 
-- No refunds (next sprint), no late fees, no one-time admission fee, no assigning concessions to students, no approval flow for large concessions.
+- No late fees, no one-time admission fee, no assigning concessions to students, no approval flow for large concessions.
 - Parents cannot pay online yet ("How to pay" explains the counter); no partial-payment minimum (the prototype's `minPartPayment`) because there is no online payment.
 - Collect fee takes one student at a time (the prototype can add siblings to one payment).
 - Fees columns/tabs on the Students list and profile, and the dashboard fee cards, still show "Not available yet" / sample numbers.

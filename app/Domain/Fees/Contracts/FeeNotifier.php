@@ -19,4 +19,9 @@ interface FeeNotifier
      * Sends the guardian a secure link to pay what a failed payment was for.
      */
     public function sendPaymentLink(string $paymentUlid): void;
+
+    /**
+     * Tells the guardian that a refund request was approved or rejected.
+     */
+    public function refundDecided(string $refundUlid, bool $approved): void;
 }

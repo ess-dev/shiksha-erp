@@ -89,8 +89,8 @@ export default function PaymentDetailsDialog({
                         >
                             {formatPaise(detail.excess_paise)} of this payment
                             could not be applied because the installment was
-                            already paid. It is due back to the family (refunds
-                            arrive in a later release).
+                            already paid. It is due back to the family and was
+                            added to Refunds as a request.
                         </p>
                     )}
 

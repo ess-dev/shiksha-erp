@@ -27,6 +27,8 @@ class SchoolSettingsQuery
 
     public const STAFF_LEAVE_POLICY = 'leave.staff_policy';
 
+    public const REFUND_PRINCIPAL_LIMIT = 'fees.refund_principal_limit_paise';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
@@ -42,6 +44,9 @@ class SchoolSettingsQuery
 
     /** illustrative — verify: the prototype sends leave longer than 3 school days to the coordinator. */
     private const DEFAULT_LEAVE_ESCALATION_DAYS = 3;
+
+    /** illustrative — verify: the prototype asks for the principal's sign-off above ₹10,000. */
+    private const DEFAULT_REFUND_PRINCIPAL_LIMIT_PAISE = 1_000_000;
 
     /**
      * The weekdays the school is open, as ISO numbers (1 Monday to 7 Sunday).
@@ -68,6 +73,17 @@ class SchoolSettingsQuery
         $value = SchoolSetting::query()->where('key', self::ATTENDANCE_CORRECTION_DAYS)->value('value');
 
         return is_int($value) && $value >= 0 ? $value : self::DEFAULT_CORRECTION_DAYS;
+    }
+
+    /**
+     * A refund above this amount (in paise) needs the principal's sign-off
+     * before it is approved.
+     */
+    public function refundPrincipalLimitPaise(): int
+    {
+        $value = SchoolSetting::query()->where('key', self::REFUND_PRINCIPAL_LIMIT)->value('value');
+
+        return is_int($value) && $value >= 0 ? $value : self::DEFAULT_REFUND_PRINCIPAL_LIMIT_PAISE;
     }
 
     /**

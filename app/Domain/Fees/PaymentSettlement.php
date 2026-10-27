@@ -3,19 +3,24 @@
 namespace App\Domain\Fees;
 
 use App\Domain\Fees\Enums\PaymentStatus;
+use App\Domain\Fees\Enums\RefundSource;
+use App\Domain\Fees\Enums\RefundStatus;
 use App\Domain\Fees\Models\FeeInvoice;
 use App\Domain\Fees\Models\FeePayment;
 use App\Domain\Fees\Models\FeePaymentAllocation;
+use App\Domain\Fees\Models\FeeRefund;
+use App\Domain\Shared\CalendarDate;
 use App\Domain\Shared\Money;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Turns money the bank has confirmed into paid installments. Runs inside an
  * Action's transaction. The installment rows are locked while their balances
  * move, so two confirmations cannot both fill the same balance. If an
  * installment was paid another way in the meantime, the part that cannot be
- * applied is kept as `details.excess_paise` (to be refunded; refunds come in a
- * later release) rather than over-crediting the student.
+ * applied is kept as `details.excess_paise` and raised as a pending refund
+ * request (source: system) rather than over-crediting the student.
  */
 class PaymentSettlement
 {
@@ -62,6 +67,20 @@ class PaymentSettlement
 
         if ($excess->isPositive()) {
             $details['excess_paise'] = $excess->paise;
+        }
+
+        if ($excess->isPositive()) {
+            FeeRefund::query()->firstOrCreate(
+                ['fee_payment_id' => $payment->id, 'source' => RefundSource::System],
+                [
+                    'ulid' => strtolower((string) Str::ulid()),
+                    'student_id' => $payment->student_id,
+                    'amount_paise' => $excess->paise,
+                    'reason' => 'Money captured for an installment that was already paid (duplicate payment)',
+                    'requested_on' => CalendarDate::today(),
+                    'status' => RefundStatus::Pending,
+                ],
+            );
         }
 
         $payment->forceFill([

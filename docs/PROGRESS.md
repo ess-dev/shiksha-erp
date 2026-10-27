@@ -50,7 +50,17 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 | 28 | Homework: teacher screen (set, edit, delete, check, feedback) and parent Homework page with uploads and past sessions (see "Homework" below and `docs/modules/homework.md`) | uncommitted |
 | 29 | Student leave: parent Leave page, teacher Student leave screen, long leave to the coordinator on Approvals, leave settings, approved leave on attendance (see `docs/modules/leave.md`) | uncommitted |
 | 30 | Staff leave: Staff and leave screen (leave requests, staff directory with name/role/today's status), teacher My leave, register cover for a class teacher's leave, staff leave policy in Leave settings (see "Staff leave" below and `docs/modules/leave.md`) | uncommitted |
+| 31 | Fees refunds: Accountant Refunds screen `/fees/refunds` (requests from the system and the office, approve with payout method and principal sign-off above a school limit, reject with a reason, adjust against next term) (see "Fees refunds" below and `docs/modules/fees.md`) | uncommitted |
 | 25 | Marks entry `/marks`, grading scale `/exams/grading`, parent Results `/parent/results` with a printable report card (from the owner's prototype screenshots; see "Marks, grades and results" below and `docs/modules/exams.md`) | see `git log` |
+
+### Fees refunds (2026-10-27; owner-approved answers)
+
+Full detail in `docs/modules/fees.md` ("Refunds"). Built from the Accountant Refunds screenshots. Owner's answers: requests come from the system (duplicate or excess payments) and the office ("New refund request"); approving records the payout only (invoices unchanged) except **Adjust against next term**, which credits unpaid installments at once; the principal sign-off above the limit is a confirmation tick, with the limit a school setting (default ₹10,000, illustrative — verify).
+
+- **Tenant migration** `2026_11_15_000000_create_fee_refunds_table`. No landlord change. No new permission (`fees.refund` is already on Accountant), no role-template change.
+- **Code**: `Fees\Actions\RequestRefund` `ApproveRefund` `RejectRefund`, `RefundsQuery`, `RefundLimits`, `FeeRefund`, enums `RefundStatus` `RefundSource` `RefundMethod`, `FeeVisibility::refunds()`, `PaymentSettlement` raises the system request, `FeeNotifier::refundDecided`, `SchoolSettingsQuery::refundPrincipalLimitPaise()`; `Fees\RefundController`, page `fees/refunds.tsx`, `components/fees/refund-dialogs.tsx`, sidebar "Refunds" (for `fees.refund`).
+- **Tests**: `tests/Feature/Fees/RefundsTest.php` (16 pass: system request, tabs and totals, student search, request limits, approve, sign-off limit and school setting, adjustment and its refusal, reject, freed amount, authorization matrices, scope, school isolation).
+- **Not built**: parent refund request form and status on the parent Fees page; reversing invoice payments; a settings screen for the limit; demo refunds in `DemoFeesSeeder`.
 
 ### Student leave (2026-10-26; owner-approved answers)
 

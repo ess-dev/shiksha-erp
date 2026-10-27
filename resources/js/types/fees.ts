@@ -25,6 +25,14 @@ export type CollectSearchResult = App.Domain.Fees.Data.CollectSearchResultData;
 export type ParentFees = App.Domain.Fees.Data.ParentFeesData;
 export type ParentInstallment = App.Domain.Fees.Data.ParentInstallmentData;
 export type ParentPayment = App.Domain.Fees.Data.ParentPaymentData;
+export type RefundsScreen = App.Domain.Fees.Data.RefundsScreenData;
+export type RefundRow = App.Domain.Fees.Data.RefundRowData;
+export type RefundCandidate = App.Domain.Fees.Data.RefundCandidateData;
+export type RefundCandidatePayment =
+    App.Domain.Fees.Data.RefundCandidatePaymentData;
+export type RefundStatus = App.Domain.Fees.Enums.RefundStatus;
+export type RefundSource = App.Domain.Fees.Enums.RefundSource;
+export type RefundMethod = App.Domain.Fees.Enums.RefundMethod;
 
 export type DuesFilters = {
     q: string;

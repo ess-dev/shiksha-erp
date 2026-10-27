@@ -19,6 +19,7 @@ use App\Http\Controllers\Fees\DuesController;
 use App\Http\Controllers\Fees\FeeStructureController;
 use App\Http\Controllers\Fees\PaymentController;
 use App\Http\Controllers\Fees\ReceiptController;
+use App\Http\Controllers\Fees\RefundController;
 use App\Http\Controllers\Homework\HomeworkController;
 use App\Http\Controllers\Homework\HomeworkFileController;
 use App\Http\Controllers\Leave\LeaveController;
@@ -173,6 +174,11 @@ Route::middleware(['auth', 'module:fees'])->prefix('fees')->name('fees.')->group
     Route::post('payments/{payment}/cheque', [PaymentController::class, 'cheque'])->name('payments.cheque');
     Route::post('payments/{payment}/link', [PaymentController::class, 'link'])->name('payments.link');
     Route::get('receipts/{payment}', [ReceiptController::class, 'show'])->name('receipts.show');
+
+    Route::get('refunds', [RefundController::class, 'index'])->name('refunds.index');
+    Route::post('refunds', [RefundController::class, 'store'])->name('refunds.store');
+    Route::post('refunds/{refund}/approve', [RefundController::class, 'approve'])->name('refunds.approve');
+    Route::post('refunds/{refund}/reject', [RefundController::class, 'reject'])->name('refunds.reject');
 
     Route::get('collect', [CollectController::class, 'index'])->name('collect.index');
     Route::post('collect', [CollectController::class, 'store'])->name('collect.store');

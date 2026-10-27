@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Download } from 'lucide-react';
 import { useRef, useState } from 'react';
 import BounceChequeDialog from '@/components/fees/bounce-cheque-dialog';
@@ -18,8 +18,10 @@ import {
     formatPaise,
     formatPaiseCompact,
 } from '@/lib/format';
+import { useCan } from '@/hooks/use-can';
 import { cn } from '@/lib/utils';
 import { index as dues } from '@/routes/fees/dues';
+import { index as refundsIndex } from '@/routes/fees/refunds';
 import {
     check,
     cheque,
@@ -57,6 +59,7 @@ type Dialog = {
 type Visit = Partial<PaymentFilters> & { page?: number };
 
 export default function Payments({ screen, filters, timezone }: Props) {
+    const canReviewRefunds = useCan('fees.refund');
     const [search, setSearch] = useState(filters.q);
     const [dialog, setDialog] = useState<Dialog>(null);
     const [processing, setProcessing] = useState(false);
@@ -181,9 +184,20 @@ export default function Payments({ screen, filters, timezone }: Props) {
                         <span className="text-xs text-muted-foreground">
                             Refund requests open
                         </span>
-                        <strong className="text-xl font-semibold">—</strong>
+                        <strong className="text-xl font-semibold">
+                            {summary.open_refunds_count}
+                        </strong>
                         <span className="text-xs text-muted-foreground">
-                            Refunds arrive in a later release
+                            {canReviewRefunds ? (
+                                <Link
+                                    href={refundsIndex()}
+                                    className="underline"
+                                >
+                                    Review refunds
+                                </Link>
+                            ) : (
+                                'Decided by the accountant'
+                            )}
                         </span>
                     </Card>
                 </div>

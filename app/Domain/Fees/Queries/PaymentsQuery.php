@@ -11,6 +11,7 @@ use App\Domain\Fees\Data\PaymentsSummaryData;
 use App\Domain\Fees\Enums\PaymentChannel;
 use App\Domain\Fees\Enums\PaymentMode;
 use App\Domain\Fees\Enums\PaymentStatus;
+use App\Domain\Fees\Enums\RefundStatus;
 use App\Domain\Fees\FeeVisibility;
 use App\Domain\Fees\Gateways\PaymentGatewayManager;
 use App\Domain\Fees\Models\FeePayment;
@@ -48,10 +49,16 @@ class PaymentsQuery
         $today = CalendarDate::today();
 
         if ($base === null) {
-            return new PaymentsScreenData([], new PaymentsSummaryData(0, 0, 0, 0, 0, 0), 0, 0, 0, 1, 1, $modes, $gatewayInfo, SettleChequePayment::BOUNCE_REASONS, $today, false);
+            return new PaymentsScreenData([], new PaymentsSummaryData(0, 0, 0, 0, 0, 0, 0), 0, 0, 0, 1, 1, $modes, $gatewayInfo, SettleChequePayment::BOUNCE_REASONS, $today, false);
         }
 
-        $summary = $this->summary($this->visibility->payments($actor, 'fees.view') ?? $base, $filters->campusUlid);
+        $refunds = $this->visibility->refunds($actor, 'fees.refund')?->where('fee_refunds.status', RefundStatus::Pending->value);
+
+        if ($refunds !== null && $filters->campusUlid !== null) {
+            $refunds->where('c.ulid', $filters->campusUlid);
+        }
+
+        $summary = $this->summary($this->visibility->payments($actor, 'fees.view') ?? $base, $filters->campusUlid, $refunds === null ? 0 : $refunds->toBase()->cloneWithout(['columns'])->count());
         $query = $this->filtered($base, $filters);
 
         $total = (clone $query)->toBase()->cloneWithout(['columns', 'orders'])->count();
@@ -206,7 +213,7 @@ class PaymentsQuery
     /**
      * @param  Builder<FeePayment>  $query
      */
-    private function summary(Builder $query, ?string $campusUlid): PaymentsSummaryData
+    private function summary(Builder $query, ?string $campusUlid, int $openRefunds): PaymentsSummaryData
     {
         if ($campusUlid !== null) {
             $query->where('c.ulid', $campusUlid);
@@ -232,6 +239,7 @@ class PaymentsQuery
             pending_paise: (int) ($row->pending_paise ?? 0),
             failed_count: (int) ($row->failed_count ?? 0),
             failed_paise: (int) ($row->failed_paise ?? 0),
+            open_refunds_count: $openRefunds,
         );
     }
 }
