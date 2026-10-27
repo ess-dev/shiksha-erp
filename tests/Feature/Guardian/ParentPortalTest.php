@@ -168,6 +168,12 @@ it('shows a past session with no records for children who were not enrolled then
 
     $this->get(route('parent.attendance'))->assertInertia(fn (Assert $page) => $page->where('attendance', null));
 
+    // The top bar sends an empty value to go back to the current session.
+    $this->put(route('parent.session.select'), ['session' => ''])->assertRedirect(route('parent.home'))->assertSessionHasNoErrors();
+    $this->get(route('parent.home'))->assertInertia(fn (Assert $page) => $page->where('is_current_session', true));
+
+    $this->put(route('parent.session.select'), ['session' => $past->ulid]);
+
     // An unknown session is ignored and the current one is shown again.
     $this->put(route('parent.session.select'), ['session' => 'nonexistent'])->assertRedirect(route('parent.home'));
     $this->get(route('parent.home'))->assertInertia(fn (Assert $page) => $page->where('is_current_session', true)->has('shell.children', 2));

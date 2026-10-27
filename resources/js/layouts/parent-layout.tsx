@@ -191,7 +191,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
             </aside>
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="bg-primary text-primary-foreground">
+                <header className="bg-indigo-600 text-white">
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 md:px-6">
                         <div className="flex min-w-0 items-center gap-3">
                             {!onHome && (
@@ -204,7 +204,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                 </Link>
                             )}
                             <div className="min-w-0">
-                                <p className="truncate text-xs text-primary-foreground/80">
+                                <p className="truncate text-xs text-white/80">
                                     {shell.school_name}
                                 </p>
                                 <h1 className="truncate text-xl font-semibold tracking-tight">
@@ -234,7 +234,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                     className={cn(
                                         'flex shrink-0 items-center gap-2 rounded-full py-1 pr-4 pl-1 text-left text-sm',
                                         child.ulid === shell.selected_child
-                                            ? 'bg-white text-foreground'
+                                            ? 'bg-white text-slate-900'
                                             : 'bg-white/15 hover:bg-white/25',
                                     )}
                                 >
@@ -269,7 +269,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                         onChange={(e) =>
                                             chooseSession(e.target.value)
                                         }
-                                        className={`${selectClassName} w-auto border-white/30 bg-white/15 text-primary-foreground`}
+                                        className={`${selectClassName} w-auto border-white/30 bg-white/15 text-white`}
                                     >
                                         {shell.sessions.sessions.map((s) => (
                                             <option
@@ -290,7 +290,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="text-primary-foreground hover:bg-white/20 hover:text-primary-foreground md:hidden"
+                                className="text-white hover:bg-white/20 hover:text-white md:hidden"
                                 aria-label="Open menu"
                                 onClick={() => setMenuOpen(true)}
                             >
