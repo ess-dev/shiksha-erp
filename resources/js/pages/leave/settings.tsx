@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import Field from '@/components/school/field';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { index, settings as settingsRoute } from '@/routes/leave';
-import { update } from '@/routes/leave/settings';
+import { staff, update } from '@/routes/leave/settings';
 import type { LeaveSettings as LeaveSettingsData } from '@/types';
 
 export default function LeaveSettings({
@@ -20,6 +21,30 @@ export default function LeaveSettings({
     settings: LeaveSettingsData;
 }) {
     const form = useForm({ escalation_days: settings.escalation_days });
+    const policy = useForm({
+        policy: Object.fromEntries(
+            settings.staff_policy.map((row) => [
+                row.type,
+                {
+                    days: row.days === null ? '' : String(row.days),
+                    document_after_days:
+                        row.document_after_days === null
+                            ? ''
+                            : String(row.document_after_days),
+                },
+            ]),
+        ) as Record<string, { days: string; document_after_days: string }>,
+    });
+    const policyErrors = policy.errors as Record<string, string | undefined>;
+    const setPolicy = (
+        type: string,
+        key: 'days' | 'document_after_days',
+        value: string,
+    ) =>
+        policy.setData('policy', {
+            ...policy.data.policy,
+            [type]: { ...policy.data.policy[type], [key]: value },
+        });
 
     return (
         <>
@@ -76,6 +101,107 @@ export default function LeaveSettings({
                                 />
                             </Field>
                             <Button type="submit" disabled={form.processing}>
+                                Save
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Staff leave allowance</CardTitle>
+                        <CardDescription>
+                            School days each member of staff may take per
+                            academic session. Leave the days empty for "as
+                            needed". A certificate or letter is required when a
+                            request is longer than the limit in the last column.
+                            A change applies to requests made after it.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form
+                            className="grid gap-4"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                policy.put(staff.url(), {
+                                    preserveScroll: true,
+                                });
+                            }}
+                        >
+                            <div className="grid gap-3">
+                                {settings.staff_policy.map((row) => (
+                                    <div
+                                        key={row.type}
+                                        className="grid items-end gap-3 sm:grid-cols-[1fr_9rem_9rem]"
+                                    >
+                                        <span className="text-sm font-medium">
+                                            {row.label}
+                                        </span>
+                                        <Field
+                                            id={`days-${row.type}`}
+                                            label="Days a year"
+                                            error={
+                                                policyErrors[
+                                                    `policy.${row.type}.days`
+                                                ]
+                                            }
+                                        >
+                                            <Input
+                                                id={`days-${row.type}`}
+                                                type="number"
+                                                min={1}
+                                                max={365}
+                                                placeholder="As needed"
+                                                value={
+                                                    policy.data.policy[row.type]
+                                                        .days
+                                                }
+                                                onChange={(e) =>
+                                                    setPolicy(
+                                                        row.type,
+                                                        'days',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                        </Field>
+                                        <Field
+                                            id={`doc-${row.type}`}
+                                            label="Certificate after"
+                                            error={
+                                                policyErrors[
+                                                    `policy.${row.type}.document_after_days`
+                                                ]
+                                            }
+                                        >
+                                            <Input
+                                                id={`doc-${row.type}`}
+                                                type="number"
+                                                min={0}
+                                                max={30}
+                                                placeholder="Never"
+                                                value={
+                                                    policy.data.policy[row.type]
+                                                        .document_after_days
+                                                }
+                                                onChange={(e) =>
+                                                    setPolicy(
+                                                        row.type,
+                                                        'document_after_days',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                        </Field>
+                                    </div>
+                                ))}
+                            </div>
+                            <InputError message={policyErrors.leave} />
+                            <Button
+                                type="submit"
+                                className="w-fit"
+                                disabled={policy.processing}
+                            >
                                 Save
                             </Button>
                         </form>

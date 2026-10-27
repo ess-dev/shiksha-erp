@@ -29,6 +29,13 @@ class StaffRefQuery
         return $staff === null ? null : $this->ref($staff);
     }
 
+    public function byKey(int $staffKey): ?StaffRefData
+    {
+        $staff = Staff::query()->find($staffKey);
+
+        return $staff === null ? null : $this->ref($staff);
+    }
+
     /**
      * Names by staff key, to show "saved by Neha Verma" next to a stored key.
      *
@@ -47,6 +54,26 @@ class StaffRefQuery
         $names = Staff::query()->whereIn('id', $staffKeys)->pluck('full_name', 'id')->all();
 
         return $names;
+    }
+
+    /**
+     * Ulids by staff key, to point a stored key at a record the pages know.
+     *
+     * @param  list<int>  $staffKeys
+     * @return array<int, string>
+     */
+    public function ulidsByKey(array $staffKeys): array
+    {
+        $staffKeys = array_values(array_unique(array_filter($staffKeys)));
+
+        if ($staffKeys === []) {
+            return [];
+        }
+
+        /** @var array<int, string> $ulids */
+        $ulids = Staff::query()->whereIn('id', $staffKeys)->pluck('ulid', 'id')->all();
+
+        return $ulids;
     }
 
     private function ref(Staff $staff): StaffRefData

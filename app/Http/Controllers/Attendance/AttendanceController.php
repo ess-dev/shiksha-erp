@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Attendance;
 
 use App\Domain\Attendance\Actions\SaveRegister;
+use App\Domain\Attendance\AttendanceAccess;
 use App\Domain\Attendance\Enums\AttendanceStatus;
 use App\Domain\Attendance\Queries\RegisterQuery;
 use App\Domain\Identity\Models\Identity;
@@ -21,12 +22,11 @@ class AttendanceController extends Controller
      * choose which; anything the person may not open falls back to their
      * first class and today.
      */
-    public function index(Request $request, RegisterQuery $registers): Response
+    public function index(Request $request, RegisterQuery $registers, AttendanceAccess $access): Response
     {
-        abort_unless(Gate::any(['attendance.view', 'attendance.mark']), 403);
-
         $identity = $request->user();
         abort_unless($identity instanceof Identity, 403);
+        abort_unless(Gate::any(['attendance.view', 'attendance.mark']) || $access->coversAnyClass($identity), 403);
 
         $section = $request->query('section');
         $date = $request->query('date');

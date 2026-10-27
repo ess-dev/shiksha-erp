@@ -76,13 +76,13 @@ class SectionDirectoryQuery
     /**
      * The current academic year's key and ulid, for new enrolments.
      *
-     * @return array{key: int, ulid: string, name: string, starts_on: string}|null
+     * @return array{key: int, ulid: string, name: string, starts_on: string, ends_on: string}|null
      */
     public function currentYearRef(): ?array
     {
         $year = AcademicYear::query()->where('is_current', true)->first();
 
-        return $year === null ? null : ['key' => $year->id, 'ulid' => $year->ulid, 'name' => $year->name, 'starts_on' => $year->starts_on];
+        return $year === null ? null : ['key' => $year->id, 'ulid' => $year->ulid, 'name' => $year->name, 'starts_on' => $year->starts_on, 'ends_on' => $year->ends_on];
     }
 
     /**

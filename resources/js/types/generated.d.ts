@@ -960,6 +960,14 @@ size_bytes: number,
 url: string,
 is_image: boolean,
 };
+export type LeaveBalanceData = {
+type: App.Domain.Leave.Enums.StaffLeaveType,
+label: string,
+allowed_half_days: number | null,
+used_half_days: number,
+pending_half_days: number,
+document_after_days: number | null,
+};
 export type LeaveFormData = {
 today: string,
 min_date: string,
@@ -979,6 +987,15 @@ label: string,
 };
 export type LeaveSettingsData = {
 escalation_days: number,
+staff_policy: App.Domain.Leave.Data.StaffLeavePolicyRowData[],
+};
+export type MyLeaveData = {
+balances: App.Domain.Leave.Data.LeaveBalanceData[],
+requests: App.Domain.Leave.Data.StaffLeaveRequestData[],
+class_label: string | null,
+earliest_from: string,
+today: string,
+backdate_days: number,
 };
 export type ParentLeaveItemData = {
 ulid: string,
@@ -995,6 +1012,14 @@ decided_by: string | null,
 note: string | null,
 attachment_name: string | null,
 can_cancel: boolean,
+};
+export type StaffDirectoryRowData = {
+ulid: string,
+name: string,
+roles: string[],
+class_label: string | null,
+is_active: boolean,
+on_leave_today: boolean,
 };
 export type StaffLeaveItemData = {
 ulid: string,
@@ -1020,6 +1045,43 @@ can_approve: boolean,
 can_reject: boolean,
 can_recommend: boolean,
 };
+export type StaffLeavePolicyRowData = {
+type: string,
+label: string,
+days: number | null,
+document_after_days: number | null,
+};
+export type StaffLeaveRequestData = {
+ulid: string,
+staff_ulid: string,
+staff_name: string,
+staff_note: string,
+leave_type: App.Domain.Leave.Enums.StaffLeaveType,
+type_label: string,
+from_on: string,
+to_on: string,
+half_days: number,
+reason: string,
+suggested_cover: string | null,
+applied_on: string,
+status: App.Domain.Leave.Enums.LeaveStatus,
+attachment: App.Domain.Leave.Data.LeaveAttachmentData | null,
+decided_by: string | null,
+decision_note: string | null,
+cover_name: string | null,
+section_label: string | null,
+can_decide: boolean,
+can_cancel: boolean,
+};
+export type StaffLeaveRequestsScreenData = {
+tab: string,
+can_view_leave: boolean,
+can_view_directory: boolean,
+pending_count: number,
+requests: App.Domain.Leave.Data.StaffLeaveRequestData[],
+directory: App.Domain.Leave.Data.StaffDirectoryRowData[],
+cover_options: App.Domain.Access.Data.StaffOptionData[],
+};
 export type StaffLeaveScreenData = {
 tab: string,
 items: App.Domain.Leave.Data.StaffLeaveItemData[],
@@ -1032,6 +1094,7 @@ can_configure: boolean,
 namespace Enums {
 export type LeaveReason = 'sick' | 'family_function' | 'family_emergency' | 'travel' | 'religious' | 'other';
 export type LeaveStatus = 'pending' | 'recommended' | 'approved' | 'rejected' | 'cancelled';
+export type StaffLeaveType = 'casual' | 'sick' | 'earned' | 'duty';
 }
 }
 namespace Platform {

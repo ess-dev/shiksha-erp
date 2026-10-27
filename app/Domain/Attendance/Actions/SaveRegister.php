@@ -76,7 +76,7 @@ class SaveRegister extends Action
         }
 
         $age = (int) (new DateTimeImmutable($date))->diff(new DateTimeImmutable($today))->days;
-        $rights = $this->access->rights($actor, $section, $age);
+        $rights = $this->access->rights($actor, $section, $age, $date);
 
         if (! $rights->canEdit) {
             throw $this->access->isClassTeacher($actor, $section)

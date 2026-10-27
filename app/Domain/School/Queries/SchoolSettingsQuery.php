@@ -25,6 +25,8 @@ class SchoolSettingsQuery
 
     public const LEAVE_ESCALATION_DAYS = 'leave.escalation_days';
 
+    public const STAFF_LEAVE_POLICY = 'leave.staff_policy';
+
     /** illustrative — verify: schools choose their own prefixes. */
     private const DEFAULTS = [
         self::ADMISSION_PREFIX => 'ADM',
@@ -77,6 +79,33 @@ class SchoolSettingsQuery
         $value = SchoolSetting::query()->where('key', self::LEAVE_ESCALATION_DAYS)->value('value');
 
         return is_int($value) && $value >= 1 && $value <= 30 ? $value : self::DEFAULT_LEAVE_ESCALATION_DAYS;
+    }
+
+    /**
+     * The staff leave allowances the school saved, by leave type key: `days`
+     * (null = as needed) and `document_after_days` (a certificate is needed for
+     * more days than this; null = never). Types it never saved are absent: the
+     * Leave module fills in its defaults.
+     *
+     * @return array<string, array{days: int|null, document_after_days: int|null}>
+     */
+    public function staffLeavePolicy(): array
+    {
+        $saved = SchoolSetting::query()->where('key', self::STAFF_LEAVE_POLICY)->value('value');
+        $policy = [];
+
+        foreach (is_array($saved) ? $saved : [] as $type => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $policy[(string) $type] = [
+                'days' => isset($row['days']) && is_int($row['days']) ? $row['days'] : null,
+                'document_after_days' => isset($row['document_after_days']) && is_int($row['document_after_days']) ? $row['document_after_days'] : null,
+            ];
+        }
+
+        return $policy;
     }
 
     public function admissionPrefix(): string

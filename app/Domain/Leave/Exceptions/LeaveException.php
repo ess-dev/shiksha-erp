@@ -103,6 +103,36 @@ class LeaveException extends DomainException
         return new self('Enter a whole number of school days from 1 to 30.');
     }
 
+    public static function unknownType(): self
+    {
+        return new self('Choose a leave type.');
+    }
+
+    public static function staffReasonTooShort(int $min): self
+    {
+        return new self("Add a short reason (at least {$min} characters).");
+    }
+
+    public static function notEnoughLeave(string $label, string $left): self
+    {
+        return new self("Not enough {$label} left ({$left} days). Choose another type.");
+    }
+
+    public static function certificateNeeded(string $label, int $days): self
+    {
+        return new self("Attach a certificate or letter for {$label} of more than {$days} days.");
+    }
+
+    public static function coverNeeded(string $section): self
+    {
+        return new self("Choose who marks {$section}'s register while the class teacher is away.");
+    }
+
+    public static function coverInvalid(): self
+    {
+        return new self('Choose another staff member to mark the register: they must be active, not the applicant and not on leave on those days.');
+    }
+
     public static function fileMissing(): self
     {
         return new self('The file is missing.', 404);

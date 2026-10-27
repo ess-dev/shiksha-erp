@@ -23,7 +23,9 @@ use App\Domain\Identity\Authentication\MailOtpSender;
 use App\Domain\Identity\Contracts\OtpSender;
 use App\Domain\Identity\Models\Identity;
 use App\Domain\Leave\Contracts\LeaveNotifier;
+use App\Domain\Leave\Contracts\StaffLeaveNotifier;
 use App\Domain\Leave\LogLeaveNotifier;
+use App\Domain\Leave\LogStaffLeaveNotifier;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FeeNotifier::class, LogFeeNotifier::class);
         $this->app->bind(HomeworkNotifier::class, LogHomeworkNotifier::class);
         $this->app->bind(LeaveNotifier::class, LogLeaveNotifier::class);
+        $this->app->bind(StaffLeaveNotifier::class, LogStaffLeaveNotifier::class);
         // The SMS provider is an open decision: only the development drivers (log, mail) exist until one is chosen.
         $this->app->bind(OtpSender::class, fn () => match (config('shiksha.otp.driver')) {
             'mail' => $this->app->make(MailOtpSender::class),

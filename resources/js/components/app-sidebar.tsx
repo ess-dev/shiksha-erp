@@ -3,6 +3,7 @@ import {
     BookOpen,
     Building2,
     CalendarCheck,
+    CalendarDays,
     CalendarX,
     ClipboardCheck,
     ClipboardPen,
@@ -19,6 +20,7 @@ import {
     School,
     ShieldCheck,
     UserPlus,
+    UserCog,
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -41,6 +43,8 @@ import { index as attendance } from '@/routes/attendance';
 import { index as exams } from '@/routes/exams';
 import { index as homework } from '@/routes/homework';
 import { index as leave } from '@/routes/leave';
+import { index as myLeave } from '@/routes/my-leave';
+import { index as staffLeave } from '@/routes/staff-leave';
 import { index as collectFee } from '@/routes/fees/collect';
 import { index as feeDues } from '@/routes/fees/dues';
 import { index as feePayments } from '@/routes/fees/payments';
@@ -83,6 +87,8 @@ export function AppSidebar() {
         useCan('reportcards.approve') || useCan('leave.approve_long');
     const canViewLeave =
         useCan('leave.approve') || useCan('leave.approve_long');
+    const canViewStaffLeave =
+        useCan('staff.leave_approve') || useCan('staff.view');
     const canViewHomework =
         useCan('homework.view') || useCan('homework.assign');
     const canUpdateSubjects = useCan('subjects.update');
@@ -195,6 +201,20 @@ export function AppSidebar() {
                   },
               ]
             : []),
+        ...(canViewStaffLeave
+            ? [
+                  {
+                      title: 'Staff and leave',
+                      href: staffLeave(),
+                      icon: UserCog,
+                  },
+              ]
+            : []),
+        {
+            title: 'My leave',
+            href: myLeave(),
+            icon: CalendarDays,
+        },
         ...(canViewHomework
             ? [
                   {

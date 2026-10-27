@@ -68,7 +68,7 @@ class RegisterQuery
 
         $age = (int) (new DateTimeImmutable($date))->diff(new DateTimeImmutable($today))->days;
         $day = $this->days->check($date);
-        $rights = $this->access->rights($identity, $section, $age);
+        $rights = $this->access->rights($identity, $section, $age, $date);
 
         $register = AttendanceRegister::query()->where('section_id', $section->sectionKey)->where('attendance_on', $date)->first();
         $marks = $register === null ? [] : $register->marks()->pluck('status', 'student_id')->all();
@@ -144,7 +144,7 @@ class RegisterQuery
         $others = [];
 
         foreach ($allowed as $section) {
-            $relation = $this->access->isClassTeacher($identity, $section) ? 'yours' : ($this->access->mayCorrect($identity, $section) ? 'correct' : 'view');
+            $relation = $this->access->isClassTeacher($identity, $section) ? 'yours' : ($this->access->isCoverNow($identity, $section) ? 'cover' : ($this->access->mayCorrect($identity, $section) ? 'correct' : 'view'));
             $label = $severalCampuses ? "{$section->label()} · {$section->campusName}" : $section->label();
             $choice = [
                 'ref' => $section,
@@ -152,7 +152,7 @@ class RegisterQuery
                 'data' => new SectionChoiceData($section->ulid, $label, $section->campusName, $relation),
             ];
 
-            if ($relation === 'yours') {
+            if ($relation === 'yours' || $relation === 'cover') {
                 $own[] = $choice;
             } else {
                 $others[] = $choice;

@@ -49,6 +49,7 @@ Quality gates used so far: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analys
 | 27 | Fees: Dues, Payments and reconciliation, Collect fee, Fee structure, parent Fees, per-school payment gateway (see "Fees" below and `docs/modules/fees.md`) | see `git log` |
 | 28 | Homework: teacher screen (set, edit, delete, check, feedback) and parent Homework page with uploads and past sessions (see "Homework" below and `docs/modules/homework.md`) | uncommitted |
 | 29 | Student leave: parent Leave page, teacher Student leave screen, long leave to the coordinator on Approvals, leave settings, approved leave on attendance (see `docs/modules/leave.md`) | uncommitted |
+| 30 | Staff leave: Staff and leave screen (leave requests, staff directory with name/role/today's status), teacher My leave, register cover for a class teacher's leave, staff leave policy in Leave settings (see "Staff leave" below and `docs/modules/leave.md`) | uncommitted |
 | 25 | Marks entry `/marks`, grading scale `/exams/grading`, parent Results `/parent/results` with a printable report card (from the owner's prototype screenshots; see "Marks, grades and results" below and `docs/modules/exams.md`) | see `git log` |
 
 ### Student leave (2026-10-26; owner-approved answers)
@@ -58,6 +59,15 @@ Full detail in `docs/modules/leave.md`. Built from the owner's screenshots (pare
 - **Tenant migration** `2026_11_12_000000_create_student_leave_tables`. No landlord table change. Permissions: `leave.approve` module changed to `core`, new `leave.approve_long`; Principal, Vice principal, Coordinator template **version 13** (existing schools apply the update). Setting `leave.escalation_days`.
 - **Attendance**: roster rows carry `leave_reason`; Mark all present marks them absent; `SaveRegister` leaves them out of the absence alert; `StudentDayData.leave_reason` for the parent page.
 - **Not built**: exam-overlap warning, naming the coordinator on the parent form, notification rows, staff leave.
+
+### Staff leave (2026-10-26; owner-approved answers)
+
+Full detail in `docs/modules/leave.md` ("Staff leave"). Built from the owner's screenshots (Principal: Leave requests, Staff directory, Approve and Reject dialogs; Teacher: My leave). Owner's answers: staff directory later (only name, roles and today's status now), register cover built in this slice, leave policy is a school setting, approver is a new scoped permission.
+
+- **Tenant migration** `2026_11_13_000000_create_staff_leave_tables` (`staff_leave_requests`). No landlord table change. New permission `staff.leave_approve` (core, sensitive); Principal, Vice principal, Coordinator template **version 14** (existing schools apply the update). Setting `leave.staff_policy`. Routes `/my-leave`, `/staff-leave`, `PUT /leave/settings/staff`.
+- **Register cover**: approving a class teacher's leave requires naming a cover (active, not the applicant, not on leave on those days). Cover access is computed from the approved request (`StaffLeaveCoverQuery`, `AttendanceAccess`): they open and mark that class's register only on the leave dates, with the class teacher's rules, and it ends when the leave does. Cancelled or rejected leave never grants it.
+- **Tests**: `tests/Feature/Leave/StaffLeaveTest.php` (15). Also run: `tests/Architecture`, `tests/Feature/Access`, `Leave`, `Attendance`, `GeneratedTypesTest`.
+- **Not built / assumptions**: "Goes to X" line on My leave is generic (no way yet to find who holds a permission over someone's class); staff with no class are approved only by someone holding `staff.leave_approve` school-wide; a principal's own leave has no approver until a second school-wide holder exists; no period-wise cover, exam/meeting overlap warnings or period count (no timetable); no notification rows; no staff profile fields (joined date, department, campus, subjects, contact) so the directory is minimal.
 
 ### Homework (2026-10-26; owner-approved answers)
 

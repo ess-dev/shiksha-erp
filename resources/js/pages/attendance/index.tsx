@@ -28,6 +28,7 @@ type Draft = Record<string, AttendanceStatus>;
 
 const RELATION_SUFFIX: Record<string, string> = {
     yours: ' · your class',
+    cover: ' · covering',
     view: ' · view only',
     correct: '',
 };

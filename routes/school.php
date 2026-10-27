@@ -24,6 +24,9 @@ use App\Http\Controllers\Homework\HomeworkFileController;
 use App\Http\Controllers\Leave\LeaveController;
 use App\Http\Controllers\Leave\LeaveFileController;
 use App\Http\Controllers\Leave\LeaveSettingsController;
+use App\Http\Controllers\Leave\MyLeaveController;
+use App\Http\Controllers\Leave\StaffLeaveController;
+use App\Http\Controllers\Leave\StaffLeaveFileController;
 use App\Http\Controllers\School\AcademicYearController;
 use App\Http\Controllers\School\ApprovalsController;
 use App\Http\Controllers\School\CampusController;
@@ -215,8 +218,22 @@ Route::middleware(['auth'])->prefix('leave')->name('leave.')->group(function () 
     Route::get('/', [LeaveController::class, 'index'])->name('index');
     Route::get('settings', [LeaveSettingsController::class, 'show'])->name('settings');
     Route::put('settings', [LeaveSettingsController::class, 'update'])->name('settings.update');
+    Route::put('settings/staff', [LeaveSettingsController::class, 'updateStaffPolicy'])->name('settings.staff');
     Route::post('{leave}/decide', [LeaveController::class, 'decide'])->name('decide');
     Route::get('{leave}/attachment', [LeaveFileController::class, 'attachment'])->middleware('signed')->name('attachment');
+});
+
+// Staff leave is core too: anyone with a staff record applies on My leave; `staff.leave_approve` holders decide on Staff and leave (checked in the Actions).
+Route::middleware(['auth'])->prefix('my-leave')->name('my-leave.')->group(function () {
+    Route::get('/', [MyLeaveController::class, 'index'])->name('index');
+    Route::post('/', [MyLeaveController::class, 'store'])->name('store');
+    Route::post('{leave}/cancel', [MyLeaveController::class, 'cancel'])->name('cancel');
+});
+
+Route::middleware(['auth'])->prefix('staff-leave')->name('staff-leave.')->group(function () {
+    Route::get('/', [StaffLeaveController::class, 'index'])->name('index');
+    Route::post('{leave}/decide', [StaffLeaveController::class, 'decide'])->name('decide');
+    Route::get('{leave}/attachment', [StaffLeaveFileController::class, 'attachment'])->middleware('signed')->name('attachment');
 });
 
 Route::middleware(['auth', 'module:homework'])->prefix('homework')->name('homework.')->group(function () {

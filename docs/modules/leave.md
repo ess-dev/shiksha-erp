@@ -8,12 +8,12 @@ A parent applies for leave for a child; the class teacher approves or rejects sh
 
 ## Screens
 
-| Screen                 | Route                          | Needs                                                  | Notes                                                                                                         |
-| ---------------------- | ------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Parent Leave           | `/parent/leave?child=<ulid>`   | parent sign-in                                         | Apply form (dates, reason type, details, optional certificate), school-day count, "Your requests", cancel.    |
-| Staff Student leave    | `/leave` (`?tab=review\|all`)  | `leave.approve` or `leave.approve_long`                | To review / All leave, approve, reject, recommend with a note; "on approved leave today" banner.              |
-| Approvals > Student leave | `/approvals`                | `leave.approve_long`                                   | Recommended requests and long requests still with the class teacher, over the person's scope.                |
-| Leave settings         | `/leave/settings`              | `settings.manage`                                      | The class teacher's limit in school days (default 3, 1 to 30).                                                |
+| Screen                    | Route                         | Needs                                   | Notes                                                                                                      |
+| ------------------------- | ----------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Parent Leave              | `/parent/leave?child=<ulid>`  | parent sign-in                          | Apply form (dates, reason type, details, optional certificate), school-day count, "Your requests", cancel. |
+| Staff Student leave       | `/leave` (`?tab=review\|all`) | `leave.approve` or `leave.approve_long` | To review / All leave, approve, reject, recommend with a note; "on approved leave today" banner.           |
+| Approvals > Student leave | `/approvals`                  | `leave.approve_long`                    | Recommended requests and long requests still with the class teacher, over the person's scope.              |
+| Leave settings            | `/leave/settings`             | `settings.manage`                       | The class teacher's limit in school days (default 3, 1 to 30).                                             |
 
 ## Rules
 
@@ -46,5 +46,49 @@ A parent applies for leave for a child; the class teacher approves or rejects sh
 
 - The exam-overlap warning of the prototype is not built.
 - The parent form names "the class teacher" but not the coordinator (no way yet to name who covers a section).
-- "Ask principal" escalation, teacher (staff) leave and the sidebar count badge are not built.
+- "Ask principal" escalation and the sidebar count badge are not built.
 - No notification rows or delivery; no sick-day reminders.
+
+# Staff leave
+
+Built 2026-10-26 from the owner's screenshots (Principal: Staff and leave; Teacher: My leave) and answers.
+
+## Screens
+
+| Screen          | Route                             | Needs                                     | Notes                                                                                                                                       |
+| --------------- | --------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| My leave        | `/my-leave`                       | an active staff record                    | Balances by type, apply form (type, full days or half day, dates, reason, suggested cover, certificate), My requests, cancel while pending. |
+| Staff and leave | `/staff-leave` (`?tab=directory`) | `staff.leave_approve` and/or `staff.view` | Leave requests (Approve with cover choice, Reject with a note) and a staff directory (name, roles, class, In school / On leave).            |
+| Leave settings  | `/leave/settings`                 | `settings.manage`                         | Student limit as before, plus yearly allowance and certificate limit per staff leave type.                                                  |
+
+## Rules
+
+- **Applying**: current session; start at most 3 days back; end not before start; inside the academic year; at least one school day; at most 30 days; no overlap with own pending or approved leave; reason 5 to 300 characters; optional photo or PDF up to 5 MB (same store as student leave). Half day = one date, counts 0.5. Stored as `half_days` (2 per day).
+- **Balance**: per type from the school setting `leave.staff_policy` (illustrative defaults: casual 12, sick 10 with a certificate beyond 2 days, earned 15, duty as needed — verify). Approved plus pending leave of the session counts; a request that does not fit is refused.
+- **Who decides**: holders of `staff.leave_approve`. A class teacher's request is decided by someone whose scope covers that class (coordinator: their wing); anyone else's (no class) only by a school-wide holder. Nobody decides their own leave. Out of scope is 404; own leave is 403. Rejecting needs a note of at least 5 characters.
+- **Register cover**: approving a class teacher's leave needs a cover. They must be an active staff member who is not the applicant and not on approved leave on those days. The cover may open and mark that class's register on the leave dates only, with the class teacher's rules (free on the day; a reason on later days inside the correction window), and may still open it until the correction window after the last day closes. It is worked out from the approved request: cancelling is only possible while pending, rejecting never grants it, and nothing is stored apart from the request. The Attendance class picker marks it "covering".
+- **Attachments**: opened through a short-lived signed link by the applicant or an approver in scope; every opening is audited.
+- **Notifications**: `StaffLeaveNotifier` (events `applied`, `approved`, `rejected`, `cancelled`) is bound to a log-only driver.
+
+## Data (tenant)
+
+`staff_leave_requests` (status, type and date CHECKs; a half day must be a single date; migration `2026_11_13_000000_create_staff_leave_tables`).
+
+## Code
+
+`app/Domain/Leave/`: Actions `ApplyForStaffLeave`, `CancelStaffLeave`, `DecideStaffLeave`, `OpenStaffLeaveAttachment`; Queries `MyLeaveQuery`, `StaffLeaveRequestsQuery`, `StaffLeaveItemBuilder`, `StaffLeaveFileQuery`, `StaffLeaveCoverQuery`; `StaffLeaveAccess`, `StaffLeaveBalances`, `StaffLeavePolicy`; `StaffLeaveNotifier` + `LogStaffLeaveNotifier`. School: `UpdateStaffLeavePolicy`, `SchoolSettingsQuery::staffLeavePolicy()`. Attendance: `AttendanceAccess` (cover rules). Controllers `Leave\MyLeaveController`, `StaffLeaveController`, `StaffLeaveFileController`. Pages `leave/my-leave.tsx`, `leave/staff.tsx`, component `components/leave/staff-leave-row.tsx`.
+
+## Permissions
+
+New `staff.leave_approve` (core, sensitive). Role templates Principal, Vice principal, Coordinator **version 14**. Existing schools must apply the template update.
+
+## Audit keys
+
+`staff_leave.applied`, `.approved`, `.rejected`, `.cancelled`, `.attachment_opened`, `settings.staff_leave_policy_updated`.
+
+## Known limitations
+
+- No staff profile fields (joined date, department, campus, subjects, contact): the directory shows name, roles, class and today's status only.
+- The "Goes to ..." line on My leave is generic; the approver is not looked up.
+- No period-wise cover for subject teachers, no exam or meeting overlap warnings, no notification rows or delivery.
+- A principal's own leave stays pending until another school-wide holder of `staff.leave_approve` exists.

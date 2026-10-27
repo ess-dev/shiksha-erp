@@ -25,6 +25,11 @@ class CalendarException extends DomainException
         return new self('The correction window is a whole number of days from 0 to 60.');
     }
 
+    public static function invalidStaffLeavePolicy(): self
+    {
+        return new self('Enter whole days: a yearly allowance from 1 to 365 (or leave it empty for "as needed") and a certificate limit from 0 to 30.');
+    }
+
     public static function invalidLeaveLimit(): self
     {
         return new self('Enter a whole number of school days from 1 to 30.');
