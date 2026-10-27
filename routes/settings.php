@@ -10,6 +10,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('settings/profile/channels', [ProfileController::class, 'channels'])->name('profile.channels');
+    Route::get('settings/profile/photo', [ProfileController::class, 'photo'])->name('profile.photo');
+    Route::post('settings/profile/photo', [ProfileController::class, 'storePhoto'])->name('profile.photo.store');
+    Route::delete('settings/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {

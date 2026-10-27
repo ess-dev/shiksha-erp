@@ -21,13 +21,14 @@ class ProfileUpdateTest extends TestCase
             ->assertOk();
     }
 
-    public function test_contact_details_can_be_updated_and_phone_is_normalised()
+    public function test_mobile_can_be_updated_and_is_normalised_but_the_work_email_is_not_editable()
     {
         $user = $this->staff();
+        $email = $user->email;
 
         $this->actingAs($user)
             ->patch(route('profile.update'), [
-                'email' => 'Principal@Example.com',
+                'email' => 'someone-else@example.com',
                 'phone' => '98765 43210',
             ])
             ->assertSessionHasNoErrors()
@@ -35,43 +36,45 @@ class ProfileUpdateTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('principal@example.com', $user->email);
+        $this->assertSame($email, $user->email);
         $this->assertSame('+919876543210', $user->phone_e164);
     }
 
-    public function test_phone_or_email_is_required()
+    public function test_mobile_is_required_when_there_is_no_email()
     {
-        $this->actingAs($this->staff())
-            ->patch(route('profile.update'), ['email' => '', 'phone' => ''])
-            ->assertSessionHasErrors(['email', 'phone']);
+        $user = Identity::factory()->create(['email' => null, 'phone_e164' => '+919000000002']);
+        $this->grantStaffMembership($user);
+
+        $this->actingAs($user)
+            ->patch(route('profile.update'), ['phone' => ''])
+            ->assertSessionHasErrors('phone');
     }
 
     public function test_invalid_phone_is_rejected()
     {
         $this->actingAs($this->staff())
-            ->patch(route('profile.update'), ['email' => 'a@example.com', 'phone' => '12345'])
+            ->patch(route('profile.update'), ['phone' => '12345'])
             ->assertSessionHasErrors('phone');
     }
 
-    public function test_contact_details_must_be_unique_across_identities()
+    public function test_mobile_must_be_unique_across_identities()
     {
-        $other = Identity::factory()->create(['email' => 'taken@example.com', 'phone_e164' => '+919000000001']);
+        Identity::factory()->create(['email' => 'taken@example.com', 'phone_e164' => '+919000000001']);
 
         $this->actingAs($this->staff())
-            ->patch(route('profile.update'), ['email' => $other->email, 'phone' => '9000000001'])
-            ->assertSessionHasErrors(['email', 'phone']);
+            ->patch(route('profile.update'), ['phone' => '9000000001'])
+            ->assertSessionHasErrors('phone');
     }
 
     public function test_an_update_is_audited_without_the_values()
     {
         $user = $this->staff();
 
-        $this->actingAs($user)->patch(route('profile.update'), ['email' => 'new@example.com', 'phone' => '9876543210']);
+        $this->actingAs($user)->patch(route('profile.update'), ['phone' => '9876543210']);
 
         $event = PlatformAuditEvent::query()->where('action', 'identity.contact_updated')->sole();
 
         $this->assertSame($user->ulid, $event->subject_ulid);
-        $this->assertStringNotContainsString('new@example.com', json_encode($event->after));
         $this->assertStringNotContainsString('9876543210', json_encode($event->after));
     }
 

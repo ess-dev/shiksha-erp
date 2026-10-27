@@ -50,6 +50,38 @@ export type StaffOptionData = {
 ulid: string,
 name: string,
 };
+export type StaffProfileData = {
+full_name: string,
+school_name: string,
+has_photo: boolean,
+personal_email: string | null,
+qualifications: string | null,
+languages: string | null,
+home_address: string | null,
+about: string | null,
+emergency_name: string | null,
+emergency_relation: string | null,
+emergency_phone: string | null,
+employee_code: string | null,
+job_title: string | null,
+department: string | null,
+joined_on: string | null,
+campuses: string[],
+class_teacher_of: string[],
+subjects: string[],
+roles: App.Domain.Access.Data.StaffRoleChipData[],
+channels: {
+push: boolean,
+sms: boolean,
+whatsapp: boolean,
+email: boolean,
+},
+whatsapp_in_plan: boolean,
+};
+export type StaffRoleChipData = {
+role_name: string,
+scope_label: string,
+};
 }
 namespace Enums {
 export type PermissionRisk = 'normal' | 'sensitive' | 'critical';

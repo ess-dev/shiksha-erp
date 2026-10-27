@@ -69,6 +69,9 @@ class DemoAttendanceSeeder extends Seeder
 
             $section = Section::query()->where('ulid', $ref->ulid)->firstOrFail();
             $staffUlid = $staffRefs->forIdentity($teacher)?->ulid ?? $createStaff->handle($teacher->ulid, 'Neha Verma')->ulid;
+            Staff::query()->where('ulid', $staffUlid)->whereNull('employee_code')->update([
+                'employee_code' => 'GPS-NEHA', 'job_title' => 'Teacher', 'department' => 'Mathematics', 'joined_on' => '2021-06-14',
+            ]);
             $setClassTeacher->handle($principal, $section, $staffUlid);
 
             if (AttendanceRegister::query()->where('section_id', $section->id)->exists()) {
