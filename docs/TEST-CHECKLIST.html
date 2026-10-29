@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shiksha ERP guided test script</title>
+<style>
+  :root { --bg:#f7f7fb; --card:#fff; --ink:#1c1d2b; --mute:#666a80; --line:#e2e3ee; --accent:#4f46e5; --ok:#15803d; --bad:#b91c1c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14151f; --card:#1d1f2e; --ink:#e8e9f3; --mute:#9a9db5; --line:#2e3045; --accent:#818cf8; --ok:#4ade80; --bad:#f87171; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 22px; margin: 8px 0; }
+  h2 { font-size: 18px; margin: 0 0 6px; }
+  .bar { position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 5; border-bottom: 1px solid var(--line); }
+  .prog { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .prog > div { height: 100%; background: var(--ok); width: 0; transition: width .2s; }
+  nav { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  nav a { font-size:13px; padding:2px 8px; border:1px solid var(--line); border-radius:12px; text-decoration:none; background:var(--card); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+  .creds { background: var(--bg); border: 1px dashed var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: 14px; }
+  .creds div { margin: 3px 0; }
+  code { background: var(--bg); border: 1px solid var(--line); padding: 0 5px; border-radius: 4px; font-size: 13px; word-break: break-all; }
+  a { color: var(--accent); }
+  .t { border-top: 1px solid var(--line); padding: 10px 0; }
+  .t.pass { background: color-mix(in srgb, var(--ok) 8%, transparent); }
+  .t.fail { background: color-mix(in srgb, var(--bad) 10%, transparent); }
+  .t h4 { margin: 0 0 4px; font-size: 15px; }
+  .t ol { margin: 4px 0 4px 0; padding-left: 22px; }
+  .exp { margin: 4px 0; padding: 4px 8px; border-left: 3px solid var(--ok); background: var(--bg); font-size: 14px; }
+  .ctl { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
+  .ctl button { font: inherit; font-size: 13px; padding: 2px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); cursor: pointer; }
+  .ctl button.on-pass { background: var(--ok); color: #fff; border-color: var(--ok); }
+  .ctl button.on-fail { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .ctl input { flex: 1; min-width: 160px; font: inherit; font-size: 13px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); }
+  .note { color: var(--mute); font-size: 13px; }
+  .count { color: var(--mute); font-size: 13px; font-weight: normal; margin-left: 8px; }
+  #reset { font: inherit; padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); cursor: pointer; float: right; }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <h1>Shiksha ERP: guided test script</h1>
+    <div><span id="total"></span> <button id="reset">Reset all</button></div>
+    <div class="prog"><div id="fill"></div></div>
+    <nav id="nav"></nav>
+  </div>
+  <p class="note">Go top to bottom: the order matters (the teacher publishes marks before the parent looks at them, and so on). For each test do the steps, compare with "Expect", then press Pass or Fail. Type a short note on a failure and send it to me. Results are saved in this browser.</p>
+  <div id="root"></div>
+</main>
+
+<script>
+const B = 'http://greenfield.shiksha.localhost:8000';
+const A = 'http://admin.shiksha.localhost:8000';
+const g = (p) => `<a href="${B}${p}" target="_blank">${p}</a>`;
+const ad = (p) => `<a href="${A}${p}" target="_blank">${p}</a>`;
+
+/* test = [title, [steps], expect] */
+const data = [
+{ id:'s0', title:'0. Before you start',
+  creds:[
+    'Start servers: <code>php artisan serve --port=8000</code> and <code>npm run build</code>. If demo data looks empty: <code>php artisan db:seed</code>.',
+    'Parent codes: in <code>.env</code> set <code>SHIKSHA_OTP_DRIVER=log</code> and <code>MAIL_MAILER=log</code>, then run <code>php artisan config:clear</code>. Codes then appear in <code>storage/logs/laravel.log</code> (search <code>[dev OTP]</code>).',
+    'Tip: use two browsers (or one normal and one private window) so you can be the teacher and the parent at the same time.'
+  ],
+  tests:[
+   ['Greenfield site opens', [`Open ${B}`], 'Greenfield sign-in page appears, no error.'],
+   ['Unknown school shows neutral page', ['Open <code>http://nosuchschool.shiksha.localhost:8000</code>'], 'A "school not found" page, no stack trace.'],
+   ['Admin host opens', [`Open ${A}/sign-in`], 'Super Admin sign-in page.']
+  ]},
+
+{ id:'s1', title:'1. Super Admin',
+  creds:[`Open ${A}/sign-in · <code>superadmin@shiksha.test</code> / <code>password</code>`],
+  tests:[
+   ['Sign in with two-step setup', ['Sign in with the email and password.','First time: scan the QR code with an authenticator app, enter the 6-digit code.','Save the recovery codes shown.'], 'You land on Overview. Signing out and in again asks for a 6-digit code.'],
+   ['Overview', [ad('/overview')], 'Cards for Schools and Plans, status doughnut, date. (MRR and revenue cards are not built: ignore.)'],
+   ['Plans: edit', [ad('/plans'),'Click Edit on a plan, change its price, Save.'], 'Dialog closes, toast confirms, card shows the new price.'],
+   ['Plans: remove a module warns', ['Edit a plan, untick one module, Save.'], 'A confirmation about removing modules appears before saving.'],
+   ['Schools list', [ad('/schools'),'Click each status tab.','Type "Green" in search.','Use the plan filter.'], 'Counts match the tabs, search narrows to Greenfield, filter works.'],
+   ['Schools CSV export', ['On Schools click Export CSV.'], 'A CSV file downloads with the schools.'],
+   ['School details', ['Open Greenfield from the list (or ' + ad('/schools') + ').'], 'Contact, plan, modules with "In plan / Add-on / Turned off" badges, recent platform actions.'],
+   ['Suspend and reactivate', ['On Greenfield details click Suspend, enter a reason, confirm.',`In another window open ${B} as principal.`,'Back in admin, click Reactivate.'], 'While suspended the school shows a "subscription suspended" screen; after reactivation staff can sign in again.'],
+   ['Payment gateway', ['School details, Payment gateway card, view the setting.'], 'Greenfield shows the "fake" (test) gateway. Do not change it for the next tests.'],
+   ['Onboard a test school', [ad('/schools/onboard'),'Walk all 8 steps with fake data (use subdomain "testschool"). Skip optional steps.','Activate and finish.'], 'Success page shows set-password links ONCE. The school appears in the list.'],
+   ['Delete the test school', ['Open testschool details, Delete school, type the exact phrase it asks for, confirm.'], 'School goes to "deleting" then disappears from the list; its site shows "school not found".']
+  ]},
+
+{ id:'s2', title:'2. Principal: one-time setup (do before every other role)',
+  creds:[`${B} · <code>principal@greenfield.test</code> / <code>password</code>`],
+  tests:[
+   ['Principal two-step setup', ['Sign in. You are sent to two-step setup.','Scan QR, enter code, save recovery codes.'], 'You reach the Dashboard. Next sign-ins ask for the code.'],
+   ['Apply role template updates', [g('/roles') + ' or sidebar "Roles and access".','For EACH role showing "update available" (Principal, Vice principal, Coordinator, Class teacher, Subject teacher, Accountant) click the update and confirm.'], 'Every role shows the newest version, no "update available" left. If the owner role is refused, tell me.'],
+   ['Dashboard', [g('/dashboard')], 'Greeting with your name, attendance today, admissions funnel, upcoming events. Fee cards and some rows are faded "Coming soon" sample numbers: expected.'],
+   ['Dashboard at phone width', ['Press F12, toggle device toolbar, width 375.'], 'No sideways scroll, cards stack.']
+  ]},
+
+{ id:'s3', title:'3. Teacher (class teacher of Class 1-A)',
+  creds:[`${B} · <code>teacher@greenfield.test</code> / <code>password</code>`],
+  tests:[
+   ['Sidebar is limited', ['Sign in, look at the sidebar.'], 'Attendance, Marks, Report cards, Subjects/Homework, Leave items. NO Fees, Admissions or School structure.'],
+   ['Mark attendance', [g('/attendance'),'Choose Class 1 A, today.','Click Mark all present.','Switch two children to Absent and one to Late.','Save, read the summary dialog.'], 'Summary counts match what you set (e.g. 2 absent, 1 late). Reopen the page: marks are kept.'],
+   ['Attendance on an earlier day', ['Pick yesterday (a school day), change a child, Save.'], 'A reason box is required before saving.'],
+   ['Locked old day', ['Pick a date more than 7 days back.'], 'The register is locked/read-only for a teacher.'],
+   ['Syllabus: whole class', [g('/teaching/subjects'),'Open Whole class tab, enter a textbook name, add or rename a chapter, Save.'], 'A confirm dialog, then saved message. Reload: values stay.'],
+   ['Syllabus: section progress', ['Section tab: tick two chapters, set the current chapter, write a note, Save.'], 'Saved; reload shows ticks and note. The parent will see this later.'],
+   ['Syllabus: student note', ['Student notes tab: write a note for one student, Save.'], 'Saved; the note is private to the teacher and that child\'s parent.'],
+   ['Homework: create without file', [g('/homework'),'Click New assignment: pick section and subject, title, description, a due date that is a school day after today, Save.'], 'It appears in the list with every student "Not submitted".'],
+   ['Homework: create with attachment', ['New assignment again, attach a PDF or photo, Save.'], 'Assignment shows the attachment; clicking it opens/downloads the file.'],
+   ['Homework: bad due date', ['New assignment with a due date of today or a Sunday.'], 'A validation error, nothing saved.'],
+   ['Homework: edit and delete', ['Edit the first assignment (change title), Save.','Delete the second.'], 'Edit shows new title; delete asks confirmation and the item disappears.'],
+   ['Homework: mark checked', ['Open an assignment, mark one student Checked, then click Mark all checked in class.'], 'Per-student state changes, then all become Checked.'],
+   ['Marks entry', [g('/marks'),'Pick the demo exam "October Unit Test", Class 1 A, a subject.','Type valid marks for 3 students, AB for one, and a value above the maximum for another.'], 'Live % and grade update as you type; the bad value shows an error; AB is accepted.'],
+   ['Marks: save draft then publish', ['Fix the bad value, click Save draft, reload.','Click Publish to parents and confirm.'], 'Draft survives reload. After publishing the sheet becomes read-only with "Published".'],
+   ['Report card: generate', [g('/report-cards'),'Click Generate for a student, edit the remark, Send for approval.'], 'Card preview matches the marks; status becomes "Awaiting approval".'],
+   ['Report card: withdraw', ['Open the sent card, click Withdraw.'], 'Status returns to a draft state; you can generate again.'],
+   ['Report card: upload', ['Use Upload on a student, choose a PDF or photo.'], 'File accepted; viewing it works. A .exe or huge file is refused.'],
+   ['Student leave (do after the parent applies for leave in section 4)', ['Sidebar "Student leave". Open a pending request, click Approve; open another and click Reject with a reason; for a long one click Recommend.'], 'Status changes for each; recommended ones disappear from your queue and go to the Coordinator.'],
+   ['My leave', [g('/my-leave'),'Apply for leave for next Monday to Tuesday with a reason.','Then cancel it.'], 'Request shows Pending then Cancelled.'],
+   ['Out of reach is hidden', ['In Marks/Attendance open the class pickers.'], 'Only your sections (or view-only ones) are offered.']
+  ]},
+
+{ id:'s4', title:'4. Parent (Priya Sharma: Riya in 5-A, Arjun in 2-A)',
+  creds:[`${B}/parent/sign-in · phone <code>9876519001</code> · OTP from <code>storage/logs/laravel.log</code> (<code>[dev OTP]</code>). Use a private window so it does not clash with the teacher.`],
+  tests:[
+   ['Sign in with OTP', ['Enter 9876519001, request code.','Open the log file, copy the newest 6-digit [dev OTP] code, enter it.'], 'You land on Home with the child chip. If the OTP boxes ignore typing, paste all 6 digits.'],
+   ['Wrong code and unknown phone', ['Sign out, try a wrong code; then try phone 9999999999.'], 'Both give the same generic failure; no hint whether the phone exists.'],
+   ['Child switcher', ['Click the child chip, switch to Arjun and back.'], 'Name and class in the header change.'],
+   ['Attendance', ['Open Attendance from the parent menu for Riya, then Arjun.'], 'Calendar shows present/absent/late days, approved-leave badge on leave days.'],
+   ['Fees overview', [`<a href="${B}/parent/fees" target="_blank">/parent/fees</a>`], 'Installments with breakdown. Arjun shows a failed-payment alert. Riya shows a ₹5,000 part payment.'],
+   ['Fee receipt and statement', ['On Fees open a receipt, click Print; open the fee statement.'], 'Receipt shows number like RCPT/2026/xxxx and amount in words; statement prints cleanly.'],
+   ['Homework', [`<a href="${B}/parent/homework" target="_blank">/parent/homework</a>`,'Open the To do tab, pick an assignment, upload a photo, submit.','Upload a Word file on another.'], 'Item moves to Submitted. Photos are accepted and Word file accepted; after the due date it shows Late.'],
+   ['Homework feedback', ['After the teacher gives feedback, reopen Submitted.'], 'Teacher feedback text is visible.'],
+   ['Subjects', [`<a href="${B}/parent/subjects" target="_blank">/parent/subjects</a>`], 'All subjects start collapsed. Expanding shows book, teacher, % done, "Now" chapter, teacher note and the child note.'],
+   ['Past session', ['Top bar session dropdown: choose 2025-2026, then go back to the current session.'], 'Child not enrolled then shows "No records"; you can always return to the current session.'],
+   ['Results', [`<a href="${B}/parent/results" target="_blank">/parent/results</a>`], 'Subjects with published marks show marks and grade; unpublished ones say "Awaiting results".'],
+   ['Report card print', ['On Results click Open as report card, then Print / Save as PDF.'], 'A clean one-page report card.'],
+   ['Apply for leave: short', ['Menu, Leave. Apply for tomorrow-to-tomorrow with a reason.'], 'Request shows Pending. The teacher sees it.'],
+   ['Apply for leave: long', ['Apply for more than 3 school days with a medical certificate attached.'], 'Goes to the teacher with a note that it needs the coordinator.'],
+   ['Leave rules', ['Try overlapping dates with an existing request; try a start date more than 3 days in the past; try more than 30 days.'], 'Each is refused with a clear message.'],
+   ['Cancel leave', ['Cancel a pending request.'], 'Status Cancelled; the teacher no longer sees it pending.'],
+   ['Phone width and dark mode', ['Browser device toolbar width 375; switch OS/browser to dark mode.'], 'No sideways scroll, top bar and child chip readable in dark.']
+  ]},
+
+{ id:'s5', title:'5. Coordinator (Classes 1 to 3, Main campus)',
+  creds:[`${B} · <code>coordinator@greenfield.test</code> / <code>password</code> (no two-step). Principal must have applied the role updates first.`],
+  tests:[
+   ['Only the wing is visible', [g('/students'),'Open the class filter.'], 'Only Classes 1 to 3 are offered.'],
+   ['Out-of-wing student is hidden', ['Open a student of Class 5 from a copied link (Principal view) while signed in as Coordinator.'], 'A 404/not found, not "forbidden".'],
+   ['Classes and dashboard', [g('/classes'), g('/dashboard')], 'Only wing sections and wing numbers.'],
+   ['Exam limited to wing', [g('/exams'),'Click New test or exam.'], 'Only Classes 1 to 3 can be picked.'],
+   ['Approve a report card', [g('/approvals'),'Report cards tab: Preview one, then Publish. Send another back with a note.'], 'Published card shows to the parent under "Report cards from school"; sent-back one returns to the teacher with your note.'],
+   ['Decide a long student leave', ['Approvals, Student leave tab: open the recommended request, Approve.'], 'Request becomes Approved; the parent and attendance register show approved-leave.'],
+   ['Marks overview/reopen', [g('/marks'),'Open a published sheet, click Reopen, enter a reason.'], 'Sheet reopens for the teacher.']
+  ]},
+
+{ id:'s6', title:'6. Accountant',
+  creds:[`${B} · <code>accountant@greenfield.test</code> / <code>password</code> (no two-step)`],
+  tests:[
+   ['Sidebar', ['Sign in.'], 'Collect fee, Dues, Payments, Fee structure, Refunds. No attendance or exams screens.'],
+   ['Dues list', [g('/fees/dues'),'Use each filter (class, term, status).','Click Export CSV.'], 'List narrows with each filter; CSV downloads.'],
+   ['Remind one family', ['On a due row click Remind, send.'], 'Success toast. Nothing is actually sent: check <code>storage/logs/laravel.log</code> for the reminder line.'],
+   ['Remind several', ['Tick 3 rows, use the bulk remind.'], 'Toast with count 3; three log lines.'],
+   ['Collect: cash', [g('/fees/collect'),'Search a student, choose installments, payment mode Cash, collect.'], 'Receipt with number RCPT/2026/xxxx appears; installment shows paid.'],
+   ['Collect: part payment', ['Collect only half of one installment.'], 'Installment shows partly paid with the remaining balance.'],
+   ['Collect: UPI', ['Collect with UPI and a reference number.'], 'Payment recorded with the reference on the receipt.'],
+   ['Collect: cheque', ['Collect with Cheque (number, bank, date).'], 'Payment is Pending until cleared (see next test).'],
+   ['Clear and bounce cheque', [g('/fees/payments'),'Find the cheque, press Clear. Make another cheque and press Bounce with a reason.'], 'Cleared cheque becomes paid; bounced one frees the installment again.'],
+   ['Gateway check', ['Open the pending net-banking payment, click Check status, choose "bank says success".','Open the failed card payment and Re-check it.'], 'Pending becomes Paid; the failed one reflects the outcome you chose.'],
+   ['Receipt print', ['Open any receipt, press Print.'], 'Receipt layout with amount in words prints on one page.'],
+   ['Pay link', ['On a payment/due row send a pay link.'], 'Success toast; link appears in the log only.'],
+   ['Fee structure', [g('/fees/structure'),'Edit a group\'s fee heads, Save; move a class to another group; add a concession.'], 'Changes save; amounts recalc; sibling concession is 10% of tuition for the 2nd child onward.'],
+   ['Refund: new request', [g('/fees/refunds'),'Click New refund request, pick a student who has paid, amount, reason, Submit.'], 'Request listed as Open; Payments card "Refund requests open" increases.'],
+   ['Refund: approve with payout method', ['Approve it, try each payout method.'], 'Status Approved with method recorded; invoices unchanged.'],
+   ['Refund: adjust against next term', ['Create another request and approve with "Adjust against next term".'], 'Unpaid installments are credited immediately.'],
+   ['Refund: over ₹10,000', ['Request a refund above ₹10,000 and approve.'], 'A principal sign-off tick must be confirmed first.'],
+   ['Refund: reject', ['Reject a request with a reason.'], 'Status Rejected, reason saved, count of open requests drops.']
+  ]},
+
+{ id:'s7', title:'7. Principal: remaining screens',
+  creds:[`${B} · Principal login (needs the authenticator code)`],
+  tests:[
+   ['School structure', [g('/school/structure'),'Add a campus, a class and a section; make a different academic year current, then switch back.'], 'Each appears in the lists; only one year is current.'],
+   ['Classes', [g('/classes'),'Click Edit classes and sections, then + Section on a class.'], 'Dialog opens; adding creates the next letter (e.g. 1-D) and shows a toast naming it. Switch edit mode off again.'],
+   ['Set class teacher', ['On Classes/Structure pick a class teacher for a section.'], 'That teacher can now open the section\'s register (try as teacher).'],
+   ['Subjects', [g('/subjects'),'Subject list: Add subject; Edit (rename); Delete an unused one. Subjects by class: Change. Subject teachers: pick a teacher for a section.'], 'Each action saves; delete is refused for a subject that is in use.'],
+   ['Students list', [g('/students'),'Search a name, filter class and status, switch session, export CSV.'], '25 per page, filters work, CSV downloads.'],
+   ['Student profile', ['Open a student: visit Overview, Guardians, Enrollment history, Documents tabs.'], 'Guardian phones are masked unless you have the permission. Attendance/Fees/Marks tabs say "Not available yet": expected.'],
+   ['Student documents', ['Documents tab: upload a PDF, JPEG, then a 6 MB file and a .exe. Verify one.'], 'PDF/JPEG accepted; large or wrong type refused; verified badge shows.'],
+   ['Edit and change section', ['Edit details, change roll number, change section.'], 'Saved with success toast; Enrollment history shows the change.'],
+   ['Issue TC', ['Issue a transfer certificate to a test student, print it.'], 'Student status becomes left/transferred; printable TC opens (layout is a draft).'],
+   ['CSV import', ['Download the import template, fill 2 rows, import.'], 'A preview/warnings screen, then students appear.'],
+   ['Houses and numbering', [g('/students/settings'),'Add a house, rename, reorder, set a prefix.'], 'Saved; new admissions use the prefix.'],
+   ['Admissions board', [g('/admissions'),'Add enquiry; move the card with arrows and by drag; try to move with missing documents.'], 'Card moves between stages; a "Documents still missing" prompt appears when relevant.'],
+   ['Accept and Enroll', ['Upload a document to an enquiry, move to Accept, click Enroll.'], 'A new student exists; the scan appears under that student\'s Documents.'],
+   ['Required documents', [g('/admissions/settings'),'Change required documents for a class.'], 'Saved; the admission check reflects it.'],
+   ['Attendance settings', [g('/attendance/settings'),'Add a holiday for next Friday; change working days.'], 'Teacher register shows that day as a holiday / not a school day.'],
+   ['Correct a locked day', [g('/attendance'),'Pick a date older than 7 days, correct one child with a reason.'], 'Allowed for you (teacher could not); change is saved.'],
+   ['Exams: create', [g('/exams'),'New test or exam: name, classes, dates, date sheet with one subject per day. Create.'], 'Exam appears as Draft/Scheduled.'],
+   ['Exams: date rules', ['Try two subjects on one day, and a date on a holiday.'], 'Both are refused with a clear message.'],
+   ['Exams: status flow', ['Open marking, Close marking, Publish all (after teachers published), Cancel then Restore.'], 'Status badge changes each time; confirmations appear for open/close.'],
+   ['Date sheet CSV', ['Download the date sheet.'], 'A CSV with subjects and dates.'],
+   ['Grading scale', [g('/exams/grading'),'Change a grade boundary, Save. Toggle "Report cards need approval" off, then on.'], 'Saved. Exams with published marks keep their old scale.'],
+   ['Leave settings', ['Sidebar Leave settings: change the student-leave limit from 3 to 2, Save.'], 'A 3-day parent leave now needs the coordinator.'],
+   ['Staff leave: approve with cover', [g('/staff-leave'),'Leave requests tab: open the class teacher\'s request, Approve and choose a cover teacher.'], 'Approval requires a cover; the cover teacher can mark that class register only on the leave dates.'],
+   ['Staff leave: reject', ['Reject another request with a reason.'], 'Status Rejected with the reason.'],
+   ['Staff directory', ['Open the Staff directory tab.'], 'Names, roles and today\'s status (On leave / Present). Other fields are not built yet.'],
+   ['Fees as principal', [g('/fees/dues'), g('/fees/payments'), g('/fees/structure')], 'Same data as the accountant sees, plus Super Admin settings untouched.']
+  ]},
+
+{ id:'s8', title:'8. Security and isolation (quick checks)',
+  tests:[
+   ['School isolation', ['As Greenfield principal copy a student profile URL.',`Open it on <code>http://riverside.shiksha.localhost:8000/...</code>`], 'Not found / no data from the other school.'],
+   ['Direct URL without permission', ['As teacher open ' + g('/fees/dues') + ' and ' + g('/school/structure') + '.'], 'Forbidden or not found, never the data.'],
+   ['Generic sign-in failure', ['Staff sign-in with: wrong password; unknown email; a real email of a user from the other school.'], 'The same wording for all three.'],
+   ['Sign-out revokes session', ['Sign out, press browser Back.'], 'You are sent to sign-in, no data shown.'],
+   ['Suspended school', ['Suspend Greenfield from Super Admin; try staff and parent pages; reactivate.'], 'Everything is blocked while suspended and works again after.'],
+   ['Notifications are log-only', ['After marking an absence, sending a reminder, approving leave and approving a refund open <code>storage/logs/laravel.log</code>.'], 'Matching lines exist; no SMS/email was actually sent (providers are not chosen yet).'],
+   ['No console errors', ['Open DevTools Console on Dashboard, Attendance, Fees and Parent Home.'], 'No red errors.']
+  ]}
+];
+
+const KEY = 'shiksha-script-v2';
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const esc = (s) => String(s).replace(/"/g, '&quot;');
+
+const root = document.getElementById('root');
+const nav = document.getElementById('nav');
+data.forEach((s) => {
+  nav.insertAdjacentHTML('beforeend', `<a href="#${s.id}">${s.title.split(':')[0].split(' ')[0]} ${s.title.split('.')[1] ? s.title.split('.')[1].trim().split(' ')[0] : ''}</a>`);
+  let h = `<section id="${s.id}"><h2>${s.title}<span class="count" data-sec="${s.id}"></span></h2>`;
+  (s.creds || []).forEach((c) => h += `<div class="creds"><div>${c}</div></div>`);
+  s.tests.forEach(([title, steps, expect], i) => {
+    const id = `${s.id}-${i}`;
+    h += `<div class="t" data-id="${id}"><h4>${title}</h4><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol>
+      <div class="exp"><strong>Expect:</strong> ${expect}</div>
+      <div class="ctl"><button data-act="pass">Pass</button><button data-act="fail">Fail</button><input type="text" placeholder="Note (what went wrong)" data-note="${id}"></div></div>`;
+  });
+  root.insertAdjacentHTML('beforeend', h + '</section>');
+});
+
+function refresh() {
+  let pass = 0, fail = 0, all = 0;
+  document.querySelectorAll('.t').forEach((el) => {
+    const id = el.dataset.id, st = (state[id] || {}).s;
+    el.classList.toggle('pass', st === 'pass');
+    el.classList.toggle('fail', st === 'fail');
+    el.querySelector('[data-act=pass]').classList.toggle('on-pass', st === 'pass');
+    el.querySelector('[data-act=fail]').classList.toggle('on-fail', st === 'fail');
+    el.querySelector('input').value = (state[id] || {}).n || '';
+    all++; if (st === 'pass') pass++; if (st === 'fail') fail++;
+  });
+  document.getElementById('total').innerHTML = `<strong>${pass} passed</strong> · ${fail} failed · ${all - pass - fail} left of ${all}`;
+  document.getElementById('fill').style.width = (all ? (pass + fail) / all * 100 : 0) + '%';
+  document.querySelectorAll('[data-sec]').forEach((c) => {
+    const els = [...document.querySelectorAll(`.t[data-id^="${c.dataset.sec}-"]`)];
+    c.textContent = `${els.filter((e) => (state[e.dataset.id] || {}).s).length} / ${els.length}`;
+  });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const id = b.closest('.t').dataset.id; const cur = state[id] || {};
+  cur.s = cur.s === b.dataset.act ? '' : b.dataset.act; state[id] = cur; save(); refresh();
+});
+document.addEventListener('input', (e) => {
+  if (e.target.dataset.note) { const id = e.target.dataset.note; state[id] = { ...(state[id] || {}), n: e.target.value }; save(); }
+});
+document.getElementById('reset').onclick = () => { if (confirm('Clear all results?')) { state = {}; save(); refresh(); } };
+refresh();
+</script>
+</body>
+</html>
