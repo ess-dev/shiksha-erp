@@ -85,6 +85,7 @@ Route::middleware(['auth'])->prefix('school/structure')->name('school.structure.
     Route::patch('campuses/{campus}', [CampusController::class, 'update'])->name('campuses.update');
 
     Route::post('classes', [SchoolClassController::class, 'store'])->name('classes.store');
+    Route::post('classes/bulk', [SchoolClassController::class, 'storeBulk'])->name('classes.bulk');
     Route::post('subjects', [SubjectController::class, 'store'])->name('subjects.store');
     Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
     Route::put('sections/{section}/class-teacher', [ClassTeacherController::class, 'update'])->name('sections.class-teacher');

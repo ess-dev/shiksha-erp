@@ -42,6 +42,7 @@ class StructureController extends Controller
             'campuses' => $campuses->get($identity),
             'classes' => $definitions->classes($identity),
             'subjects' => $definitions->subjects($identity),
+            'classLadder' => Gate::allows('structure.manage') ? config('shiksha.class_ladder') : [],
             // Only people who can change structure see (and need) the staff list.
             'staffOptions' => Gate::allows('structure.manage') ? $staff->options() : [],
             'sections' => $sections->paginate(

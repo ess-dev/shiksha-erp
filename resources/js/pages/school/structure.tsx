@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import AcademicYearsCard from '@/components/school/academic-years-card';
+import BulkClassesCard from '@/components/school/bulk-classes-card';
 import CampusesCard from '@/components/school/campuses-card';
 import ClassesSubjectsCard from '@/components/school/classes-subjects-card';
 import SectionsCard from '@/components/school/sections-card';
@@ -8,6 +9,7 @@ import { index } from '@/routes/school/structure';
 import type {
     AcademicYear,
     Campus,
+    ClassLadderStep,
     PaginatedSections,
     SchoolClass,
     StaffOption,
@@ -19,6 +21,7 @@ type Props = {
     academicYears: AcademicYear[];
     campuses: Campus[];
     classes: SchoolClass[];
+    classLadder: ClassLadderStep[];
     subjects: Subject[];
     sections: PaginatedSections;
     staffOptions: StaffOption[];
@@ -29,6 +32,7 @@ export default function Structure({
     academicYears,
     campuses,
     classes,
+    classLadder,
     subjects,
     sections,
     staffOptions,
@@ -55,6 +59,14 @@ export default function Structure({
                     subjects={subjects}
                     canManage={canManage}
                 />
+                {canManage && classLadder.length > 0 && (
+                    <BulkClassesCard
+                        ladder={classLadder}
+                        classes={classes}
+                        years={academicYears}
+                        campuses={campuses}
+                    />
+                )}
                 <SectionsCard
                     sections={sections}
                     years={academicYears}

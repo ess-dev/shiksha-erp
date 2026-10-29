@@ -149,7 +149,7 @@ export default function ClassesEditor({
                                         }}
                                     >
                                         <Plus aria-hidden />
-                                        Add class
+                                        Add section
                                     </Button>
                                 </div>
                             )}

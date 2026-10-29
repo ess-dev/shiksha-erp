@@ -19,6 +19,11 @@ export type SchoolClass = {
     level: number;
 };
 
+export type ClassLadderStep = {
+    name: string;
+    level: number;
+};
+
 export type Subject = {
     ulid: string;
     name: string;

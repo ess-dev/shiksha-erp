@@ -85,6 +85,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Class ladder
+    |--------------------------------------------------------------------------
+    |
+    | The classes the bulk "add classes by range" tool can create, with the
+    | level that orders each one. illustrative - verify the names and levels
+    | (nursery stages differ by board and state) with the owner.
+    |
+    */
+
+    'class_ladder' => [
+        ['name' => 'Nursery', 'level' => -2],
+        ['name' => 'LKG', 'level' => -1],
+        ['name' => 'UKG', 'level' => 0],
+        ['name' => 'Class 1', 'level' => 1],
+        ['name' => 'Class 2', 'level' => 2],
+        ['name' => 'Class 3', 'level' => 3],
+        ['name' => 'Class 4', 'level' => 4],
+        ['name' => 'Class 5', 'level' => 5],
+        ['name' => 'Class 6', 'level' => 6],
+        ['name' => 'Class 7', 'level' => 7],
+        ['name' => 'Class 8', 'level' => 8],
+        ['name' => 'Class 9', 'level' => 9],
+        ['name' => 'Class 10', 'level' => 10],
+        ['name' => 'Class 11', 'level' => 11],
+        ['name' => 'Class 12', 'level' => 12],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Parent sign-in (phone + OTP)
     |--------------------------------------------------------------------------
     |
