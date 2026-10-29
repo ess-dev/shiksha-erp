@@ -7,6 +7,7 @@ export type * from './homework';
 export type * from './leave';
 export type * from './navigation';
 export type * from './parent';
+export type * from './plan';
 export type * from './platform';
 export type * from './school';
 export type * from './students';

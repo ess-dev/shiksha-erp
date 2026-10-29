@@ -1181,6 +1181,22 @@ export type StaffLeaveType = 'casual' | 'sick' | 'earned' | 'duty';
 }
 }
 namespace Platform {
+namespace Data {
+export type PlanAndModulesData = {
+school_name: string,
+plan_name: string | null,
+status: string,
+trial_ends_on: string | null,
+renews_on: string | null,
+students: number,
+plan_min_students: number | null,
+modules: {
+key: string,
+label: string,
+state: string,
+}[],
+};
+}
 namespace Enums {
 export type SuspensionReason = 'invoice_overdue' | 'requested_by_school' | 'terms_review';
 }
